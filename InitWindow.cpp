@@ -1,5 +1,5 @@
 #include "InitWindow.h"
-#include "ThirdsColumn.h"
+#include "MainWindow.h"
 #include <string>
 #include <FL/Fl_Button.H>
 #include <FL/Fl_Group.H>
@@ -27,13 +27,12 @@ InitWindow::~InitWindow()
 
 void InitWindow::StartClient(Fl_Widget* widget, void* data)
 {
-	std::printf("Starting client \n");
+	std::printf("Starting client... \n");
+	MainWindow* mw = new MainWindow(400, 400, 640, 360, std::string("Messenger Thingymabob"), false);
 }
 
 void InitWindow::StartServer(Fl_Widget* widget, void* data)
 {
 	std::printf("Starting server... \n");
-
-	//Server will also run a client
-	StartClient(widget, (void*)0);
+	MainWindow* mw = new MainWindow(400, 400, 640, 360, std::string("Messenger Thingymabob"), true);
 }
