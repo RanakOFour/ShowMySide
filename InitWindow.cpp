@@ -28,11 +28,13 @@ InitWindow::~InitWindow()
 void InitWindow::StartClient(Fl_Widget* widget, void* data)
 {
 	std::printf("Starting client... \n");
-	MainWindow* mw = new MainWindow(400, 400, 640, 360, std::string("Messenger Thingymabob"), false);
+	MainWindow* mw = new MainWindow(400, 400, 640, 360, std::string("Name"), false);
+	mw->show();
 }
 
 void InitWindow::StartServer(Fl_Widget* widget, void* data)
 {
 	std::printf("Starting server... \n");
-	MainWindow* mw = new MainWindow(400, 400, 640, 360, std::string("Messenger Thingymabob"), true);
+	MainWindow* mw = new MainWindow(400, 400, 640, 360, std::string("Name"), true);
+	mw->show();
 }

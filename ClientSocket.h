@@ -7,8 +7,9 @@ class ClientSocket
 public:
 	ClientSocket();
 	~ClientSocket();
-	bool receive(std::string& _message);
-	void send(const std::string& _message);
+	bool Connect(std::string _connectInfo);
+	bool Receive(std::string& _message);
+	void Send(const std::string& _message);
 	bool m_closed;
 private:
 	friend class ServerSocket;

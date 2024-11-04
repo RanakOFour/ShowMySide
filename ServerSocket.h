@@ -8,6 +8,7 @@ public:
 	ServerSocket(int _port);
 	~ServerSocket();
 	std::shared_ptr<ClientSocket> accept();
+	void on_tick();
 private:
 	SOCKET m_socket;
 	ServerSocket(const ServerSocket& _copy);
