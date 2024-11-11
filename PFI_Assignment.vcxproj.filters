@@ -36,9 +36,6 @@
     <ClCompile Include="MainWindow.cpp">
       <Filter>Source Files\GUI</Filter>
     </ClCompile>
-    <ClCompile Include="InitWindow.cpp">
-      <Filter>Source Files\GUI</Filter>
-    </ClCompile>
     <ClCompile Include="ClientSocket.cpp">
       <Filter>Source Files\Networking</Filter>
     </ClCompile>
@@ -51,9 +48,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MainWindow.h">
-      <Filter>Header Files\GUI</Filter>
-    </ClInclude>
-    <ClInclude Include="InitWindow.h">
       <Filter>Header Files\GUI</Filter>
     </ClInclude>
     <ClInclude Include="Wsa.h">

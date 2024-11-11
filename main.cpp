@@ -1,6 +1,6 @@
 #include <iostream>
 #include "Wsa.h"
-#include "InitWindow.h"
+#include "MainWindow.h"
 
 int main(int argc, char** argv)
 {
@@ -8,7 +8,7 @@ int main(int argc, char** argv)
 	Wsa wsa;
 	printf("Initialized Winsock\n");
 
-	InitWindow win(640, 360, "Test");
+	MainWindow win(640, 360, "Test");
 	win.show();
 
 	return Fl::run();

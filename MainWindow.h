@@ -1,6 +1,7 @@
 #include "Timer.h"
 #include <string>
 #include <FL/Fl_Window.H>
+#include <FL/Fl_Input.H>
 
 class ServerSocket;
 class ClientSocket;
@@ -9,11 +10,16 @@ struct MainWindow : public Fl_Window, public Timer
 private:
 	ServerSocket* m_Server;
 	ClientSocket* m_Client;
+	Fl_Input* m_ipAddr;
 	std::string m_serverConnectInfo;
-	bool m_isServer;
+	bool m_isHost;
+	int m_state;
 	void on_tick(void* _userData);
+	static void onConnect(Fl_Widget* _widget, void* _userData);
+	static void onServer(Fl_Widget* _widget, void* _userData);
+	static void onClient(Fl_Widget* _widget, void* _userData);
 public:
-	MainWindow(int x, int y, int w, int h, std::string name, bool hasServer);
+	MainWindow(int _w, int _h, std::string _name);
 	~MainWindow();
 };
 

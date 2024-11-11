@@ -141,7 +141,6 @@
   <ItemGroup>
     <ClCompile Include="ClientSocket.cpp" />
     <ClCompile Include="MainWindow.cpp" />
-    <ClCompile Include="InitWindow.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="ServerSocket.cpp" />
     <ClCompile Include="Timer.cpp" />
@@ -150,7 +149,6 @@
   <ItemGroup>
     <ClInclude Include="ClientSocket.h" />
     <ClInclude Include="MainWindow.h" />
-    <ClInclude Include="InitWindow.h" />
     <ClInclude Include="ServerSocket.h" />
     <ClInclude Include="Timer.h" />
     <ClInclude Include="Wsa.h" />

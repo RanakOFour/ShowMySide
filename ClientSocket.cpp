@@ -1,4 +1,5 @@
 #include "ClientSocket.h"
+#include <iostream>
 #include <ws2tcpip.h>
 #include <string>
 #include <memory>
@@ -47,21 +48,48 @@ void ClientSocket::Send(const std::string& _message)
 	}
 }
 
-bool ClientSocket::Connect(std::string _connectInfo)
+bool ClientSocket::Connect(const std::string &_serverName)
 {
 	addrinfo *result = nullptr,
-		hints;
+			 *ptr = nullptr,
+		hints{ 0 };
+	hints.ai_family = AF_INET;
+	hints.ai_socktype = SOCK_STREAM;
+	hints.ai_protocol = 0;
+	hints.ai_flags = AI_PASSIVE;
 
-	std::string ipAddress = _connectInfo.substr(0, _connectInfo.find(":"));
-	std::string portNum = _connectInfo.substr(_connectInfo.find(":"), _connectInfo.size() - ipAddress.size());
-
-	printf("IP: ", ipAddress);
-	printf("Port num: ", portNum);
-
-	int addrResult = getaddrinfo(ipAddress.c_str(), portNum.c_str(), &hints, &result);
+	//We are SO BACK!!!
+	int addrResult = getaddrinfo(_serverName.c_str(), "8080\0", &hints, &result);
 	if (addrResult != 0) {
 		printf("getaddrinfo failed with error: %d\n", addrResult);
 		WSACleanup();
-		return 1;
+		return false;
 	}
+
+	SOCKET connectSocket = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
+
+	if (connectSocket == INVALID_SOCKET) {
+		printf("Error at socket(): %ld\n", WSAGetLastError());
+		freeaddrinfo(result);
+		WSACleanup();
+		return false;
+	}
+
+	ptr = result;
+
+	int iResult = connect(connectSocket, ptr->ai_addr, (int)ptr->ai_addrlen);
+	if (iResult == SOCKET_ERROR) {
+		closesocket(connectSocket);
+		connectSocket = INVALID_SOCKET;
+	}
+
+	freeaddrinfo(result);
+
+	if (connectSocket == INVALID_SOCKET) {
+		printf("Unable to connect to server!\n");
+		WSACleanup();
+		return false;
+	}
+
+	return true;
 }
