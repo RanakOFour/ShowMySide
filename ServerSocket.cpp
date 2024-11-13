@@ -135,6 +135,11 @@ void ServerSocket::on_tick()
 		while (m_clients.at(ci)->Receive(message))
 		{
 			printf("Message recieved: %s\n", message.c_str());
+
+			if (message.c_str() == "CLOSED")
+			{
+				m_clients.at(ci)->m_closed = true;
+			}
 		}
 		if (m_clients.at(ci)->m_closed)
 		{

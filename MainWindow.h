@@ -13,6 +13,7 @@ private:
 	Fl_Input* m_ipAddr;
 	std::string m_serverConnectInfo;
 	int m_state;
+	void changeInterface(int _state);
 	void on_tick(void* _userData);
 	static void onServer(Fl_Widget* _widget, void* _userData);
 	static void onClient(Fl_Widget* _widget, void* _userData);
