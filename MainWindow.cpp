@@ -4,6 +4,7 @@
 #include "ServerSocket.h"
 #include <string>
 #include <iostream>
+#include <FL/Fl_Flex.H>
 #include <FL/Fl_Button.H>
 #include <FL/Fl_Window.H>
 #include <FL/Fl_Menu_Bar.H>
@@ -12,17 +13,21 @@
 
 MainWindow::MainWindow(int _w, int _h, std::string _name) 
 	: Fl_Window(200, 200, _w, _h, _name.c_str()), 
-	Timer(1.0), 
+	Timer(0.5), 
 	m_ipAddr(nullptr),
-	m_isHost(false), 
 	m_state(0),
 	m_Client(nullptr),
 	m_Server(nullptr)
 {
-	Fl_Button* startClient = new Fl_Button(((640 * 3) / 4) - 50, 160, 100, 100, "Join");
-	Fl_Button* startServer = new Fl_Button((640 / 4) - 50, 160, 100, 100, "Host");
-	startClient->callback(onClient, (void*)this);
-	startServer->callback(onServer, (void*)this);
+	Fl_Menu_Bar* menu = new Fl_Menu_Bar(0, 0, _w, 30, "");
+	menu->add("&Start/&Join Server", NULL, onClient, this);
+	menu->add("&Start/&Create Server", NULL, onServer, this, FL_MENU_DIVIDER);
+	menu->add("&Start/&Exit", NULL, onExit, this);
+
+	Fl_Flex* menuFlex = new Fl_Flex(menu->w(), menu->h(), 0);
+	menuFlex->add(menu);
+	menuFlex->fixed(menu, 0);
+	add_resizable(*menuFlex);
 }
 
 MainWindow::~MainWindow()
@@ -40,7 +45,7 @@ void MainWindow::on_tick(void* _userData)
 		case 1:
 			m_Server->on_tick();
 		case 2:
-			printf("Client\n");
+			printf("Client tick\n");
 			break;
 		}
 	}
@@ -52,7 +57,7 @@ void MainWindow::onConnect(Fl_Widget* _widget, void* _userData)
 {
 	MainWindow* mw = (MainWindow*)_userData;
 	const char* ip = mw->m_ipAddr->value();
-	std::cout << "IP: " << ip << std::endl;
+	printf("IP: %s\n", ip);
 	
 	if (mw->m_Client->Connect(ip))
 	{
@@ -63,26 +68,23 @@ void MainWindow::onConnect(Fl_Widget* _widget, void* _userData)
 void MainWindow::onServer(Fl_Widget* _widget, void* _userData)
 {
 	MainWindow* mw = (MainWindow*)_userData;
-	mw->m_isHost = true;
 	mw->m_Server = new ServerSocket(8080);
 	mw->m_state = 1;
 
 	std::string ipAddressString = mw->m_Server->m_ipAddress;
-	std::cout << "Top IP: " << ipAddressString << std::endl;
 
 	//Create client for host
 	mw->m_Client = new ClientSocket();
 	mw->m_Client->Connect(ipAddressString);
 
-	//Remove client and server selection buttons
-	mw->delete_child(1);
-	mw->delete_child(0);
-	mw->redraw();
-
-	Fl_Output* ipAddress = new Fl_Output(100, 0, 300, 25, "Local IP: ");
+	//Display server IP address for other clients to connect
+	Fl_Output* ipAddress = new Fl_Output(60, 30, 95, 25, "Local IP:");
 	ipAddress->box(FL_NO_BOX);
 	mw->add(ipAddress);
-	ipAddress->insert(ipAddressString.c_str(), sizeof(ipAddressString.c_str()));
+
+	ipAddress->insert(ipAddressString.c_str(), ipAddressString.length());
+	ipAddress->redraw_label();
+
 }
 
 void MainWindow::onClient(Fl_Widget* _widget, void* _userData)
@@ -90,11 +92,6 @@ void MainWindow::onClient(Fl_Widget* _widget, void* _userData)
 	MainWindow* mw = (MainWindow*)_userData;
 	mw->m_Client = new ClientSocket();
 	mw->m_state = 2;
-
-	//Remove client and server selection buttons
-	mw->delete_child(1);
-	mw->delete_child(0);
-	mw->redraw();
 
 	//Create ip address input box
 	mw->m_ipAddr = new Fl_Input(100, 100, 120, 25, "Enter IP here: ");
@@ -105,8 +102,13 @@ void MainWindow::onClient(Fl_Widget* _widget, void* _userData)
 	mw->m_ipAddr->value(" ");
 	mw->m_ipAddr->value("");
 
-	
 	Fl_Button* connectBtn = new Fl_Button(270, 260, 100, 50, "Connect");
 	connectBtn->callback(onConnect, (void*)mw);
 	mw->add(connectBtn);
+}
+
+void MainWindow::onExit(Fl_Widget* _widget, void* _userData)
+{
+	MainWindow* self = (MainWindow*)_userData;
+	self->hide();
 }

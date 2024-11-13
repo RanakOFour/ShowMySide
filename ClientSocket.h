@@ -5,12 +5,12 @@ class ServerSocket;
 class ClientSocket
 {
 public:
+	bool m_closed;
+	bool Connect(const std::string& _serverName);
+	void Send(const std::string& _message);
+	bool Receive(std::string& _message);
 	ClientSocket();
 	~ClientSocket();
-	bool Connect(const std::string& _serverName);
-	bool Receive(std::string& _message);
-	void Send(const std::string& _message);
-	bool m_closed;
 private:
 	friend class ServerSocket;
 	SOCKET m_socket;

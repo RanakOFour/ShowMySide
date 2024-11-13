@@ -9,11 +9,11 @@
 
 ServerSocket::ServerSocket(int _port)
 	: m_socket(INVALID_SOCKET),
-	m_ipAddress("")
+	m_clients()
 {
 	m_tickNum = 0;
-
-	//Precursor stuff
+	
+	//Pre stuff
 	addrinfo hints = { 0 };
 	hints.ai_family = AF_INET;
 	hints.ai_socktype = SOCK_STREAM;
@@ -55,10 +55,48 @@ ServerSocket::ServerSocket(int _port)
 		throw std::runtime_error("Failed to set non-blocking");
 	}
 
-	
+	printf("Successfully opened socket %d\n", (int)m_socket);
+
 	freeaddrinfo(result);
 
-	m_ipAddress = GetIP();
+	//Next we need to get the IP address of the host
+	//Open a new socket
+	int sock = socket(AF_INET, SOCK_DGRAM, 0);
+
+	if (sock == -1) {
+		std::cerr << "Could not socket\n";
+	}
+
+	sockaddr_in loopback;
+	//loopbakc needs to have properties set
+	loopback.sin_family = AF_INET;
+	loopback.sin_addr.s_addr = 1337;   // can be any IP address
+	loopback.sin_port = htons(9);      // using debug port
+
+	//connect socket at loopback address
+	if (connect(sock, reinterpret_cast<sockaddr*>(&loopback), sizeof(loopback)) == -1) {
+		::closesocket(sock);
+		std::cerr << "Could not connect\n";
+	}
+
+	// Get socket information from loopback
+	socklen_t addrlen = sizeof(loopback);
+	if (getsockname(sock, reinterpret_cast<sockaddr*>(&loopback), &addrlen) == -1) {
+		::closesocket(sock);
+		std::cerr << "Could not getsockname\n";
+	}
+
+	// Socket is no longer needed
+	::closesocket(sock);
+
+	// Get the ip address from loopback's socket information
+	char buffer[22];
+	if (inet_ntop(AF_INET, &loopback.sin_addr, buffer, INET_ADDRSTRLEN) == 0x0) {
+		std::cerr << "Could not inet_ntop\n";
+	}
+	m_ipAddress = buffer;
+
+	printf("IP: %s\n", m_ipAddress.c_str());
 }
 
 ServerSocket::~ServerSocket()
@@ -84,75 +122,28 @@ std::shared_ptr<ClientSocket> ServerSocket::accept()
 
 void ServerSocket::on_tick()
 {
-	std::vector<std::shared_ptr<ClientSocket>> clients;
-
 	std::shared_ptr<ClientSocket> client = accept();
 	if (client)
 	{
 		printf("Client Connected!\n");
-		clients.push_back(client);
+		m_clients.push_back(client);
 	}
 
-	for (size_t ci = 0; ci < clients.size(); ++ci)
+	for (size_t ci = 0; ci < m_clients.size(); ++ci)
 	{
 		std::string message;
-		while (clients.at(ci)->Receive(message))
+		while (m_clients.at(ci)->Receive(message))
 		{
 			printf("Message recieved: %s\n", message.c_str());
 		}
-		if (clients.at(ci)->m_closed)
+		if (m_clients.at(ci)->m_closed)
 		{
 			printf("Client Disconnected\n");
-			clients.erase(clients.begin() + ci);
+			m_clients.erase(m_clients.begin() + ci);
 			--ci;
 		}
 	}
 
-	std::cout << "Server Tick " << m_tickNum << std::endl;
+	printf("Server Tick %d\n", m_tickNum);
 	++m_tickNum;
-}
-
-char* ServerSocket::GetIP()
-{
-	//Open a new socket
-	int sock = socket(AF_INET, SOCK_DGRAM, 0);
-
-	if (sock == -1) {
-		std::cerr << "Could not socket\n";
-		return nullptr;
-	}
-
-	sockaddr_in loopback;
-	//loopbakc needs to have properties set
-	loopback.sin_family = AF_INET;
-	loopback.sin_addr.s_addr = 1337;   // can be any IP address
-	loopback.sin_port = htons(9);      // using debug port
-
-	//connect socket at loopback address
-	if (connect(sock, reinterpret_cast<sockaddr*>(&loopback), sizeof(loopback)) == -1) {
-		::closesocket(sock);
-		std::cerr << "Could not connect\n";
-		return nullptr;
-	}
-
-	// Get socket information from loopback
-	socklen_t addrlen = sizeof(loopback);
-	if (getsockname(sock, reinterpret_cast<sockaddr*>(&loopback), &addrlen) == -1) {
-		::closesocket(sock);
-		std::cerr << "Could not getsockname\n";
-		return nullptr;
-	}
-
-	// Socket is no longer needed
-	::closesocket(sock);
-
-	// Get the ip address from loopback's socket information
-	char ipAddress[INET_ADDRSTRLEN];
-	if (inet_ntop(AF_INET, &loopback.sin_addr, ipAddress, INET_ADDRSTRLEN) == 0x0) {
-		std::cerr << "Could not inet_ntop\n";
-		return nullptr;
-	}
-	printf("%s", ipAddress);
-
-	return ipAddress;
 }
