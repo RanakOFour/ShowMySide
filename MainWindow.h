@@ -1,26 +1,43 @@
 #include "Timer.h"
 #include <string>
 #include <FL/Fl_Window.H>
-#include <FL/Fl_Input.H>
 
 class ServerSocket;
 class ClientSocket;
-struct MainWindow : public Fl_Window, public Timer
+class Host;
+class Client;
+class MainWindow : public Fl_Window
 {
 private:
-	ServerSocket* m_Server;
-	ClientSocket* m_Client;
-	Fl_Input* m_ipAddr;
-	std::string m_serverConnectInfo;
-	int m_state;
-	void changeInterface(int _state);
-	void on_tick(void* _userData);
-	static void onServer(Fl_Widget* _widget, void* _userData);
-	static void onClient(Fl_Widget* _widget, void* _userData);
-	static void onConnect(Fl_Widget* _widget, void* _userData);
-	static void onExit(Fl_Widget* _widget, void* _userData);
+	Host* m_Host;
+	Client* m_Client;
+	int m_CurrentLayout;
+	bool AttemptConnection(const char* _ipAddress);
+
 public:
 	MainWindow(int _w, int _h, std::string _name);
 	~MainWindow();
+
+	// More understandable this way
+	enum LayoutType
+	{
+		SPLASH_SCREEN = 0,
+		DUMMY_HOST = 1,
+		JOIN_GAME = 2,
+		HOST = 3,
+		IN_GAME = 4
+	};
+	void ChangeLayout(LayoutType _newState);
+
+	void Send(const std::string _msg);
+
+	void OnTick(void* _userData);
+
+	//Button events
+	static void OnSendData(Fl_Widget* _widget, void* _userData);
+	static void OnJoinServer(Fl_Widget* _widget, void* _userData);
+	static void OnClientStart(Fl_Widget* _widget, void* _userData);
+	static void OnServerStart(Fl_Widget* _widget, void* _userData);
+	static void OnExit(Fl_Widget* _widget, void* _userData);
 };
 

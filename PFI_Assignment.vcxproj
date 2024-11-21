@@ -139,16 +139,23 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Client.cpp" />
     <ClCompile Include="ClientSocket.cpp" />
     <ClCompile Include="MainWindow.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Host.cpp" />
+    <ClCompile Include="Pugixml\pugixml.cpp" />
     <ClCompile Include="ServerSocket.cpp" />
     <ClCompile Include="Timer.cpp" />
     <ClCompile Include="Wsa.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Client.h" />
     <ClInclude Include="ClientSocket.h" />
     <ClInclude Include="MainWindow.h" />
+    <ClInclude Include="Host.h" />
+    <ClInclude Include="Pugixml\pugiconfig.hpp" />
+    <ClInclude Include="Pugixml\pugixml.hpp" />
     <ClInclude Include="ServerSocket.h" />
     <ClInclude Include="Timer.h" />
     <ClInclude Include="Wsa.h" />

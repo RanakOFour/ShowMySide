@@ -6,9 +6,9 @@ class Timer
 public:
 	Timer(double _duration);
 	virtual ~Timer();
-	virtual void on_tick(void* _userData);
+	virtual void OnTick(void* _userData);
 protected:
 	void* m_userdata;
 	double m_duration;
-	static void tick(void* _userData);
+	static void Tick(void* _userData);
 };

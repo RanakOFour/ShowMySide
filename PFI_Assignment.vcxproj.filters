@@ -25,6 +25,9 @@
     <Filter Include="Source Files\Networking">
       <UniqueIdentifier>{52cfee1a-31f3-4378-b24d-427671e2a034}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource Files\pugixml">
+      <UniqueIdentifier>{a63df374-dedb-4b4a-9cda-2a084b91509e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -45,6 +48,15 @@
     <ClCompile Include="Timer.cpp">
       <Filter>Source Files\GUI</Filter>
     </ClCompile>
+    <ClCompile Include="Host.cpp">
+      <Filter>Source Files\Networking</Filter>
+    </ClCompile>
+    <ClCompile Include="Client.cpp">
+      <Filter>Source Files\Networking</Filter>
+    </ClCompile>
+    <ClCompile Include="Pugixml\pugixml.cpp">
+      <Filter>Resource Files\pugixml</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MainWindow.h">
@@ -61,6 +73,18 @@
     </ClInclude>
     <ClInclude Include="Timer.h">
       <Filter>Header Files\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="Host.h">
+      <Filter>Header Files\Networking</Filter>
+    </ClInclude>
+    <ClInclude Include="Client.h">
+      <Filter>Header Files\Networking</Filter>
+    </ClInclude>
+    <ClInclude Include="Pugixml\pugiconfig.hpp">
+      <Filter>Resource Files\pugixml</Filter>
+    </ClInclude>
+    <ClInclude Include="Pugixml\pugixml.hpp">
+      <Filter>Resource Files\pugixml</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

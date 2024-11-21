@@ -1,184 +1,189 @@
 #include "MainWindow.h"
 #include "Timer.h"
-#include "ClientSocket.h"
-#include "ServerSocket.h"
+#include "Host.h"
+#include "Client.h"
 #include <string>
 #include <iostream>
-#include <FL/Fl_Flex.H>
-#include <FL/Fl_Button.H>
-#include <FL/Fl_Window.H>
+#include <FL/Fl_Group.H>
+#include <FL/Fl_Multiline_Input.H>
 #include <FL/Fl_Menu_Bar.H>
 #include <FL/Fl_Input.H>
 #include <FL/Fl_Output.H>
+#include <FL/Fl_Flex.H>
+#include <FL/Fl_Button.H>
 
-MainWindow::MainWindow(int _w, int _h, std::string _name) 
-	: Fl_Window(200, 200, _w, _h, _name.c_str()), 
-	Timer(0.5), 
-	m_ipAddr(nullptr),
-	m_state(0),
+/*
+	Weird singleton - ish member so that I can access it within fltk callbacks
+	while also encapsulating the layouts into their own structs passed into said callbacks
+*/
+static MainWindow* m_Main;
+
+MainWindow::MainWindow(int _w, int _h, std::string _name)
+	: Fl_Window(200, 200, _w, _h, _name.c_str()),
 	m_Client(nullptr),
-	m_Server(nullptr)
+	m_Host(nullptr),
+	m_CurrentLayout(0)
 {
-	changeInterface(m_state);
-	Fl_Menu_Bar* menu = new Fl_Menu_Bar(0, 0, _w, 30, "");
-	menu->add("&Start/&Join Server", NULL, onClient, this);
-	menu->add("&Start/&Create Server", NULL, onServer, this, FL_MENU_DIVIDER);
-	menu->add("&Start/&Exit", NULL, onExit, this);
+	m_Main = this;
+	ChangeLayout(LayoutType::SPLASH_SCREEN);
 }
 
 MainWindow::~MainWindow()
 {
 }
 
-void MainWindow::changeInterface(int _state)
+bool MainWindow::AttemptConnection(const char* _ipAddress)
 {
-	int currentChildren = children();
+	if (m_Client->Connect(_ipAddress))
+	{
+		return true;
+	}
 
-	// Removes all children except the menu bar
-	for (int i = 0; i < currentChildren - 1; i++)
+	return false;
+}
+
+void MainWindow::Send(const std::string _msg)
+{
+	m_Client->Send(_msg);
+}
+
+void MainWindow::ChangeLayout(LayoutType _newState)
+{
+	
+	//Leaves the menubar intact
+	while (children() > 1)
 	{
 		delete_child(1);
 	}
-	redraw();
+
 
 	//Switch is secretly goto, so braces are needed to for the compiler to like declaractions inside
-	switch (_state)
+	switch (_newState)
 	{
-		// Main menu
-	case 0:
+		// Start menu
+	case SPLASH_SCREEN:
 	{
 		Fl_Menu_Bar* menu = new Fl_Menu_Bar(0, 0, w(), 30, "");
-		menu->add("&Start/&Join Server", NULL, onClient, this);
-		menu->add("&Start/&Create Server", NULL, onServer, this, FL_MENU_DIVIDER);
-		menu->add("&Start/&Exit", NULL, onExit, this);
+		menu->add("&Start/&Join Server", NULL, OnClientStart, NULL);
+		menu->add("&Start/&Create Server", NULL, OnServerStart, NULL, FL_MENU_DIVIDER);
+		menu->add("&Start/&Exit", NULL, OnExit, this);
 
 		Fl_Flex* menuFlex = new Fl_Flex(menu->w(), menu->h(), 0);
 		menuFlex->add(menu);
 		menuFlex->fixed(menu, 0);
 		add_resizable(*menuFlex);
+		add(menuFlex);
 	}
-		break;
+	break;
 
-		// Client pre-connection state
-	case 1:
+	// Host state
+	case DUMMY_HOST:
 	{
-		std::string ipAddressString = m_Server->m_ipAddress;
-
 		//Display server IP address for other clients to connect
 		Fl_Output* ipAddress = new Fl_Output(60, 30, 95, 25, "Local IP:");
+		ipAddress->value(m_Host->GetIP().c_str());
 		ipAddress->box(FL_NO_BOX);
+
 		add(ipAddress);
 
-		ipAddress->insert(ipAddressString.c_str(), ipAddressString.length());
 		ipAddress->redraw_label();
 	}
-		break;
+	break;
 
-		// Host state
-	case 2:
+	// Client pre-connection state
+	case JOIN_GAME:
 	{
-		m_ipAddr = new Fl_Input(100, 100, 120, 25, "Enter IP here: ");
-		add(m_ipAddr);
+		Fl_Input* ipAddressInput = new Fl_Input(100, 100, 120, 25, "Enter IP here: ");
+		add(ipAddressInput);
 
 		//Forces the textbox to be shown on the screen
-		m_ipAddr->redraw_label();
-		m_ipAddr->value(" ");
-		m_ipAddr->value("");
+		ipAddressInput->value(" ");
+		ipAddressInput->value("");
+		ipAddressInput->box(FL_ENGRAVED_BOX);
+		ipAddressInput->redraw_label();
 
 		//Show connect button to confirm connection
 		Fl_Button* connectBtn = new Fl_Button(270, 260, 100, 50, "Connect");
-		connectBtn->callback(onConnect, (void*)this);
+		connectBtn->callback(OnJoinServer, (void*)ipAddressInput);
 		add(connectBtn);
+
 		connectBtn->redraw();
 	}
-		break;
-	}
-}
+	break;
 
-void MainWindow::on_tick(void* _userData)
-{
-	if (m_state != 0)
+
+	//Overlay for ingame and host is the same
+	case HOST:
 	{
-		MainWindow* mw = (MainWindow*)_userData;
+		//Display server IP address for other clients to connect
+		Fl_Output* ipAddress = new Fl_Output(58, 30, 95, 25, "Local IP:");
+		ipAddress->value(m_Host->GetIP().c_str());
+		ipAddress->box(FL_NO_BOX);
 
-		switch (m_state)
-		{
-		case 1:
-			m_Server->on_tick();
-		case 2:
-			printf("Client tick\n");
-			break;
-		}
+		add(ipAddress);
+
+		ipAddress->redraw_label();
+	}
+	case IN_GAME:
+	{
+		Fl_Output* outputBox = new Fl_Output(0, 60, w(), 200);
+		Fl_Multiline_Input* messageInput = new Fl_Multiline_Input(220, 260, 200, 50, "Enter Text");
+		Fl_Button* sendMessageBtn = new Fl_Button(270, 320, 100, 50, "Send");
+
+		add(outputBox);
+		add(messageInput);
+		add(sendMessageBtn);
+		sendMessageBtn->callback(OnSendData, (void*)messageInput);
+	}
+	break;
 	}
 
-	Fl::repeat_timeout(m_duration, tick, _userData);
+	redraw();
+	m_CurrentLayout = _newState;
 }
 
-void MainWindow::onConnect(Fl_Widget* _widget, void* _userData)
+void MainWindow::OnClientStart(Fl_Widget* _widget, void* _userData)
 {
-	MainWindow* mw = (MainWindow*)_userData;
-	const char* ip = mw->m_ipAddr->value();
+	m_Main->m_Client = new Client();
+
+	m_Main->ChangeLayout(JOIN_GAME);
+}
+
+void MainWindow::OnServerStart(Fl_Widget* _widget, void* _userData)
+{
+							 //port, timer duration
+	m_Main->m_Host = new Host(8080, 0.5);
+
+	m_Main->m_Client = new Client();
+	m_Main->m_Client->Connect(m_Main->m_Host->GetIP().c_str());
+
+	m_Main->ChangeLayout(HOST);
+}
+
+void MainWindow::OnJoinServer(Fl_Widget* _widget, void* _userData)
+{
+	Fl_Input* ipAddressInput = (Fl_Input*)_userData;
+
+	const char* ip = ipAddressInput->value();
 	printf("IP: %s\n", ip);
-	
-	if (mw->m_Client->Connect(ip))
-	{
 
+	if (m_Main->AttemptConnection(ip))
+	{
+		m_Main->ChangeLayout(IN_GAME);
 	}
 }
 
-void MainWindow::onServer(Fl_Widget* _widget, void* _userData)
+void MainWindow::OnSendData(Fl_Widget* _widget, void* _userData)
+{
+	Fl_Multiline_Input* messageBox = (Fl_Multiline_Input*)_userData;
+	const std::string textToSend = messageBox->value();
+	printf("Attempting to send: %s\n", textToSend.c_str());
+	m_Main->Send(textToSend);
+}
+
+
+void MainWindow::OnExit(Fl_Widget* _widget, void* _userData)
 {
 	MainWindow* mw = (MainWindow*)_userData;
-
-	if (mw->m_Server != nullptr)
-	{
-		delete mw->m_Server;
-	}
-
-	if (mw->m_Client != nullptr)
-	{
-		mw->m_Client->m_closed = true;
-		mw->m_Client->Send("CLOSED");
-
-		delete mw->m_Client;
-	}
-
-	mw->m_Server = new ServerSocket(8080);
-
-	mw->m_Client = new ClientSocket();
-	mw->m_Client->Connect(mw->m_Server->m_ipAddress);
-
-	mw->m_state = 1;
-
-	mw->changeInterface(mw->m_state);
-}
-
-void MainWindow::onClient(Fl_Widget* _widget, void* _userData)
-{
-	MainWindow* mw = (MainWindow*)_userData;
-
-	if (mw->m_Server != nullptr)
-	{
-		delete mw->m_Server;
-	}
-
-	if (mw->m_Client != nullptr)
-	{
-		mw->m_Client->m_closed = true;
-		mw->m_Client->Send("CLOSED");
-
-		delete mw->m_Client;
-	}
-
-	mw->m_Client = new ClientSocket();
-	mw->m_state = 2;
-
-
-	mw->changeInterface(mw->m_state);
-}
-
-void MainWindow::onExit(Fl_Widget* _widget, void* _userData)
-{
-	MainWindow* self = (MainWindow*)_userData;
-	self->hide();
+	mw->hide();
 }

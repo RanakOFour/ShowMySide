@@ -8,6 +8,7 @@
 ClientSocket::ClientSocket() : m_socket(INVALID_SOCKET)
 {
 	m_closed = false;
+	m_Connected = false;
 }
 
 ClientSocket::~ClientSocket()
@@ -60,6 +61,7 @@ bool ClientSocket::Connect(const std::string& _serverName)
 		return false;
 	}
 
+	m_Connected = true;
 	return true;
 }
 

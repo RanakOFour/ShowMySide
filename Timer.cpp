@@ -4,23 +4,23 @@ Timer::Timer(double _duration)
 {
 	m_duration = _duration;
 	m_userdata = (void*)0;
-	Fl::add_timeout(_duration, tick, this);
+	Fl::add_timeout(_duration, Tick, this);
 }
 
 Timer::~Timer()
 {
-	Fl::remove_timeout(tick, this);
+	Fl::remove_timeout(Tick, this);
 }
 
-void Timer::on_tick(void* _userData)
+void Timer::OnTick(void* _userData)
 {
 	m_userdata = _userData;
-	printf("Tick!\n");
-	Fl::repeat_timeout(m_duration, tick, m_userdata);
+	printf("Timer Tick!\n");
+	Fl::repeat_timeout(m_duration, Tick, m_userdata);
 }
 
-void Timer::tick(void* _userData)
+void Timer::Tick(void* _userData)
 {
 	Timer* timer = (Timer*)_userData;
-	timer->on_tick(_userData);
+	timer->OnTick(_userData);
 }

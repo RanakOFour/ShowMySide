@@ -1,7 +1,9 @@
 #include "ServerSocket.h"
 #include "ClientSocket.h"
+#include "pugixml/pugixml.hpp"
 #include <ws2tcpip.h>
 #include <stdexcept>
+#include <sstream>
 #include <string>
 #include <iostream>
 #include <memory>
@@ -120,9 +122,14 @@ std::shared_ptr<ClientSocket> ServerSocket::accept()
 	return rtn;
 }
 
-void ServerSocket::on_tick()
+void ServerSocket::OnTick()
 {
 	std::shared_ptr<ClientSocket> client = accept();
+
+	bool messageToRepeat{ false };
+	pugi::xml_document sendOutTemplate;
+	pugi::xml_node serverMessageNode = sendOutTemplate.append_child("s_msg");
+
 	if (client)
 	{
 		printf("Client Connected!\n");
@@ -135,10 +142,24 @@ void ServerSocket::on_tick()
 		while (m_clients.at(ci)->Receive(message))
 		{
 			printf("Message recieved: %s\n", message.c_str());
+			messageToRepeat = true;
+			pugi::xml_document xmlMessageDoc;
+			pugi::xml_parse_result xmlMessage = xmlMessageDoc.load_string(message.c_str());
 
 			if (message.c_str() == "CLOSED")
 			{
 				m_clients.at(ci)->m_closed = true;
+			}
+
+			pugi::xml_node message = xmlMessageDoc.child("c_msg");
+			pugi::xml_attribute text = message.attribute("text");
+			printf("Text value: %s\n", text.value());
+
+			if (text.value() != NULL)
+			{
+				pugi::xml_node playerNode = serverMessageNode.append_child("player");
+				playerNode.append_attribute("name").set_value(ci);
+				playerNode.append_attribute("text").set_value(text.value());
 			}
 		}
 		if (m_clients.at(ci)->m_closed)
@@ -146,6 +167,23 @@ void ServerSocket::on_tick()
 			printf("Client Disconnected\n");
 			m_clients.erase(m_clients.begin() + ci);
 			--ci;
+		}
+	}
+
+	if (messageToRepeat)
+	{
+		std::stringstream ss;
+		sendOutTemplate.save(ss);
+		std::string xmlToSend = ss.str();
+
+		if (sendOutTemplate.child_value() != "")
+		{
+			printf("Message to send: %s\n", xmlToSend.c_str());
+
+			for (size_t ci = 0; ci < m_clients.size(); ++ci)
+			{
+				m_clients.at(ci)->Send(xmlToSend);
+			}
 		}
 	}
 
