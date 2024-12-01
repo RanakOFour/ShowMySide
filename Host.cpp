@@ -10,6 +10,7 @@ Host::Host(int _port, double _tickTimer) :
 	m_Server(nullptr)
 {
 	m_Server = new ServerSocket(_port);
+	m_Lobby = new Lobby();
 }
 
 Host::~Host()
