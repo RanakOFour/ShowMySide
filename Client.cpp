@@ -7,7 +7,7 @@
 #include <string>
 
 Client::Client() :
-	Timer(0.3),
+	Timer(0.25),
 	m_currentMessage("")
 {
 	m_Socket = new ClientSocket();
@@ -49,24 +49,25 @@ void Client::OnTick(void* _userData)
 	if (m_Socket->m_Connected)
 	{
 		pugi::xml_document doc;
-		while (m_Socket->Receive(m_currentMessage))
+		bool yankle = m_Socket->Receive(m_currentMessage);
+		if (yankle)
 		{
 			printf("Client received: %s", m_currentMessage.c_str());
 			pugi::xml_parse_result result = doc.load_string(m_currentMessage.c_str());
-			if (result)
+			if (result.status)
 			{
 				throw std::runtime_error(result.description());
 			}
 
-			pugi::xml_node messages = doc.child("s_msg");
-			std::string output = messages.child_value("player");
-			output.append(": ");
-			output.append(messages.child_value("text"));
+			pugi::xml_node message = doc.child("s_msg");
+			for (pugi::xml_node i = message.child("player"); i; i = i.next_sibling())
+			{
+				std::cout << "Player: " << i.attribute("name").value() << ", Text value: " << i.attribute("text").value() << std::endl;
+			}
 
-			printf("Message recieved: %s", output.c_str());
 		}
 	}
 
-	printf("Client Tick!\n");
-	Fl::repeat_timeout(0.3, Tick, this);
+	//printf("Client Tick!\n");
+	Fl::repeat_timeout(0.25, Tick, this);
 }

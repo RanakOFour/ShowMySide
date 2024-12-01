@@ -152,7 +152,7 @@ void MainWindow::OnClientStart(Fl_Widget* _widget, void* _userData)
 void MainWindow::OnServerStart(Fl_Widget* _widget, void* _userData)
 {
 							 //port, timer duration
-	m_Main->m_Host = new Host(8080, 0.5);
+	m_Main->m_Host = new Host(8080, 0.25);
 
 	m_Main->m_Client = new Client();
 	m_Main->m_Client->Connect(m_Main->m_Host->GetIP().c_str());

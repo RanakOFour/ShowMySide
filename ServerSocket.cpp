@@ -13,7 +13,6 @@ ServerSocket::ServerSocket(int _port)
 	: m_socket(INVALID_SOCKET),
 	m_clients()
 {
-	m_tickNum = 0;
 	
 	//Pre stuff
 	addrinfo hints = { 0 };
@@ -51,6 +50,7 @@ ServerSocket::ServerSocket(int _port)
 		throw std::runtime_error("Failed to listen on socket");
 	}
 
+	//Set non-blocking
 	u_long mode = 1;
 	if (ioctlsocket(m_socket, FIONBIO, &mode) == SOCKET_ERROR)
 	{
@@ -127,8 +127,8 @@ void ServerSocket::OnTick()
 	std::shared_ptr<ClientSocket> client = accept();
 
 	bool messageToRepeat{ false };
-	pugi::xml_document sendOutTemplate;
-	pugi::xml_node serverMessageNode = sendOutTemplate.append_child("s_msg");
+	pugi::xml_document serverMessageDoc;
+	pugi::xml_node serverMessageNode = serverMessageDoc.append_child("s_msg");
 
 	if (client)
 	{
@@ -142,26 +142,29 @@ void ServerSocket::OnTick()
 		while (m_clients.at(ci)->Receive(message))
 		{
 			printf("Message recieved: %s\n", message.c_str());
-			messageToRepeat = true;
-			pugi::xml_document xmlMessageDoc;
-			pugi::xml_parse_result xmlMessage = xmlMessageDoc.load_string(message.c_str());
 
 			if (message.c_str() == "CLOSED")
 			{
 				m_clients.at(ci)->m_closed = true;
 			}
-
-			pugi::xml_node message = xmlMessageDoc.child("c_msg");
-			pugi::xml_attribute text = message.attribute("text");
-			printf("Text value: %s\n", text.value());
-
-			if (text.value() != NULL)
+			else if (message.c_str() != NULL)
 			{
+				//Parse message to echo on to other clients
+
+				messageToRepeat = true;
+				pugi::xml_document clientMessageDoc;
+				pugi::xml_parse_result clientMessage = clientMessageDoc.load_string(message.c_str());
+
+				pugi::xml_node message = clientMessageDoc.child("c_msg");
+				pugi::xml_attribute text = message.attribute("text");
+				printf("Text value: %s\n", text.value());
+
 				pugi::xml_node playerNode = serverMessageNode.append_child("player");
 				playerNode.append_attribute("name").set_value(ci);
 				playerNode.append_attribute("text").set_value(text.value());
 			}
 		}
+
 		if (m_clients.at(ci)->m_closed)
 		{
 			printf("Client Disconnected\n");
@@ -170,23 +173,17 @@ void ServerSocket::OnTick()
 		}
 	}
 
+	std::stringstream ss;
+	serverMessageDoc.save(ss);
+	std::string xmlToSend = ss.str();
+
 	if (messageToRepeat)
 	{
-		std::stringstream ss;
-		sendOutTemplate.save(ss);
-		std::string xmlToSend = ss.str();
+		printf("Message to send: %s\n", xmlToSend.c_str());
 
-		if (sendOutTemplate.child_value() != "")
+		for (size_t ci = 0; ci < m_clients.size(); ++ci)
 		{
-			printf("Message to send: %s\n", xmlToSend.c_str());
-
-			for (size_t ci = 0; ci < m_clients.size(); ++ci)
-			{
-				m_clients.at(ci)->Send(xmlToSend);
-			}
+			m_clients.at(ci)->Send(xmlToSend);
 		}
 	}
-
-	printf("Server Tick %d\n", m_tickNum);
-	++m_tickNum;
 }

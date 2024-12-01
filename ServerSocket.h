@@ -8,7 +8,6 @@ class ClientSocket;
 class ServerSocket
 {
 private:
-	int m_tickNum;
 	SOCKET m_socket;
 	std::vector<std::shared_ptr<ClientSocket>> m_clients;
 	std::shared_ptr<ClientSocket> accept();

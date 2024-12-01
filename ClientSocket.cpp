@@ -53,6 +53,12 @@ bool ClientSocket::Connect(const std::string& _serverName)
 		m_socket = INVALID_SOCKET;
 	}
 
+	u_long mode = 1;
+	if (ioctlsocket(m_socket, FIONBIO, &mode) == SOCKET_ERROR)
+	{
+		throw std::runtime_error("Failed to set non-blocking");
+	}
+
 	freeaddrinfo(result);
 
 	if (m_socket == INVALID_SOCKET) {

@@ -141,9 +141,12 @@
   <ItemGroup>
     <ClCompile Include="Client.cpp" />
     <ClCompile Include="ClientSocket.cpp" />
+    <ClCompile Include="Lobby.cpp" />
+    <ClCompile Include="LobbyState.cpp" />
     <ClCompile Include="MainWindow.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Host.cpp" />
+    <ClCompile Include="Player.cpp" />
     <ClCompile Include="Pugixml\pugixml.cpp" />
     <ClCompile Include="ServerSocket.cpp" />
     <ClCompile Include="Timer.cpp" />
@@ -152,8 +155,11 @@
   <ItemGroup>
     <ClInclude Include="Client.h" />
     <ClInclude Include="ClientSocket.h" />
+    <ClInclude Include="Lobby.h" />
+    <ClInclude Include="LobbyState.h" />
     <ClInclude Include="MainWindow.h" />
     <ClInclude Include="Host.h" />
+    <ClInclude Include="Player.h" />
     <ClInclude Include="Pugixml\pugiconfig.hpp" />
     <ClInclude Include="Pugixml\pugixml.hpp" />
     <ClInclude Include="ServerSocket.h" />

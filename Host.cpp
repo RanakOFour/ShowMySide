@@ -21,7 +21,7 @@ void Host::OnTick(void* _userData)
 {
 	m_Server->OnTick();
 
-	printf("Host Tick");
+	//printf("Host Tick");
 	Fl::repeat_timeout(0.25, Tick, this);
 }
 

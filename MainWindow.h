@@ -31,8 +31,6 @@ public:
 
 	void Send(const std::string _msg);
 
-	void OnTick(void* _userData);
-
 	//Button events
 	static void OnSendData(Fl_Widget* _widget, void* _userData);
 	static void OnJoinServer(Fl_Widget* _widget, void* _userData);
