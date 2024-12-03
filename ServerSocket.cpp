@@ -11,9 +11,9 @@
 
 ServerSocket::ServerSocket(int _port)
 	: m_socket(INVALID_SOCKET),
-	m_clients()
+	m_clients(),
+	m_idJustAdded(-1)
 {
-	
 	//Pre stuff
 	addrinfo hints = { 0 };
 	hints.ai_family = AF_INET;
@@ -70,7 +70,7 @@ ServerSocket::ServerSocket(int _port)
 	}
 
 	sockaddr_in loopback;
-	//loopbakc needs to have properties set
+	//loopback needs to have properties set
 	loopback.sin_family = AF_INET;
 	loopback.sin_addr.s_addr = 1337;   // can be any IP address
 	loopback.sin_port = htons(9);      // using debug port
@@ -96,6 +96,7 @@ ServerSocket::ServerSocket(int _port)
 	if (inet_ntop(AF_INET, &loopback.sin_addr, buffer, INET_ADDRSTRLEN) == 0x0) {
 		std::cerr << "Could not inet_ntop\n";
 	}
+
 	m_ipAddress = buffer;
 
 	printf("IP: %s\n", m_ipAddress.c_str());
@@ -106,7 +107,7 @@ ServerSocket::~ServerSocket()
 	closesocket(m_socket);
 }
 
-std::shared_ptr<ClientSocket> ServerSocket::accept()
+std::shared_ptr<ClientSocket> ServerSocket::Accept()
 {
 	SOCKET socket = ::accept(m_socket, NULL, NULL);
 	if (socket == INVALID_SOCKET)
@@ -122,68 +123,134 @@ std::shared_ptr<ClientSocket> ServerSocket::accept()
 	return rtn;
 }
 
-void ServerSocket::OnTick()
+std::string ServerSocket::OnTick()
 {
-	std::shared_ptr<ClientSocket> client = accept();
+	//create document to repackage messages into and return
+	pugi::xml_document currentMessageStruct;
+	pugi::xml_node events = currentMessageStruct.append_child("Events");
 
-	bool messageToRepeat{ false };
-	pugi::xml_document serverMessageDoc;
-	pugi::xml_node serverMessageNode = serverMessageDoc.append_child("s_msg");
+	bool messagesToSend{ false };
+
+	//Accept any new connections and add them to m_clients, tell host to add them to Lobby
+	std::shared_ptr<ClientSocket> client = Accept();
 
 	if (client)
 	{
 		printf("Client Connected!\n");
+
 		m_clients.push_back(client);
+		m_idJustAdded = m_clients.size() - 1;
 	}
+
 
 	for (size_t ci = 0; ci < m_clients.size(); ++ci)
 	{
-		std::string message;
-		while (m_clients.at(ci)->Receive(message))
-		{
-			printf("Message recieved: %s\n", message.c_str());
-
-			if (message.c_str() == "CLOSED")
-			{
-				m_clients.at(ci)->m_closed = true;
-			}
-			else if (message.c_str() != NULL)
-			{
-				//Parse message to echo on to other clients
-
-				messageToRepeat = true;
-				pugi::xml_document clientMessageDoc;
-				pugi::xml_parse_result clientMessage = clientMessageDoc.load_string(message.c_str());
-
-				pugi::xml_node message = clientMessageDoc.child("c_msg");
-				pugi::xml_attribute text = message.attribute("text");
-				printf("Text value: %s\n", text.value());
-
-				pugi::xml_node playerNode = serverMessageNode.append_child("player");
-				playerNode.append_attribute("name").set_value(ci);
-				playerNode.append_attribute("text").set_value(text.value());
-			}
-		}
-
+		//Close connection if nothing
 		if (m_clients.at(ci)->m_closed)
 		{
 			printf("Client Disconnected\n");
 			m_clients.erase(m_clients.begin() + ci);
 			--ci;
+			continue;
 		}
-	}
 
-	std::stringstream ss;
-	serverMessageDoc.save(ss);
-	std::string xmlToSend = ss.str();
 
-	if (messageToRepeat)
-	{
-		printf("Message to send: %s\n", xmlToSend.c_str());
+		//recieved messages are put into here
+		std::string clientMessageAsString;
 
-		for (size_t ci = 0; ci < m_clients.size(); ++ci)
+		// Loop through getting information from server until it has it all
+		bool dataComplete{ false };
+		while (!dataComplete)
 		{
-			m_clients.at(ci)->Send(xmlToSend);
+			std::string currentDataPull;
+			m_clients.at(ci)->Receive(currentDataPull);
+
+			clientMessageAsString.append(currentDataPull);
+			if (currentDataPull == "")
+			{
+				dataComplete = true;
+			}
+		}
+
+		if(clientMessageAsString != "")
+		{
+			printf("Message recieved: %s\n", clientMessageAsString.c_str());
+
+			messagesToSend = true;
+
+			if (clientMessageAsString.c_str() == "CLOSED")
+			{
+				m_clients.at(ci)->m_closed = true;
+			}
+			else if (clientMessageAsString.c_str() != NULL)
+			{
+				//Parse client message into xml and pass up to Host
+				pugi::xml_document clientEventDoc;
+
+				//Parses document
+				pugi::xml_parse_result clientMessageResult = clientEventDoc.load_string(clientMessageAsString.c_str());
+				if (clientMessageResult.status)
+				{
+					throw std::runtime_error(clientMessageResult.description());
+				}
+
+				//Add message to return document
+				pugi::xml_node clientEvent = clientEventDoc.first_child();
+
+				//Determine message type (text/delta)
+				std::string messageType = clientEvent.attribute("type").value();
+
+				//Add message into list with id
+				pugi::xml_node currentEvent = events.append_child("Event");
+				currentEvent.append_attribute("id").set_value(ci);
+				currentEvent.append_attribute("type").set_value(messageType.c_str());
+
+				//Add additional information based on message type
+				if (messageType == "new_message")
+				{
+					currentEvent.append_attribute("text").set_value(clientEvent.attribute("text").value());
+				}
+				else if (messageType == "attr_change")
+				{
+					currentEvent.append_attribute("attribute").set_value(clientEvent.attribute("attribute").value());
+					currentEvent.append_attribute("value").set_value(clientEvent.attribute("value").value());
+				}
+			}
 		}
 	}
+
+	//Converts to string to send up
+	if (messagesToSend)
+	{
+		std::stringstream ss;
+		currentMessageStruct.save(ss);
+		std::string xmlToSend = ss.str();
+
+		printf("Message to pass up: %s\n", xmlToSend.c_str());
+
+		return xmlToSend;
+	}
+
+	return "";
+}
+
+void ServerSocket::Send(std::string _xmlToSend)
+{
+	for (size_t i = 0; i < m_clients.size(); i++)
+	{
+		//Avoids sending both update and initial stuff in the same frame because the xml won't parse correctly
+		if (i != m_idJustAdded)
+		{
+			m_clients.at(i)->Send(_xmlToSend);
+		}
+		else
+		{
+			m_idJustAdded = -1;
+		}
+	}
+}
+
+void ServerSocket::SendTo(int _id, std::string _xmlToSend)
+{
+	m_clients.at(_id)->Send(_xmlToSend);
 }

@@ -1,5 +1,11 @@
 #include "Timer.h"
 
+Timer::Timer()
+{
+	m_duration = 0;
+	m_userdata = (void*)0;
+}
+
 Timer::Timer(double _duration)
 {
 	m_duration = _duration;

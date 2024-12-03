@@ -1,6 +1,7 @@
 #include <iostream>
 #include "Wsa.h"
 #include "MainWindow.h"
+#include "ImagePool.h"
 
 int main(int argc, char** argv)
 {
@@ -8,7 +9,10 @@ int main(int argc, char** argv)
 	Wsa wsa;
 	printf("Initialized Winsock\n");
 
-	MainWindow win(640, 360, "Test");
+	ImagePool::Initialise();
+	printf("Initialsed image pool\n");
+
+	MainWindow win(640, 360, "Thingamabob");
 	win.show();
 
 	return Fl::run();

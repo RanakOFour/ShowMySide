@@ -1,4 +1,3 @@
-#include "Timer.h"
 #include <string>
 #include <FL/Fl_Window.H>
 

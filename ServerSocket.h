@@ -5,17 +5,21 @@
 #include <string>
 
 class ClientSocket;
+class Host;
 class ServerSocket
 {
+	friend class Host;
 private:
 	SOCKET m_socket;
+	int m_idJustAdded;
 	std::vector<std::shared_ptr<ClientSocket>> m_clients;
-	std::shared_ptr<ClientSocket> accept();
-	ServerSocket(const ServerSocket& _copy);
+	std::shared_ptr<ClientSocket> Accept();
+	std::string m_ipAddress;
+	std::string OnTick();
+	void Send(std::string _xmlToSend);
+	void SendTo(int _id, std::string _xmlToSend);
 
 public:
 	ServerSocket(int _port);
 	~ServerSocket();
-	std::string m_ipAddress;
-	void OnTick();
 };

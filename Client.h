@@ -3,13 +3,14 @@
 
 #pragma once
 class ClientSocket;
+class Lobby;
 
 //This is a clientsocket wrapper
 class Client : public Timer
 {
 private:
-	ClientSocket* m_Socket;
-	std::string m_currentMessage;
+	ClientSocket* m_socket;
+	Lobby* m_lobby;
 
 public:
 	Client();

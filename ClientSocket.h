@@ -1,19 +1,20 @@
 #include <winsock2.h>
 #include <string>
 
+class Client;
 class ServerSocket;
 class ClientSocket
 {
 private:
+	friend class Client;
 	friend class ServerSocket;
 	SOCKET m_socket;
-
-public:
 	bool m_closed;
-	bool m_Connected;
+public:
+	ClientSocket();
+	~ClientSocket();
+
 	bool Connect(const std::string& _serverName);
 	void Send(const std::string& _message);
 	bool Receive(std::string& _message);
-	ClientSocket();
-	~ClientSocket();
 };

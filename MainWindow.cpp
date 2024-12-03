@@ -4,6 +4,7 @@
 #include "Client.h"
 #include <string>
 #include <iostream>
+#include <thread>
 #include <FL/Fl_Group.H>
 #include <FL/Fl_Multiline_Input.H>
 #include <FL/Fl_Menu_Bar.H>
@@ -144,24 +145,31 @@ void MainWindow::ChangeLayout(LayoutType _newState)
 
 void MainWindow::OnClientStart(Fl_Widget* _widget, void* _userData)
 {
+	//Start client
 	m_Main->m_Client = new Client();
+
 
 	m_Main->ChangeLayout(JOIN_GAME);
 }
 
 void MainWindow::OnServerStart(Fl_Widget* _widget, void* _userData)
 {
+	//Start a new host and connect client to it
+	
 							 //port, timer duration
 	m_Main->m_Host = new Host(8080, 0.25);
 
 	m_Main->m_Client = new Client();
 	m_Main->m_Client->Connect(m_Main->m_Host->GetIP().c_str());
 
+
+
 	m_Main->ChangeLayout(HOST);
 }
 
 void MainWindow::OnJoinServer(Fl_Widget* _widget, void* _userData)
 {
+	//Search to connect to given ip address
 	Fl_Input* ipAddressInput = (Fl_Input*)_userData;
 
 	const char* ip = ipAddressInput->value();
@@ -175,6 +183,8 @@ void MainWindow::OnJoinServer(Fl_Widget* _widget, void* _userData)
 
 void MainWindow::OnSendData(Fl_Widget* _widget, void* _userData)
 {
+	// Send data to server
+
 	Fl_Multiline_Input* messageBox = (Fl_Multiline_Input*)_userData;
 	const std::string textToSend = messageBox->value();
 	printf("Attempting to send: %s\n", textToSend.c_str());
