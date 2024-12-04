@@ -135,14 +135,13 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>fltk\lib;wsa_2.lib%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>fltk.lib;fltk_forms.lib;fltk_images.lib;fltk_jpeg.lib;fltk_png.lib;fltk_z.lib;fltk_images.lib;ws2_32.lib;gdiplus.lib;comctl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>fltk.lib;fltk_forms.lib;fltk_images.lib;fltk_jpeg.lib;fltk_png.lib;fltk_z.lib;ws2_32.lib;gdiplus.lib;comctl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="ChatBox.cpp" />
+    <ClCompile Include="Chatbox.cpp" />
     <ClCompile Include="Client.cpp" />
     <ClCompile Include="ClientSocket.cpp" />
-    <ClCompile Include="Event.cpp" />
     <ClCompile Include="HeadlessLobby.cpp" />
     <ClCompile Include="ImagePool.cpp" />
     <ClCompile Include="Lobby.cpp" />
@@ -158,10 +157,9 @@
     <ClCompile Include="Wsa.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ChatBox.h" />
+    <ClInclude Include="Chatbox.h" />
     <ClInclude Include="Client.h" />
     <ClInclude Include="ClientSocket.h" />
-    <ClInclude Include="Event.h" />
     <ClInclude Include="HeadlessLobby.h" />
     <ClInclude Include="ImagePool.h" />
     <ClInclude Include="Lobby.h" />

@@ -6,9 +6,10 @@
 #include "FL/Fl_Multiline_Output.H"
 
 
-Messagebox::Messagebox(int _playerX, int _playerY, std::string _text, Fl_Window* _winToAdd) :
+Messagebox::Messagebox(int _playerX, int _playerY) :
+	Fl_Group(_playerX + 20, _playerY - 100, 200, 30, ""),
 	Timer(),
-	m_textToShow(_text),
+	m_textToShow(""),
 	m_textBoxImage(nullptr),
 	m_textBox(nullptr)
 {
@@ -18,8 +19,12 @@ Messagebox::Messagebox(int _playerX, int _playerY, std::string _text, Fl_Window*
 	m_textBox->insert(m_textToShow.c_str());
 	m_textBox->box(FL_NO_BOX);
 
-	_winToAdd->add(m_textBoxImage);
-	_winToAdd->add(m_textBox);
+	add(m_textBox);
+	add(m_textBoxImage);
+	m_textBoxImage->show();
+	m_textBox->show();
+	hide();
+	end();
 }
 
 Messagebox::~Messagebox()
@@ -27,20 +32,18 @@ Messagebox::~Messagebox()
 
 }
 
-void Messagebox::UpdatePosition(int _xIncrement, int _yIncrement)
-{
-	m_textBoxImage->position(m_textBoxImage->x() + _xIncrement, m_textBoxImage->y() + _yIncrement);
-}
-
-void Messagebox::show()
-{
-	Fl::add_timeout(10, Tick, (void*)this);
-	m_textBoxImage->show();
-	m_textBox->show();
-}
 
 void Messagebox::OnTick(void* _userData)
 {
-	delete m_textBoxImage;
-	delete m_textBox;
+	hide();
+	m_textToShow = "";
+	m_textBox->value("");
+}
+
+void Messagebox::DisplayMessage(std::string _message)
+{
+	m_textToShow = _message;
+	m_textBox->insert(m_textToShow.c_str());
+	show();
+	Fl::add_timeout(10, Tick, (void*)this);
 }

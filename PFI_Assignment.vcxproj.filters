@@ -81,11 +81,8 @@
     <ClCompile Include="ImagePool.cpp">
       <Filter>Source Files\GUI</Filter>
     </ClCompile>
-    <ClCompile Include="ChatBox.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Event.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="Chatbox.cpp">
+      <Filter>Source Files\GUI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -134,11 +131,8 @@
     <ClInclude Include="ImagePool.h">
       <Filter>Header Files\GUI</Filter>
     </ClInclude>
-    <ClInclude Include="ChatBox.h">
+    <ClInclude Include="Chatbox.h">
       <Filter>Header Files\GUI</Filter>
-    </ClInclude>
-    <ClInclude Include="Event.h">
-      <Filter>Header Files\Networking</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

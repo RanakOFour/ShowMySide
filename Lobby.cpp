@@ -3,10 +3,11 @@
 #include "Player.h"
 #include "PlayerInfo.h"
 #include "Timer.h"
+#include "ChatBox.h"
 #include "Pugixml/pugixml.hpp"
 
 Lobby::Lobby(std::string _docToLoad) :
-	Fl_Double_Window(800, 600),
+	Fl_Double_Window(0, 0, 1200, 800, "Lobby"),
 	m_events(),
 	m_players(),
 	m_clientPlayer(nullptr)
@@ -38,6 +39,14 @@ Lobby::Lobby(std::string _docToLoad) :
 
 	m_clientPlayer = m_players[m_players.size() - 1];
 	add(m_clientPlayer);
+
+	m_chatBox = new Chatbox();
+	add(m_chatBox);
+	hide();
+
+	end();
+	show();
+	take_focus();
 }
 
 Lobby::~Lobby()
@@ -47,35 +56,59 @@ Lobby::~Lobby()
 
 int Lobby::handle(int _event)
 {
-	if (_event == FL_PUSH && Fl::event_button() == FL_LEFT_MOUSE)
+	switch (_event)
 	{
-		m_clientPlayer->SetDestination(Fl::event_x(), Fl::event_y());
-		pugi::xml_document playerDoc;
-		playerDoc.load_string(m_clientPlayer->AsXMLString().c_str());
-		std::string destination[2] = { "destination", playerDoc.child("Player").attribute("destination").value() };
-
-
-		LogEvent("attr_change", (void*)destination);
+	case FL_FOCUS:
 		return 1;
+
+	case FL_PUSH:
+		if (Fl::event_button() == FL_LEFT_MOUSE && !m_chatBox->visible())
+		{
+			m_clientPlayer->SetDestination(Fl::event_x(), Fl::event_y());
+			pugi::xml_node destinationNode = m_events.append_child("Event");
+			destinationNode.append_attribute("type").set_value("attr_change");
+			destinationNode.append_attribute("attribute").set_value("destination");
+			destinationNode.append_attribute("value").set_value(std::string(std::to_string(Fl::event_x()) + "," + std::to_string(Fl::event_y())).c_str());
+
+			pugi::xml_document playerInfo;
+			playerInfo.load_string(m_clientPlayer->AsXMLString().c_str());
+
+			pugi::xml_node startNode = m_events.append_child("Event");
+			startNode.append_attribute("type").set_value("attr_change");
+			startNode.append_attribute("attribute").set_value("start");
+			startNode.append_attribute("value").set_value(playerInfo.child("Player").attribute("start").value());
+			return 1;
+		}
+		break;
+
+	case FL_KEYDOWN:
+		if (Fl::event_key() == 't')
+		{
+			printf("'t' key pressed!\n");
+			if (!m_chatBox->visible())
+			{
+				m_chatBox->show();
+				m_chatBox->take_focus();
+				redraw();
+			}
+		}
+		break;
 	}
 
 	return 0;
 }
 
-void Lobby::LogEvent(const char* _type, void* _data)
+void Lobby::FlushEvents(pugi::xml_document& _document)
 {
-	//Create an event and log into m_events
-	pugi::xml_document newEvent;
-	pugi::xml_node eventInfo = newEvent.append_child("Event");
-	eventInfo.append_attribute("type").set_value(_type);
-
-	if (_type == "attr_change")
+	if (m_events.child("Event") != NULL)
 	{
-		//// Change specified attribute
-		//std::string data[2] = ;
+		_document.append_child("Event");
+		for (pugi::xml_attribute currentAttr = m_events.child("Event").first_attribute(); currentAttr; currentAttr = currentAttr.next_attribute())
+		{
+			_document.child("Event").append_copy(currentAttr);
+		}
 
-		//eventInfo.append_attribute("attribute").set_value(attrName->c_str());
-		//eventInfo.append_attribute("value").set_value(newVal->c_str());
+		m_events.remove_child("Event");
 	}
 }
 
@@ -117,5 +150,5 @@ void Lobby::ChangeAttribute(int _id, std::string _attributeName, std::string _ne
 
 void Lobby::ShowMessage(int _id, std::string _message)
 {
-	m_players[_id]->ShowMessage(_message, this);
+	m_players[_id]->ShowMessage(_message);
 }

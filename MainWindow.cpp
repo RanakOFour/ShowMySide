@@ -20,10 +20,9 @@
 static MainWindow* m_Main;
 
 MainWindow::MainWindow(int _w, int _h, std::string _name)
-	: Fl_Window(200, 200, _w, _h, _name.c_str()),
+	: Fl_Double_Window(200, 200, _w, _h, _name.c_str()),
 	m_Client(nullptr),
-	m_Host(nullptr),
-	m_CurrentLayout(0)
+	m_Host(nullptr)
 {
 	m_Main = this;
 	ChangeLayout(LayoutType::SPLASH_SCREEN);
@@ -77,20 +76,6 @@ void MainWindow::ChangeLayout(LayoutType _newState)
 	}
 	break;
 
-	// Host state
-	case DUMMY_HOST:
-	{
-		//Display server IP address for other clients to connect
-		Fl_Output* ipAddress = new Fl_Output(60, 30, 95, 25, "Local IP:");
-		ipAddress->value(m_Host->GetIP().c_str());
-		ipAddress->box(FL_NO_BOX);
-
-		add(ipAddress);
-
-		ipAddress->redraw_label();
-	}
-	break;
-
 	// Client pre-connection state
 	case JOIN_GAME:
 	{
@@ -140,7 +125,6 @@ void MainWindow::ChangeLayout(LayoutType _newState)
 	}
 
 	redraw();
-	m_CurrentLayout = _newState;
 }
 
 void MainWindow::OnClientStart(Fl_Widget* _widget, void* _userData)

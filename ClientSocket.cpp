@@ -60,7 +60,8 @@ bool ClientSocket::Connect(const std::string& _serverName)
 
 	freeaddrinfo(result);
 
-	if (m_socket == INVALID_SOCKET) {
+	if (m_socket == INVALID_SOCKET)
+	{
 		printf("Unable to connect to server!\n");
 		WSACleanup();
 		return false;

@@ -35,7 +35,7 @@ void Host::MonitorNetwork()
 
 		if (eventsFromClient != "")
 		{
-			printf("Messages recieved %s", eventsFromClient.c_str());
+			printf("Host messages recieved %s\n", eventsFromClient.c_str());
 
 			//Parse client messages back into xml
 			pugi::xml_document clientEvents;

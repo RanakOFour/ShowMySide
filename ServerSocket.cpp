@@ -174,7 +174,7 @@ std::string ServerSocket::OnTick()
 
 		if(clientMessageAsString != "")
 		{
-			printf("Message recieved: %s\n", clientMessageAsString.c_str());
+			printf("Message recieved as server: %s\n", clientMessageAsString.c_str());
 
 			messagesToSend = true;
 
@@ -225,8 +225,6 @@ std::string ServerSocket::OnTick()
 		std::stringstream ss;
 		currentMessageStruct.save(ss);
 		std::string xmlToSend = ss.str();
-
-		printf("Message to pass up: %s\n", xmlToSend.c_str());
 
 		return xmlToSend;
 	}

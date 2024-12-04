@@ -60,6 +60,16 @@ void Client::Send(const std::string _message)
 	m_socket->Send(messageString);
 }
 
+void Client::Send(pugi::xml_document& _nodeToSend)
+{
+	std::stringstream ss;
+	_nodeToSend.save(ss);
+	std::string messageString = ss.str();
+	printf("XML to Send: %s", messageString.c_str());
+
+	m_socket->Send(messageString);
+}
+
 void Client::OnTick(void* _userData)
 {
 	//Don't run before connected to a lobby
@@ -77,7 +87,7 @@ void Client::OnTick(void* _userData)
 
 			eventsFromServer.append(currentDataPull);
 			pugi::xml_parse_result result = eventsDocument.load_string(eventsFromServer.c_str());
-			if (currentDataPull == "" || result.status)
+			if ((currentDataPull == "" && eventsFromServer == "") || !result.status)
 			{
 				dataComplete = true;
 			}
@@ -127,8 +137,25 @@ void Client::OnTick(void* _userData)
 			}
 		}
 
-		m_lobby->OnTick();
+		if (m_lobby != nullptr)
+		{
+			m_lobby->OnTick();
+
+			//Get any events that need to be sent
+			pugi::xml_document toSend;
+			m_lobby->FlushEvents(toSend);
+
+			if (toSend.child("Event"))
+			{
+				Send(toSend);
+			}
+		}
 	}
 
 	Fl::repeat_timeout(1 / 30, Tick, this);
+}
+
+Lobby* Client::GetLobby()
+{
+	return m_lobby;
 }

@@ -41,23 +41,22 @@ void PlayerInfo::ChangeAttribute(std::string _attributeName, std::string _newVal
 	}
 	else if (_attributeName == "destination")
 	{
+		printf("comma at position: %d\n", (int)_newValue.find(','));
+		printf("size of string: %d\n", (int)_newValue.size());
+		printf("substring: %s\n", _newValue.substr(_newValue.find(',') + 1, _newValue.size()).c_str());
 		m_currentDestination[0] = atoi(_newValue.substr(0, _newValue.find(',')).c_str());
-		m_currentDestination[1] = atoi(_newValue.substr(_newValue.find(',') - 1, _newValue.size()).c_str());
+		m_currentDestination[1] = atoi(_newValue.substr(_newValue.find(',') + 1, _newValue.size()).c_str());
+		m_movementInterpolationStep = 0;
 	}
 	else if (_attributeName == "start")
 	{
 		m_startingPosition[0] = atoi(_newValue.substr(0, _newValue.find(',')).c_str());
-		m_startingPosition[1] = atoi(_newValue.substr(_newValue.find(',') - 1, _newValue.size()).c_str());
+		m_startingPosition[1] = atoi(_newValue.substr(_newValue.find(',')+ 1, _newValue.size()).c_str());
 	}
 	else if (_attributeName == "username")
 	{
 		m_username = _newValue;
 	}
-}
-
-int PlayerInfo::Id()
-{
-	return m_id;
 }
 
 std::string PlayerInfo::AsXMLString()
