@@ -52,13 +52,13 @@ void HeadlessLobby::RemovePlayer(int _id)
 }
 
 
-void HeadlessLobby::ChangeAttribute(int _id, std::string _attributeName, std::string _newValue)
+void HeadlessLobby::ChangeAttribute(int _id, std::string& _attributeName, std::string& _newValue)
 {
 	m_players[_id]->ChangeAttribute(_attributeName, _newValue);
 	m_playerXML[_id]->attribute(_attributeName.c_str()).set_value(_newValue.c_str());
 }
 
-void HeadlessLobby::LogEvent(std::string _eventXML)
+void HeadlessLobby::LogEvent(std::string& _eventXML)
 {
 	//Load string into xml and plug into m_logDocument, then save to file
 	pugi::xml_document eventDoc;

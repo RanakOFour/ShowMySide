@@ -45,7 +45,7 @@ bool Client::Connect(const char* _ipToConnect)
 	return false;
 }
 
-void Client::Send(const std::string _message)
+void Client::Send(std::string& _message)
 {
 	pugi::xml_document newDoc;
 	pugi::xml_node message = newDoc.append_child("Event");
@@ -124,11 +124,14 @@ void Client::OnTick(void* _userData)
 					else if (eventName == "attr_change")
 					{
 						// Change specified attribute
-						m_lobby->ChangeAttribute(currentEvent.attribute("id").as_int(), currentEvent.attribute("attribute").value(), currentEvent.attribute("value").value());
+						std::string attribute = currentEvent.attribute("attribute").value();
+						std::string value = currentEvent.attribute("value").value();
+						m_lobby->ChangeAttribute(currentEvent.attribute("id").as_int(), attribute, value);
 					}
 					else if (eventName == "new_message")
 					{
-						m_lobby->ShowMessage(currentEvent.attribute("id").as_int(), currentEvent.attribute("text").value());
+						std::string text = currentEvent.attribute("text").value();
+						m_lobby->ShowMessage(currentEvent.attribute("id").as_int(), text);
 						m_lobby->redraw();
 					}
 

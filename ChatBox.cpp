@@ -4,18 +4,16 @@
 #include "FL/Fl_Multiline_Input.H"
 
 Chatbox::Chatbox() :
-	Fl_Group(0, 0, 300, 300, "")
+	Fl_Group(0, 0, 300, 300, ""),
+	m_mode(-1)
 {
-	m_inputBuffer = new Fl_Multiline_Input(220, 260, 200, 50, "Enter Text");
-	m_sendButton = new Fl_Button(270, 320, 100, 50, "Send");
+	m_inputBuffer = new Fl_Multiline_Input(550, 375, 200, 50, "Enter Text");
 
 	add(m_inputBuffer);
-	add(m_sendButton);
 	end();
 
 
 	m_inputBuffer->show();
-	m_sendButton->show();
 	hide();
 }
 
@@ -32,9 +30,17 @@ int Chatbox::handle(int _event)
 		return 1;
 
 	case FL_KEYDOWN:
+		m_inputBuffer->take_focus();
 		if (Fl::event_key() == FL_Enter)
 		{
 			hide();
 		}
 	}
+}
+
+void Chatbox::Display(int _mode)
+{
+	m_mode = _mode;
+	show();
+	take_focus();
 }

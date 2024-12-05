@@ -17,8 +17,8 @@ Host::Host(int _port, double _tickTimer) :
 
 	// Set network monitoring on another thread so that it doesn't conflist with client stuff
 	// Also using fltk timeout gets messed up when you have too many timers aparrently, and this was my idea of getting rid of a repeat_timeout call
-	std::thread hostThread(&Host::MonitorNetwork, this);
-	hostThread.detach();
+	m_networkingThread = new std::thread(&Host::MonitorNetwork, this);
+	m_networkingThread->detach();
 }
 
 Host::~Host()
@@ -68,7 +68,9 @@ void Host::MonitorNetwork()
 				else if (eventName == "attr_change")
 				{
 					// Change specified attribute
-					m_lobby->ChangeAttribute(currentEvent.attribute("id").as_int(), currentEvent.attribute("attribute").value(), currentEvent.attribute("value").value());
+					std::string attribute = currentEvent.attribute("attribute").value();
+					std::string value = currentEvent.attribute("value").value();
+					m_lobby->ChangeAttribute(currentEvent.attribute("id").as_int(), attribute, value);
 				}
 
 				//Only other event type is 'new_message', but that is handled by individual clients

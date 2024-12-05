@@ -28,7 +28,7 @@ public:
 	~MainWindow();
 
 	/**
-		There are only 3 different layouts, to be real. The empty screen when the program boots, the join game screen, then the normal gameplay screen.
+		There are only 3 different layouts, in reality. The empty screen when the program boots, the join game screen, then the normal gameplay screen.
 		The only reason HOST is listed is because the host needs to also add an Fl_Label with the ip address of the machine so that other clients can
 		join.
 	*/
@@ -49,6 +49,6 @@ public:
 	/**
 		Called by OnSendData to ask the client to send a message stored in an Fl_Multiline_Input
 	*/
-	void Send(const std::string _msg);
+	void Send(std::string& _msg);
 };
 

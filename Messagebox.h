@@ -10,9 +10,8 @@ class Messagebox : public Fl_Group,
     private Timer
 {
 private:
-    std::string m_textToShow;
-    Fl_Box* m_textBoxImage;
     Fl_Multiline_Output* m_textBox;
+    Fl_Box* m_textBoxImage;
 
     /**
         Hides the text and image
@@ -26,6 +25,6 @@ public:
     /**
         Shows FLTK property components and loads message into m_textToShow and m_textBox text
     */
-    void DisplayMessage(std::string _message);
+    void DisplayMessage(std::string& _message);
 };
 

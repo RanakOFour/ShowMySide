@@ -17,8 +17,8 @@ public:
 	~HeadlessLobby();
 	void CreateNewPlayer();
 	void RemovePlayer(int _id);
-	void ChangeAttribute(int _id, std::string _attributeName, std::string _newValue);
-	void LogEvent(std::string _eventXML);
+	void ChangeAttribute(int _id, std::string& _attributeName, std::string& _newValue);
+	void LogEvent(std::string& _eventXML);
 	void LogEvent(pugi::xml_node _eventXML);
 	std::string AsXMLString();
 };

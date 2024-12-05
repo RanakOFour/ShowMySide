@@ -4,7 +4,7 @@
 #include <sstream>
 
 PlayerInfo::PlayerInfo(int _id) :
-	m_shapeImage(ImagePool::ImageType::TRIANGLE),
+	m_imageType(ImagePool::ImageType::TRIANGLE),
 	m_username("Player " + std::to_string(_id)),
 	m_id(_id)
 {
@@ -15,8 +15,8 @@ PlayerInfo::PlayerInfo(int _id) :
 	m_movementInterpolationStep = 0;
 }
 
-PlayerInfo::PlayerInfo(int _id, std::string _username, int _destination[], int _current[], int _shape) :
-	m_shapeImage((ImagePool::ImageType)_shape),
+PlayerInfo::PlayerInfo(int _id, std::string& _username, int _destination[], int _current[], int _shape) :
+	m_imageType((ImagePool::ImageType)_shape),
 	m_id(_id),
 	m_username(_username)
 {
@@ -32,18 +32,15 @@ PlayerInfo::~PlayerInfo()
 
 }
 
-void PlayerInfo::ChangeAttribute(std::string _attributeName, std::string _newValue)
+void PlayerInfo::ChangeAttribute(std::string& _attributeName, std::string& _newValue)
 {
 	// Raw dog _newVal into playerinfo value matching _attributeName
 	if (_attributeName == "shape")
 	{
-		m_shapeImage = (ImagePool::ImageType)atoi(_newValue.c_str());
+		m_imageType = (ImagePool::ImageType)atoi(_newValue.c_str());
 	}
 	else if (_attributeName == "destination")
 	{
-		printf("comma at position: %d\n", (int)_newValue.find(','));
-		printf("size of string: %d\n", (int)_newValue.size());
-		printf("substring: %s\n", _newValue.substr(_newValue.find(',') + 1, _newValue.size()).c_str());
 		m_currentDestination[0] = atoi(_newValue.substr(0, _newValue.find(',')).c_str());
 		m_currentDestination[1] = atoi(_newValue.substr(_newValue.find(',') + 1, _newValue.size()).c_str());
 		m_movementInterpolationStep = 0;
@@ -67,7 +64,7 @@ std::string PlayerInfo::AsXMLString()
 	playerNode.append_attribute("id").set_value(m_id);
 
 	playerNode.append_attribute("username").set_value(m_username.c_str());
-	playerNode.append_attribute("shape").set_value(m_shapeImage);
+	playerNode.append_attribute("shape").set_value(m_imageType);
 
 	//Don't judge
 	playerNode.append_attribute("destination").set_value(std::string(std::to_string(m_currentDestination[0]) + "," + std::to_string(m_currentDestination[1])).c_str());

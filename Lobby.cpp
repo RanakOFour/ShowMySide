@@ -1,17 +1,21 @@
-#include <memory>
 #include "Lobby.h"
+#include "Timer.h"
 #include "Player.h"
 #include "PlayerInfo.h"
-#include "Timer.h"
 #include "ChatBox.h"
+#include "ImagePool.h"
 #include "Pugixml/pugixml.hpp"
+#include <memory>
 
-Lobby::Lobby(std::string _docToLoad) :
+Lobby::Lobby(std::string& _docToLoad) :
 	Fl_Double_Window(0, 0, 1200, 800, "Lobby"),
 	m_events(),
 	m_players(),
 	m_clientPlayer(nullptr)
 {
+	icon(ImagePool::GetImage(ImagePool::ImageType::ICON));
+
+
 	//Loads xml document from text, then copies out the data from the document into m_players
 	pugi::xml_document xmlDoc;
 	xmlDoc.load_string(_docToLoad.c_str());
@@ -64,38 +68,50 @@ int Lobby::handle(int _event)
 	case FL_PUSH:
 		if (Fl::event_button() == FL_LEFT_MOUSE && !m_chatBox->visible())
 		{
-			m_clientPlayer->SetDestination(Fl::event_x(), Fl::event_y());
-			pugi::xml_node destinationNode = m_events.append_child("Event");
-			destinationNode.append_attribute("type").set_value("attr_change");
-			destinationNode.append_attribute("attribute").set_value("destination");
-			destinationNode.append_attribute("value").set_value(std::string(std::to_string(Fl::event_x()) + "," + std::to_string(Fl::event_y())).c_str());
-
-			pugi::xml_document playerInfo;
-			playerInfo.load_string(m_clientPlayer->AsXMLString().c_str());
-
-			pugi::xml_node startNode = m_events.append_child("Event");
-			startNode.append_attribute("type").set_value("attr_change");
-			startNode.append_attribute("attribute").set_value("start");
-			startNode.append_attribute("value").set_value(playerInfo.child("Player").attribute("start").value());
+			pugi::xml_document newEvent = m_clientPlayer->SetDestination(Fl::event_x(), Fl::event_y());
+			m_events.append_copy(newEvent.first_child());
+			m_events.append_copy(newEvent.last_child());
 			return 1;
 		}
 		break;
 
 	case FL_KEYDOWN:
-		if (Fl::event_key() == 't')
-		{
-			printf("'t' key pressed!\n");
-			if (!m_chatBox->visible())
-			{
-				m_chatBox->show();
-				m_chatBox->take_focus();
-				redraw();
-			}
-		}
+		HandleKeyboardEvent(Fl::event_key());
 		break;
 	}
 
 	return 0;
+}
+
+void Lobby::HandleKeyboardEvent(int _key)
+{
+	switch (_key)
+	{
+	case 't':
+		printf("'t' key pressed!\n");
+		if (!m_chatBox->visible())
+		{
+			m_chatBox->Display(0);
+			redraw();
+		}
+		break;
+
+	case 'q':
+		printf("q pressed!\n");
+		m_chatBox->Display(1);
+
+		break;
+
+	case '1':
+	case '2':
+	case '3':
+	case '4':
+	{
+		pugi::xml_document newEvent = m_clientPlayer->ChangeImage((ImagePool::ImageType)(_key - 49));
+		m_events.append_copy(newEvent.child("Event"));
+	}
+		break;
+	}
 }
 
 void Lobby::FlushEvents(pugi::xml_document& _document)
@@ -143,12 +159,12 @@ void Lobby::RemovePlayer(int _id)
 	}
 }
 
-void Lobby::ChangeAttribute(int _id, std::string _attributeName, std::string _newValue)
+void Lobby::ChangeAttribute(int _id, std::string& _attributeName, std::string& _newValue)
 {
 	m_players[_id]->ChangeAttribute(_attributeName, _newValue);
 }
 
-void Lobby::ShowMessage(int _id, std::string _message)
+void Lobby::ShowMessage(int _id, std::string& _message)
 {
 	m_players[_id]->ShowMessage(_message);
 }

@@ -19,11 +19,16 @@ private:
     */
     int handle(int _event);
 
+    /**
+        Specific function for keyboard events to escape throwing a bunch of code into a single case statement of a switch
+    */
+    void HandleKeyboardEvent(int _key);
+
 public:
     /**
         _docToLoad is an XML document listing all the players in the lobby on join
     */
-    Lobby(std::string _docToLoad);
+    Lobby(std::string& _docToLoad);
     ~Lobby();
 
     /**
@@ -49,11 +54,11 @@ public:
     /**
         Handles attr_change events from the Client
     */
-    void ChangeAttribute(int _id, std::string _attributeName, std::string _newValue);
+    void ChangeAttribute(int _id, std::string& _attributeName, std::string& _newValue);
 
     /**
         Handles new_message events from the Client
     */
-    void ShowMessage(int _id, std::string _message);
+    void ShowMessage(int _id, std::string& _message);
 };
 

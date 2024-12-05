@@ -2,6 +2,7 @@
 #include "Timer.h"
 #include "Host.h"
 #include "Client.h"
+#include "ImagePool.h"
 #include <string>
 #include <iostream>
 #include <thread>
@@ -20,12 +21,13 @@
 static MainWindow* m_Main;
 
 MainWindow::MainWindow(int _w, int _h, std::string _name)
-	: Fl_Double_Window(200, 200, _w, _h, _name.c_str()),
+	: Fl_Double_Window(200, 200, _w, _h, "Show My Side"),
 	m_Client(nullptr),
 	m_Host(nullptr)
 {
 	m_Main = this;
 	ChangeLayout(LayoutType::SPLASH_SCREEN);
+	icon(ImagePool::GetImage(ImagePool::ImageType::ICON));
 }
 
 MainWindow::~MainWindow()
@@ -42,7 +44,7 @@ bool MainWindow::AttemptConnection(const char* _ipAddress)
 	return false;
 }
 
-void MainWindow::Send(const std::string _msg)
+void MainWindow::Send(std::string& _msg)
 {
 	m_Client->Send(_msg);
 }
@@ -170,7 +172,7 @@ void MainWindow::OnSendData(Fl_Widget* _widget, void* _userData)
 	// Send data to server
 
 	Fl_Multiline_Input* messageBox = (Fl_Multiline_Input*)_userData;
-	const std::string textToSend = messageBox->value();
+	std::string textToSend = messageBox->value();
 	printf("Attempting to send: %s\n", textToSend.c_str());
 	m_Main->Send(textToSend);
 }

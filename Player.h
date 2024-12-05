@@ -31,21 +31,32 @@ public:
 
 	~Player();
 
-	/**
-		Sets m_currentDestination and updates m_startingPosition, then resets m_movementInterpolationStep for animating.
-		These properties come from PlayerInfo.
-	*/
-	void SetDestination(int _x, int _y);
 
 	/**
 		Takes XML properties and passes along to PlayerInfo
 	*/
-	void ChangeAttribute(std::string _attributeName, std::string _newValue);
+	void ChangeAttribute(std::string& _attributeName, std::string& _newValue);
+
+
+	/**
+		Sets m_currentDestination and updates m_startingPosition, then resets m_movementInterpolationStep for animating.
+		These properties come from PlayerInfo.
+	*/
+	pugi::xml_document SetDestination(int _x, int _y);
+
+
+	/**
+		Changes image everywhere and returns event as XML
+	*/
+	pugi::xml_document ChangeImage(ImagePool::ImageType _imageType);
+
+
+	pugi::xml_document ChangeUsername(std::string& _newName);
 
 	/**
 		Sets up Messagebox property to show given message
 	*/
-	void ShowMessage(std::string _message);
+	void ShowMessage(std::string& _message);
 
 	/**
 		Increments 

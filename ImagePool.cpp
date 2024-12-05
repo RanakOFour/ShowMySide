@@ -11,6 +11,7 @@ ImagePool::ImagePool()
 	m_images[2] = new Fl_PNG_Image("./images/pentagon.png");
 	m_images[3] = new Fl_PNG_Image("./images/hexagon.png");
 	m_images[4] = new Fl_PNG_Image("./images/textbox.png");
+	m_images[5] = new Fl_PNG_Image("./images/icon.png");
 
 	for (int i = 0; i < 4; i++)
 	{

@@ -30,7 +30,7 @@ public:
 	/**
 		Packages an event string into and XML node, then converts that to a string before shipping off
 	*/
-	void Send(const std::string _message);
+	void Send(std::string& _message);
 
 	/**
 		Converts a given XML node to a string then ships off.
