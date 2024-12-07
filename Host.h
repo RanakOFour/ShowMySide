@@ -26,6 +26,6 @@ public:
 		Handles all the server messages and runs inside of m_networkingThread
 	*/
 	void MonitorNetwork();
-	std::string GetIP();
+	std::string GetIPAddress();
 };
 

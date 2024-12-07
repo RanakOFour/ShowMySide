@@ -12,7 +12,6 @@ PlayerInfo::PlayerInfo(int _id) :
 	m_currentDestination[1] = 250;
 	m_startingPosition[0] = 250;
 	m_startingPosition[1] = 250;
-	m_movementInterpolationStep = 0;
 }
 
 PlayerInfo::PlayerInfo(int _id, std::string& _username, int _destination[], int _current[], int _shape) :
@@ -24,7 +23,6 @@ PlayerInfo::PlayerInfo(int _id, std::string& _username, int _destination[], int 
 	m_currentDestination[1] = _destination[1];
 	m_startingPosition[0] = _current[0];
 	m_startingPosition[1] = _current[1];
-	m_movementInterpolationStep = 0;
 }
 
 PlayerInfo::~PlayerInfo()
@@ -43,7 +41,6 @@ void PlayerInfo::ChangeAttribute(std::string& _attributeName, std::string& _newV
 	{
 		m_currentDestination[0] = atoi(_newValue.substr(0, _newValue.find(',')).c_str());
 		m_currentDestination[1] = atoi(_newValue.substr(_newValue.find(',') + 1, _newValue.size()).c_str());
-		m_movementInterpolationStep = 0;
 	}
 	else if (_attributeName == "start")
 	{

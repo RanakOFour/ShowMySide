@@ -1,5 +1,7 @@
+#include "FL/Fl_Double_Window.H"
+#include "FL/Fl_Input.H"
+#include "FL/Fl_Output.H"
 #include <string>
-#include <FL/Fl_Double_Window.H>
 
 class ServerSocket;
 class ClientSocket;
@@ -10,14 +12,14 @@ class MainWindow : public Fl_Double_Window
 private:
 	Host* m_Host;
 	Client* m_Client;
+	Fl_Input* m_ipInput;
+	Fl_Output* m_lobbyOutputLog;
 
 	/**
 		Called in OnJoinServer() to take the IPv4 address from an Fl_Input widget and pass it to the Client to connect. Returns true on a succesful connection
 	*/
-	bool AttemptConnection(const char* _ipAddress);
+	bool AttemptConnection(std::string& _ipAddress);
 
-
-	static void OnSendData(Fl_Widget* _widget, void* _userData);
 	static void OnJoinServer(Fl_Widget* _widget, void* _userData);
 	static void OnClientStart(Fl_Widget* _widget, void* _userData);
 	static void OnServerStart(Fl_Widget* _widget, void* _userData);

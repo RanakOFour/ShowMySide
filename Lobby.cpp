@@ -11,7 +11,8 @@ Lobby::Lobby(std::string& _docToLoad) :
 	Fl_Double_Window(0, 0, 1200, 800, "Lobby"),
 	m_events(),
 	m_players(),
-	m_clientPlayer(nullptr)
+	m_clientPlayer(nullptr),
+	m_textFromChatbox()
 {
 	icon(ImagePool::GetImage(ImagePool::ImageType::ICON));
 
@@ -88,7 +89,7 @@ void Lobby::HandleKeyboardEvent(int _key)
 	switch (_key)
 	{
 	case 't':
-		printf("'t' key pressed!\n");
+		printf("'t' pressed!\n");
 		if (!m_chatBox->visible())
 		{
 			m_chatBox->Display(0);
@@ -98,7 +99,11 @@ void Lobby::HandleKeyboardEvent(int _key)
 
 	case 'q':
 		printf("q pressed!\n");
-		m_chatBox->Display(1);
+		if (!m_chatBox->visible())
+		{
+			m_chatBox->Display(1);
+			redraw();
+		}
 
 		break;
 
@@ -138,6 +143,30 @@ void Lobby::OnTick()
 	for (int i = 0; i < m_players.size(); i++)
 	{
 		m_players[i]->OnTick();
+	}
+
+	m_textFromChatbox = m_chatBox->FlushMessage();
+	// Handles chatbox text if any
+	if (m_textFromChatbox != "")
+	{
+		switch (m_chatBox->m_mode)
+		{
+		case 0:
+		{
+			pugi::xml_node newEvent = m_events.append_child("Event");
+			newEvent.append_attribute("type").set_value("new_message");
+			newEvent.append_attribute("text").set_value(m_textFromChatbox.c_str());
+
+			break;
+		}
+		
+		case 1:
+		{
+			pugi::xml_document newEvent = m_clientPlayer->ChangeUsername(m_textFromChatbox);
+			m_events.append_copy(newEvent.child("Event"));
+			break;
+		}
+		}
 	}
 
 	redraw();

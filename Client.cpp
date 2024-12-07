@@ -2,6 +2,7 @@
 #include "ClientSocket.h"
 #include "Lobby.h"
 #include "Pugixml/pugixml.hpp"
+#include "FL/Fl_Output.H"
 #include <iostream>
 #include <stdexcept>
 #include <sstream>
@@ -19,57 +20,6 @@ Client::~Client()
 
 }
 
-bool Client::Connect(const char* _ipToConnect)
-{
-	m_socket = new ClientSocket();
-
-	if (m_socket->Connect(_ipToConnect))
-	{
-		//Request xml info then apply
-		printf("Connected successfully!\n");
-
-		pugi::xml_document newPlayerEvent;
-		newPlayerEvent.append_child("Event");
-		newPlayerEvent.child("Event").append_attribute("type").set_value("new_plr");
-
-		std::stringstream ss;
-		newPlayerEvent.save(ss);
-		std::string messageString = ss.str();
-		printf("Request to Send:\n%s", messageString.c_str());
-
-		m_socket->Send(messageString);
-		return true;
-	}
-
-	printf("Failed to connect to %s\n", _ipToConnect);
-	return false;
-}
-
-void Client::Send(std::string& _message)
-{
-	pugi::xml_document newDoc;
-	pugi::xml_node message = newDoc.append_child("Event");
-	message.append_attribute("type").set_value("new_message");
-	message.append_attribute("text").set_value(_message.c_str());
-
-	std::stringstream ss;
-	newDoc.save(ss);
-	std::string messageString = ss.str();
-	printf("XML to Send: %s", messageString.c_str());
-
-	m_socket->Send(messageString);
-}
-
-void Client::Send(pugi::xml_document& _nodeToSend)
-{
-	std::stringstream ss;
-	_nodeToSend.save(ss);
-	std::string messageString = ss.str();
-	printf("XML to Send: %s", messageString.c_str());
-
-	m_socket->Send(messageString);
-}
-
 void Client::OnTick(void* _userData)
 {
 	//Don't run before connected to a lobby
@@ -80,7 +30,7 @@ void Client::OnTick(void* _userData)
 
 		// Loop through getting information from server until it has it all
 		bool dataComplete{ false };
-		while(!dataComplete)
+		while (!dataComplete)
 		{
 			std::string currentDataPull;
 			m_socket->Receive(currentDataPull);
@@ -156,6 +106,63 @@ void Client::OnTick(void* _userData)
 	}
 
 	Fl::repeat_timeout(1 / 30, Tick, this);
+}
+
+
+bool Client::Connect(std::string& _ipToConnect)
+{
+	m_socket = new ClientSocket();
+
+	if (m_socket->Connect(_ipToConnect))
+	{
+		//Request xml info then apply
+		printf("Connected successfully!\n");
+
+		pugi::xml_document newPlayerEvent;
+		newPlayerEvent.append_child("Event");
+		newPlayerEvent.child("Event").append_attribute("type").set_value("new_plr");
+
+		std::stringstream ss;
+		newPlayerEvent.save(ss);
+		std::string messageString = ss.str();
+		printf("Request to Send:\n%s", messageString.c_str());
+
+		m_socket->Send(messageString);
+		return true;
+	}
+
+	printf("Failed to connect to %s\n", _ipToConnect);
+	return false;
+}
+
+void Client::Send(std::string& _message)
+{
+	pugi::xml_document newDoc;
+	pugi::xml_node message = newDoc.append_child("Event");
+	message.append_attribute("type").set_value("new_message");
+	message.append_attribute("text").set_value(_message.c_str());
+
+	std::stringstream ss;
+	newDoc.save(ss);
+	std::string messageString = ss.str();
+	printf("XML to Send: %s", messageString.c_str());
+
+	m_socket->Send(messageString);
+}
+
+void Client::Send(pugi::xml_document& _nodeToSend)
+{
+	std::stringstream ss;
+	_nodeToSend.save(ss);
+	std::string messageString = ss.str();
+	printf("XML to Send: %s", messageString.c_str());
+
+	m_socket->Send(messageString);
+}
+
+void Client::SetOutputLog(Fl_Output* _outputLog)
+{
+	m_mainWindowLog = _outputLog;
 }
 
 Lobby* Client::GetLobby()

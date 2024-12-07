@@ -1,5 +1,6 @@
 #include "Timer.h"
 #include "Pugixml/pugixml.hpp"
+#include "FL/Fl_Output.H"
 #include <string>
 
 #pragma once
@@ -12,6 +13,7 @@ class Client : public Timer
 private:
 	ClientSocket* m_socket;
 	Lobby* m_lobby;
+	Fl_Output* m_mainWindowLog;
 
 	/**
 		Routinely checks if there are new events from the server, then applies them to the Lobby.
@@ -25,7 +27,7 @@ public:
 	/**
 		Asks the ClientSocket property to connect to given ip. Returns true on successful connection
 	*/
-	bool Connect(const char* _ipToConnect);
+	bool Connect(std::string& _ipToConnect);
 
 	/**
 		Packages an event string into and XML node, then converts that to a string before shipping off
@@ -36,6 +38,12 @@ public:
 		Converts a given XML node to a string then ships off.
 	*/
 	void Send(pugi::xml_document& _nodeToSend);
+
+	/**
+		Sets value of m_mainWindowLog. This isn't done in the constructor m_mainWindowLog only starts to exist (It's created in MainWindow::ChangeLayout()) after the client has been initalised.
+	*/
+	void SetOutputLog(Fl_Output* _outputLog);
+
 	Lobby* GetLobby();
 };
 

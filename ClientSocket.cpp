@@ -18,7 +18,7 @@ ClientSocket::~ClientSocket()
 	}
 }
 
-bool ClientSocket::Connect(const std::string& _serverName)
+bool ClientSocket::Connect(std::string& _serverName)
 {
 	addrinfo* result = nullptr,
 		* ptr = nullptr,
@@ -70,7 +70,7 @@ bool ClientSocket::Connect(const std::string& _serverName)
 	return true;
 }
 
-void ClientSocket::Send(const std::string& _message)
+void ClientSocket::Send(std::string& _message)
 {
 	int bytes = ::send(m_socket, _message.c_str(), _message.length(), 0);
 	if (bytes <= 0)

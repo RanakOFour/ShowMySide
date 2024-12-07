@@ -1,7 +1,7 @@
+#include "PlayerInfo.h"
 #include "FL/Fl_PNG_Image.H"
 #include "FL/Fl_Box.H"
 #include "FL/Fl_Group.H"
-#include "PlayerInfo.h"
 #include <string>
 
 #pragma once
@@ -17,6 +17,8 @@ private:
 	Messagebox* m_messageBox;
 	Fl_Box* m_playerImage;
 	PlayerInfo m_playerInfo;
+	double m_movementStep;
+
 public:
 
 	/**

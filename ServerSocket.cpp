@@ -72,8 +72,10 @@ ServerSocket::ServerSocket(int _port)
 	sockaddr_in loopback;
 	//loopback needs to have properties set
 	loopback.sin_family = AF_INET;
-	loopback.sin_addr.s_addr = 1337;   // can be any IP address
-	loopback.sin_port = htons(9);      // using debug port
+	loopback.sin_addr.s_addr = 1337;
+	
+	// using debug port
+	loopback.sin_port = htons(9);
 
 	//connect socket at loopback address
 	if (connect(sock, reinterpret_cast<sockaddr*>(&loopback), sizeof(loopback)) == -1) {
@@ -123,11 +125,11 @@ std::shared_ptr<ClientSocket> ServerSocket::Accept()
 	return rtn;
 }
 
-std::string ServerSocket::OnTick()
+pugi::xml_document ServerSocket::OnTick()
 {
 	//create document to repackage messages into and return
-	pugi::xml_document currentMessageStruct;
-	pugi::xml_node events = currentMessageStruct.append_child("Events");
+	pugi::xml_document currentMessageDoc;
+	pugi::xml_node events = currentMessageDoc.append_child("Events");
 
 	bool messagesToSend{ false };
 
@@ -139,7 +141,6 @@ std::string ServerSocket::OnTick()
 		printf("Client Connected!\n");
 
 		m_clients.push_back(client);
-		m_idJustAdded = m_clients.size() - 1;
 	}
 
 
@@ -219,27 +220,21 @@ std::string ServerSocket::OnTick()
 		}
 	}
 
-	//Converts to string to send up
-	if (messagesToSend)
-	{
-		std::stringstream ss;
-		currentMessageStruct.save(ss);
-		std::string xmlToSend = ss.str();
-
-		return xmlToSend;
-	}
-
-	return "";
+	return currentMessageDoc;
 }
 
-void ServerSocket::Send(std::string _xmlToSend)
+void ServerSocket::Send(pugi::xml_document& _xmlToSend)
 {
+	std::stringstream ss;
+	_xmlToSend.save(ss);
+	std::string xmlAsString = ss.str();
+
 	for (size_t i = 0; i < m_clients.size(); i++)
 	{
 		//Avoids sending both update and initial stuff in the same frame because the xml won't parse correctly
 		if (i != m_idJustAdded)
 		{
-			m_clients.at(i)->Send(_xmlToSend);
+			m_clients.at(i)->Send(xmlAsString);
 		}
 		else
 		{
@@ -248,7 +243,10 @@ void ServerSocket::Send(std::string _xmlToSend)
 	}
 }
 
-void ServerSocket::SendTo(int _id, std::string _xmlToSend)
+void ServerSocket::SendServerInfo(int _id, std::string _xmlToSend)
 {
 	m_clients.at(_id)->Send(_xmlToSend);
+
+	//This is to blacklist the specific client from reviecing updates until it has recieved and processed the server info
+	m_idJustAdded = _id;
 }

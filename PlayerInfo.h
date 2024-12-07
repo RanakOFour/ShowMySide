@@ -1,6 +1,6 @@
-#include "FL/Fl_PNG_Image.H"
-#include "Pugixml/pugixml.hpp"
 #include "ImagePool.h"
+#include "Pugixml/pugixml.hpp"
+#include "FL/Fl_PNG_Image.H"
 #include <string>
 
 #pragma once
@@ -16,7 +16,6 @@ private:
 	int m_id;
 	int m_currentDestination[2];
 	int m_startingPosition[2];
-	double m_movementInterpolationStep;
 
 public:
 	/**

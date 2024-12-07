@@ -31,22 +31,14 @@ void Host::MonitorNetwork()
 	while (!m_closeServer)
 	{
 		//Get repackaged xml message from serversocket
-		std::string eventsFromClient = m_server->OnTick();
+		pugi::xml_document eventsFromClient = m_server->OnTick();
 
-		if (eventsFromClient != "")
+		if (eventsFromClient.child("Events").first_child() != NULL)
 		{
-			printf("Host messages recieved %s\n", eventsFromClient.c_str());
-
-			//Parse client messages back into xml
-			pugi::xml_document clientEvents;
-			pugi::xml_parse_result parseRes = clientEvents.load_string(eventsFromClient.c_str());
-			if (parseRes.status)
-			{
-				throw std::runtime_error(parseRes.description());
-			}
+			printf("Host messages recieved\n");
 
 			//Cycle through messages and apply changes
-			for (pugi::xml_node currentEvent = clientEvents.child("Events").first_child(); currentEvent != NULL; currentEvent = currentEvent.next_sibling())
+			for (pugi::xml_node currentEvent = eventsFromClient.child("Events").first_child(); currentEvent; currentEvent = currentEvent.next_sibling())
 			{
 				m_lobby->LogEvent(currentEvent);
 
@@ -56,9 +48,9 @@ void Host::MonitorNetwork()
 
 				if (eventName == "new_plr")
 				{
-					//Add player to lobby, send out lobby info
+					//Add player to lobby
 					m_lobby->CreateNewPlayer();
-					m_server->SendTo(currentEvent.attribute("id").as_int(), m_lobby->AsXMLString());
+					m_server->SendServerInfo(currentEvent.attribute("id").as_int(), m_lobby->AsXMLString());
 				}
 				else if (eventName == "plr_leave")
 				{
@@ -76,12 +68,13 @@ void Host::MonitorNetwork()
 				//Only other event type is 'new_message', but that is handled by individual clients
 			}
 
+			//Ship events out to the clients
 			m_server->Send(eventsFromClient);
 		}
 	}
 }
 
-std::string Host::GetIP()
+std::string Host::GetIPAddress()
 {
 	return m_server->m_ipAddress;
 }

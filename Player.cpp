@@ -13,7 +13,10 @@
 Player::Player(int _id) :
 	Fl_Group(300, 400, 100, 100, ""),
 	m_messageBox(),
-	m_playerInfo(_id)
+	m_playerImage(),
+	m_playerInfo(_id),
+	m_movementStep(0)
+
 {
 	m_playerImage = new Fl_Box(0, 0, 100, 100, m_playerInfo.m_username.c_str());
 	m_playerImage->label(m_playerInfo.m_username.c_str());
@@ -26,7 +29,8 @@ Player::Player(PlayerInfo _info) :
 	Fl_Group(300, 400, 100, 100, ""),
 	m_messageBox(),
 	m_playerImage(),
-	m_playerInfo(_info)
+	m_playerInfo(_info),
+	m_movementStep(0)
 {
 	m_playerImage = new Fl_Box(0, 0, 100, 100, m_playerInfo.m_username.c_str());
 	m_playerImage->label(m_playerInfo.m_username.c_str());
@@ -50,7 +54,11 @@ void Player::ChangeAttribute(std::string& _attributeName, std::string& _newValue
 	}
 	else if (_attributeName == "username")
 	{
-		m_playerImage->label(_newValue.c_str());
+		m_playerImage->label(m_playerInfo.m_username.c_str());
+	}
+	else if (_attributeName == "destination")
+	{
+		m_movementStep = 0;
 	}
 }
 
@@ -60,7 +68,7 @@ pugi::xml_document Player::SetDestination(int _destX, int _destY)
 	m_playerInfo.m_startingPosition[1] = m_playerImage->y();
 	m_playerInfo.m_currentDestination[0] = _destX - (w() / 2);
 	m_playerInfo.m_currentDestination[1] = _destY - (h() / 2);
-	m_playerInfo.m_movementInterpolationStep = 0;
+	m_movementStep = 0;
 
 	pugi::xml_document newEvent;
 
@@ -113,14 +121,14 @@ void Player::OnTick()
 {
 
 	//Interpolate linearly from current position to destination
-	if (m_playerInfo.m_movementInterpolationStep < 1)
+	if (m_movementStep < 1)
 	{
-		int newX = m_playerInfo.m_startingPosition[0] + (m_playerInfo.m_movementInterpolationStep * (m_playerInfo.m_currentDestination[0] - m_playerInfo.m_startingPosition[0]));
-		int newY = m_playerInfo.m_startingPosition[1] + (m_playerInfo.m_movementInterpolationStep * (m_playerInfo.m_currentDestination[1] - m_playerInfo.m_startingPosition[1]));
+		int newX = m_playerInfo.m_startingPosition[0] + (m_movementStep * (m_playerInfo.m_currentDestination[0] - m_playerInfo.m_startingPosition[0]));
+		int newY = m_playerInfo.m_startingPosition[1] + (m_movementStep * (m_playerInfo.m_currentDestination[1] - m_playerInfo.m_startingPosition[1]));
 		m_playerImage->position(newX, newY);
 		m_messageBox->position(newX + 20, newY - 100);
 
-		m_playerInfo.m_movementInterpolationStep += 0.01;
+		m_movementStep += 0.01;
 	}
 	else
 	{

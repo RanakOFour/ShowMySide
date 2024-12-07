@@ -58,17 +58,7 @@ void HeadlessLobby::ChangeAttribute(int _id, std::string& _attributeName, std::s
 	m_playerXML[_id]->attribute(_attributeName.c_str()).set_value(_newValue.c_str());
 }
 
-void HeadlessLobby::LogEvent(std::string& _eventXML)
-{
-	//Load string into xml and plug into m_logDocument, then save to file
-	pugi::xml_document eventDoc;
-	eventDoc.load_string(_eventXML.c_str());
-
-	m_logDocument.insert_child_after("Event", eventDoc);
-	m_logDocument.save_file("./Log/headless.txt");
-}
-
-void HeadlessLobby::LogEvent(pugi::xml_node _eventXML)
+void HeadlessLobby::LogEvent(pugi::xml_node& _eventXML)
 {
 	m_logDocument.insert_child_after("Event", _eventXML);
 	m_logDocument.save_file("./Log/headless.txt");

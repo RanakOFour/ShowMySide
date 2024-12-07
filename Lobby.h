@@ -1,7 +1,8 @@
-#include <vector>
-#include "FL/Fl_Double_Window.H"
-#include "Pugixml/pugixml.hpp"
 #include "Timer.h"
+#include "Pugixml/pugixml.hpp"
+#include "FL/Fl_Double_Window.H"
+#include <string>
+#include <vector>
 
 class Player;
 class Chatbox;
@@ -13,6 +14,7 @@ private:
     std::vector<Player*> m_players;
     Player* m_clientPlayer;
     Chatbox* m_chatBox;
+    std::string m_textFromChatbox;
 
     /**
         Overrides Fl_Widget::handle() so that m_clientPlayer's destination will update on a player's click. Will also open the ChatBox when pressing the 't' key.
