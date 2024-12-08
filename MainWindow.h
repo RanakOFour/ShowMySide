@@ -47,10 +47,5 @@ public:
 		needed for the layout
 	*/
 	void ChangeLayout(LayoutType _newState);
-
-	/**
-		Called by OnSendData to ask the client to send a message stored in an Fl_Multiline_Input
-	*/
-	void Send(std::string& _msg);
 };
 

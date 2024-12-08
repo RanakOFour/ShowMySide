@@ -10,15 +10,14 @@
 Host::Host(int _port, double _tickTimer) :
 	m_server(nullptr),
 	m_lobby(nullptr),
-	m_closeServer(false)
+	m_serverClosed(false)
 {
 	m_server = new ServerSocket(_port);
 	m_lobby = new HeadlessLobby();
 
 	// Set network monitoring on another thread so that it doesn't conflist with client stuff
 	// Also using fltk timeout gets messed up when you have too many timers aparrently, and this was my idea of getting rid of a repeat_timeout call
-	m_networkingThread = new std::thread(&Host::MonitorNetwork, this);
-	m_networkingThread->detach();
+	m_networkingThread = std::thread(&Host::MonitorNetwork, this);
 }
 
 Host::~Host()
@@ -28,7 +27,7 @@ Host::~Host()
 
 void Host::MonitorNetwork()
 {
-	while (!m_closeServer)
+	while (!m_serverClosed)
 	{
 		//Get repackaged xml message from serversocket
 		pugi::xml_document eventsFromClient = m_server->OnTick();
@@ -72,6 +71,22 @@ void Host::MonitorNetwork()
 			m_server->Send(eventsFromClient);
 		}
 	}
+}
+
+bool Host::CloseServer()
+{
+	m_serverClosed = true;
+	m_networkingThread.join();
+
+	pugi::xml_document closeServerMessage;
+	pugi::xml_node closeEvent = closeServerMessage.append_child("Event");
+	closeEvent.append_attribute("type").set_value("close_server");
+
+	m_server->Send(closeServerMessage);
+
+	//m_server->CloseConnections();
+
+	return true;
 }
 
 std::string Host::GetIPAddress()

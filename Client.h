@@ -29,10 +29,6 @@ public:
 	*/
 	bool Connect(std::string& _ipToConnect);
 
-	/**
-		Packages an event string into and XML node, then converts that to a string before shipping off
-	*/
-	void Send(std::string& _message);
 
 	/**
 		Converts a given XML node to a string then ships off.

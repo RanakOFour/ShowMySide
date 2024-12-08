@@ -16,8 +16,8 @@ private:
 	/**
 		Using a thread improves performance compared to having Host inherit from Timer and use Fl timeout events
 	*/
-	std::thread* m_networkingThread;
-	bool m_closeServer;
+	std::thread m_networkingThread;
+	bool m_serverClosed;
 public:
 	Host(int _port, double _tickTime);
 	~Host();
@@ -26,6 +26,11 @@ public:
 		Handles all the server messages and runs inside of m_networkingThread
 	*/
 	void MonitorNetwork();
+
+	/**
+		Stops server thread and tells clients to disconnect from the server, then shuts down the server
+	*/
+	bool CloseServer();
 	std::string GetIPAddress();
 };
 

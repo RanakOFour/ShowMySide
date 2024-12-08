@@ -135,21 +135,6 @@ bool Client::Connect(std::string& _ipToConnect)
 	return false;
 }
 
-void Client::Send(std::string& _message)
-{
-	pugi::xml_document newDoc;
-	pugi::xml_node message = newDoc.append_child("Event");
-	message.append_attribute("type").set_value("new_message");
-	message.append_attribute("text").set_value(_message.c_str());
-
-	std::stringstream ss;
-	newDoc.save(ss);
-	std::string messageString = ss.str();
-	printf("XML to Send: %s", messageString.c_str());
-
-	m_socket->Send(messageString);
-}
-
 void Client::Send(pugi::xml_document& _nodeToSend)
 {
 	std::stringstream ss;

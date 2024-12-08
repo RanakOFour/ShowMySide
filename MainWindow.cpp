@@ -40,11 +40,6 @@ bool MainWindow::AttemptConnection(std::string& _ipAddress)
 	return false;
 }
 
-void MainWindow::Send(std::string& _msg)
-{
-	m_Client->Send(_msg);
-}
-
 void MainWindow::ChangeLayout(LayoutType _newState)
 {
 	
