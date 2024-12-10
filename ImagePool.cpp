@@ -12,6 +12,7 @@ ImagePool::ImagePool()
 	m_images[3] = new Fl_PNG_Image("./images/hexagon.png");
 	m_images[4] = new Fl_PNG_Image("./images/textbox.png");
 	m_images[5] = new Fl_PNG_Image("./images/icon.png");
+	m_images[6] = new Fl_PNG_Image("./images/splash.png");
 
 	for (int i = 0; i < 4; i++)
 	{
@@ -19,6 +20,8 @@ ImagePool::ImagePool()
 	}
 
 	m_images[4] = (Fl_PNG_Image*)m_images[4]->copy(200, 75);
+
+	m_images[6] = (Fl_PNG_Image*)m_images[6]->copy(440, 160);
 }
 
 ImagePool::~ImagePool()

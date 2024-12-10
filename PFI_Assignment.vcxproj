@@ -153,6 +153,7 @@
     <ClCompile Include="PlayerInfo.cpp" />
     <ClCompile Include="Pugixml\pugixml.cpp" />
     <ClCompile Include="ServerSocket.cpp" />
+    <ClCompile Include="MenuWrapper.cpp" />
     <ClCompile Include="Timer.cpp" />
     <ClCompile Include="Wsa.cpp" />
   </ItemGroup>
@@ -171,6 +172,7 @@
     <ClInclude Include="Pugixml\pugiconfig.hpp" />
     <ClInclude Include="Pugixml\pugixml.hpp" />
     <ClInclude Include="ServerSocket.h" />
+    <ClInclude Include="MenuWrapper.h" />
     <ClInclude Include="Timer.h" />
     <ClInclude Include="Wsa.h" />
   </ItemGroup>

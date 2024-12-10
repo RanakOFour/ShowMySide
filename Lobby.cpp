@@ -69,7 +69,7 @@ int Lobby::handle(int _event)
 	case FL_PUSH:
 		if (Fl::event_button() == FL_LEFT_MOUSE && !m_chatBox->visible())
 		{
-			pugi::xml_document newEvent = m_clientPlayer->SetDestination(Fl::event_x(), Fl::event_y());
+			pugi::xml_document newEvent = m_clientPlayer->CreateMovementEvent(Fl::event_x(), Fl::event_y());
 			m_events.append_copy(newEvent.first_child());
 			m_events.append_copy(newEvent.last_child());
 			return 1;
@@ -89,7 +89,7 @@ void Lobby::HandleKeyboardEvent(int _key)
 	switch (_key)
 	{
 	case 't':
-		printf("'t' pressed!\n");
+		//printf("'t' pressed!\n");
 		if (!m_chatBox->visible())
 		{
 			m_chatBox->Display(0);
@@ -98,7 +98,7 @@ void Lobby::HandleKeyboardEvent(int _key)
 		break;
 
 	case 'q':
-		printf("q pressed!\n");
+		//printf("q pressed!\n");
 		if (!m_chatBox->visible())
 		{
 			m_chatBox->Display(1);
@@ -112,7 +112,7 @@ void Lobby::HandleKeyboardEvent(int _key)
 	case '3':
 	case '4':
 	{
-		pugi::xml_document newEvent = m_clientPlayer->ChangeImage((ImagePool::ImageType)(_key - 49));
+		pugi::xml_document newEvent = m_clientPlayer->CreateImageEvent((ImagePool::ImageType)(_key - 49));
 		m_events.append_copy(newEvent.child("Event"));
 	}
 		break;
@@ -162,7 +162,7 @@ void Lobby::OnTick()
 		
 		case 1:
 		{
-			pugi::xml_document newEvent = m_clientPlayer->ChangeUsername(m_textFromChatbox);
+			pugi::xml_document newEvent = m_clientPlayer->CreateUsernameEvent(m_textFromChatbox);
 			m_events.append_copy(newEvent.child("Event"));
 			break;
 		}
@@ -196,4 +196,9 @@ void Lobby::ChangeAttribute(int _id, std::string& _attributeName, std::string& _
 void Lobby::ShowMessage(int _id, std::string& _message)
 {
 	m_players[_id]->ShowMessage(_message);
+}
+
+std::string Lobby::GetUsername(int _id)
+{
+	return m_players[_id]->GetUsername();
 }

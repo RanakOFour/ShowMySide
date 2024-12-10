@@ -62,12 +62,10 @@ void Player::ChangeAttribute(std::string& _attributeName, std::string& _newValue
 	}
 }
 
-pugi::xml_document Player::SetDestination(int _destX, int _destY)
+pugi::xml_document Player::CreateMovementEvent(int _destX, int _destY)
 {
-	m_playerInfo.m_startingPosition[0] = m_playerImage->x();
-	m_playerInfo.m_startingPosition[1] = m_playerImage->y();
-	m_playerInfo.m_currentDestination[0] = _destX - (w() / 2);
-	m_playerInfo.m_currentDestination[1] = _destY - (h() / 2);
+	//We don't need to actually change any values, because they will change when we recieve these events from the server later
+	//The movement step is not accounted for inside of PlayerInfo, so it is set here
 	m_movementStep = 0;
 
 	pugi::xml_document newEvent;
@@ -75,20 +73,18 @@ pugi::xml_document Player::SetDestination(int _destX, int _destY)
 	pugi::xml_node destinationNode = newEvent.append_child("Event");
 	destinationNode.append_attribute("type").set_value("attr_change");
 	destinationNode.append_attribute("attribute").set_value("destination");
-	destinationNode.append_attribute("value").set_value(std::string(std::to_string(_destX) + "," + std::to_string(_destY)).c_str());
+	destinationNode.append_attribute("value").set_value(std::string(std::to_string(_destX - (w() / 2)) + "," + std::to_string(_destY - (h() / 2))).c_str());
 
 	pugi::xml_node startNode = newEvent.append_child("Event");
 	startNode.append_attribute("type").set_value("attr_change");
 	startNode.append_attribute("attribute").set_value("start");
-	startNode.append_attribute("value").set_value(std::string(std::to_string(m_playerInfo.m_startingPosition[0]) + "," + std::to_string(m_playerInfo.m_startingPosition[1])).c_str());
+	startNode.append_attribute("value").set_value(std::string(std::to_string(m_playerImage->x()) + "," + std::to_string(m_playerImage->y())).c_str());
 
 	return newEvent;
 }
 
-pugi::xml_document Player::ChangeImage(ImagePool::ImageType _imageType)
+pugi::xml_document Player::CreateImageEvent(ImagePool::ImageType _imageType)
 {
-	m_playerInfo.m_imageType = _imageType;
-
 	pugi::xml_document newEvent;
 	pugi::xml_node eventNode = newEvent.append_child("Event");
 	eventNode.append_attribute("type").set_value("attr_change");
@@ -99,10 +95,8 @@ pugi::xml_document Player::ChangeImage(ImagePool::ImageType _imageType)
 }
 
 
-pugi::xml_document Player::ChangeUsername(std::string& _newName)
+pugi::xml_document Player::CreateUsernameEvent(std::string& _newName)
 {
-	m_playerInfo.m_username = _newName;
-
 	pugi::xml_document newEvent;
 	pugi::xml_node eventNode = newEvent.append_child("Event");
 	eventNode.append_attribute("type").set_value("attr_change");
@@ -140,4 +134,9 @@ void Player::OnTick()
 std::string Player::AsXMLString()
 {
 	return m_playerInfo.AsXMLString();
+}
+
+std::string Player::GetUsername()
+{
+	return m_playerInfo.m_username;
 }

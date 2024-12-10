@@ -41,19 +41,23 @@ public:
 
 
 	/**
-		Sets m_currentDestination and updates m_startingPosition, then resets m_movementInterpolationStep for animating.
-		These properties come from PlayerInfo.
+		Returns two XML events to change the startingPosition and currentDestination properties of PlayerInfo.
+		No actual data in PlayerInfo needs to change as the client will recieve the event from the server aswell
 	*/
-	pugi::xml_document SetDestination(int _x, int _y);
+	pugi::xml_document CreateMovementEvent(int _x, int _y);
 
 
 	/**
-		Changes image everywhere and returns event as XML
+		Returns an XML event to change the image of the character.
+		No actual data in PlayerInfo needs to change as the client will recieve the event from the server aswell.
 	*/
-	pugi::xml_document ChangeImage(ImagePool::ImageType _imageType);
+	pugi::xml_document CreateImageEvent(ImagePool::ImageType _imageType);
 
-
-	pugi::xml_document ChangeUsername(std::string& _newName);
+	/**
+		Returns an XML event to change the username of the character.
+		No actual data in PlayerInfo needs to change as the client will recieve the event from the server aswell.
+	*/
+	pugi::xml_document CreateUsernameEvent(std::string& _newName);
 
 	/**
 		Sets up Messagebox property to show given message
@@ -69,5 +73,7 @@ public:
 		Literally just calls PlayerInfo::AsXMLString(), as all the info is stored there
 	*/
 	std::string AsXMLString();
+
+	std::string GetUsername();
 };
 

@@ -1,6 +1,7 @@
 #include "Timer.h"
 #include "Pugixml/pugixml.hpp"
-#include "FL/Fl_Output.H"
+#include "FL/Fl_Text_Buffer.H"
+#include "FL/Fl_Text_Display.H"
 #include <string>
 
 #pragma once
@@ -13,7 +14,7 @@ class Client : public Timer
 private:
 	ClientSocket* m_socket;
 	Lobby* m_lobby;
-	Fl_Output* m_mainWindowLog;
+	Fl_Text_Buffer* m_mainWindowLog;
 
 	/**
 		Routinely checks if there are new events from the server, then applies them to the Lobby.
@@ -38,7 +39,7 @@ public:
 	/**
 		Sets value of m_mainWindowLog. This isn't done in the constructor m_mainWindowLog only starts to exist (It's created in MainWindow::ChangeLayout()) after the client has been initalised.
 	*/
-	void SetOutputLog(Fl_Output* _outputLog);
+	void SetLogDisplay(Fl_Text_Display* _outputLog);
 
 	Lobby* GetLobby();
 };

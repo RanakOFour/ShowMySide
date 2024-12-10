@@ -16,7 +16,8 @@ Host::Host(int _port, double _tickTimer) :
 	m_lobby = new HeadlessLobby();
 
 	// Set network monitoring on another thread so that it doesn't conflist with client stuff
-	// Also using fltk timeout gets messed up when you have too many timers aparrently, and this was my idea of getting rid of a repeat_timeout call
+	// Also using fltk timeout gets messed up when you have too many timers aparrently
+	// Also it needs to be a pointer so that it can be instantiated here, after the server and lobby have been instantiated
 	m_networkingThread = std::thread(&Host::MonitorNetwork, this);
 }
 
@@ -34,7 +35,7 @@ void Host::MonitorNetwork()
 
 		if (eventsFromClient.child("Events").first_child() != NULL)
 		{
-			printf("Host messages recieved\n");
+			//printf("Host messages recieved\n");
 
 			//Cycle through messages and apply changes
 			for (pugi::xml_node currentEvent = eventsFromClient.child("Events").first_child(); currentEvent; currentEvent = currentEvent.next_sibling())
@@ -43,7 +44,7 @@ void Host::MonitorNetwork()
 
 				// Enact event based on event type
 				std::string eventName = currentEvent.attribute("type").value();
-				printf("Parsing current event type: %s\n", eventName.c_str());
+				//printf("Parsing current event type: %s\n", eventName.c_str());
 
 				if (eventName == "new_plr")
 				{
@@ -75,6 +76,7 @@ void Host::MonitorNetwork()
 
 bool Host::CloseServer()
 {
+	// End the thread, then send out close_server event
 	m_serverClosed = true;
 	m_networkingThread.join();
 

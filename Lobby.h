@@ -62,5 +62,7 @@ public:
         Handles new_message events from the Client
     */
     void ShowMessage(int _id, std::string& _message);
+
+    std::string GetUsername(int _id);
 };
 

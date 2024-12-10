@@ -79,7 +79,7 @@ void ClientSocket::Send(std::string& _message)
 	}
 	else
 	{
-		printf("Bytes sent on socket %d: %d\n", (int)m_socket, bytes);
+		//printf("Bytes sent on socket %d: %d\n", (int)m_socket, bytes);
 	}
 }
 

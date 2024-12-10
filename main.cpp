@@ -1,7 +1,7 @@
-#include <iostream>
 #include "Wsa.h"
 #include "MainWindow.h"
 #include "ImagePool.h"
+#include <iostream>
 
 int main(int argc, char** argv)
 {
@@ -12,7 +12,7 @@ int main(int argc, char** argv)
 	ImagePool::Initialise();
 	printf("Initialsed image pool\n");
 
-	MainWindow win(640, 360, "Thingamabob");
+	MainWindow win(640, 360, "ShowMySide");
 	win.show();
 
 	return Fl::run();

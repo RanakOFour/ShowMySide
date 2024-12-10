@@ -57,7 +57,7 @@ ServerSocket::ServerSocket(int _port)
 		throw std::runtime_error("Failed to set non-blocking");
 	}
 
-	printf("Successfully opened socket %d\n", (int)m_socket);
+	//printf("Successfully opened socket %d\n", (int)m_socket);
 
 	freeaddrinfo(result);
 
@@ -101,7 +101,7 @@ ServerSocket::ServerSocket(int _port)
 
 	m_ipAddress = buffer;
 
-	printf("IP: %s\n", m_ipAddress.c_str());
+	//printf("IP: %s\n", m_ipAddress.c_str());
 }
 
 ServerSocket::~ServerSocket()
@@ -138,7 +138,7 @@ pugi::xml_document ServerSocket::OnTick()
 
 	if (client)
 	{
-		printf("Client Connected!\n");
+		//printf("Client Connected!\n");
 
 		m_clients.push_back(client);
 	}
@@ -149,7 +149,7 @@ pugi::xml_document ServerSocket::OnTick()
 		//Close connection if nothing
 		if (m_clients.at(ci)->m_closed)
 		{
-			printf("Client Disconnected\n");
+			//printf("Client Disconnected\n");
 			m_clients.erase(m_clients.begin() + ci);
 			--ci;
 			continue;
@@ -175,7 +175,7 @@ pugi::xml_document ServerSocket::OnTick()
 
 		if(clientMessageAsString != "")
 		{
-			printf("Message recieved as server: %s\n", clientMessageAsString.c_str());
+			//printf("Message recieved as server: %s\n", clientMessageAsString.c_str());
 
 			messagesToSend = true;
 

@@ -8,7 +8,7 @@
 
 Messagebox::Messagebox(int _playerX, int _playerY) :
 	Fl_Group(_playerX + 20, _playerY - 100, 200, 30, ""),
-	Timer(6),
+	Timer(0),
 	m_textBoxImage(nullptr),
 	m_textBox(nullptr)
 {

@@ -8,7 +8,7 @@
 class ImagePool
 {
 private:
-	Fl_PNG_Image* m_images[6];
+	Fl_PNG_Image* m_images[7];
 	ImagePool();
 
 public:
@@ -19,7 +19,8 @@ public:
 		PENTAGON = 2,
 		HEXAGON = 3,
 		TEXTBOX = 4,
-		ICON = 5
+		ICON = 5,
+		SPLASH = 6
 	};
 
 	~ImagePool();

@@ -3,6 +3,7 @@
 #include "Host.h"
 #include "Client.h"
 #include "ImagePool.h"
+#include "MenuWrapper.h"
 #include <string>
 #include <iostream>
 #include <thread>
@@ -11,18 +12,54 @@
 #include <FL/Fl_Menu_Bar.H>
 #include <FL/Fl_Input.H>
 #include <FL/Fl_Output.H>
+#include "FL/Fl_Text_Display.H"
 #include <FL/Fl_Flex.H>
 #include <FL/Fl_Button.H>
+#include "FL/Fl_Box.H"
 
 
 MainWindow::MainWindow(int _w, int _h, std::string _name)
 	: Fl_Double_Window(200, 200, _w, _h, "Show My Side"),
 	m_Client(nullptr),
 	m_Host(nullptr),
+	m_menuWrapper(nullptr),
+	m_splashImage(nullptr),
 	m_ipInput(nullptr),
-	m_lobbyOutputLog(nullptr)
+	m_ipAddressBox(nullptr),
+	m_lobbyEventLog(nullptr)
 {
-	ChangeLayout(LayoutType::SPLASH_SCREEN);
+	end();
+
+	//Menubar with a box in a group so the menubar resizes correctly
+	m_menuWrapper = new MenuWrapper(this);
+	add(m_menuWrapper);
+
+	m_splashImage = new Fl_Box(100, 100, _w - 200, _h - 200, "");
+	m_splashImage->image(ImagePool::GetImage(ImagePool::ImageType::SPLASH));
+	add(m_splashImage);
+	m_splashImage->show();
+
+	m_ipInput = new Fl_Input(100, 100, 120, 25, "Enter IP here: ");
+	add(m_ipInput);
+
+	//Forces the textbox to be shown on the screen
+	m_ipInput->value(" ");
+	m_ipInput->value("");
+	m_ipInput->box(FL_ENGRAVED_BOX);
+	m_ipInput->redraw_label();
+	m_ipInput->hide();
+
+	//Show connect button to confirm connection
+	m_connectBtn = new Fl_Button(270, 260, 100, 50, "Connect");
+	m_connectBtn->callback(OnJoinServer, (void*)this);
+	add(m_connectBtn);
+	m_connectBtn->hide();
+
+	//Set minimum size to 640, 360
+	size_range(_w, _h);
+
+
+	resizable(m_splashImage);
 	icon(ImagePool::GetImage(ImagePool::ImageType::ICON));
 }
 
@@ -42,76 +79,43 @@ bool MainWindow::AttemptConnection(std::string& _ipAddress)
 
 void MainWindow::ChangeLayout(LayoutType _newState)
 {
-	
-	//Leaves the menubar intact
-	while (children() > 1)
-	{
-		delete_child(1);
-	}
 
-
-	//Switch is secretly goto, so braces are needed to for the compiler to like declaractions inside
 	switch (_newState)
 	{
-		// Start menu
-	case SPLASH_SCREEN:
-	{
-		Fl_Menu_Bar* menu = new Fl_Menu_Bar(0, 0, w(), 30, "");
-		menu->add("&Start/&Join Server", NULL, OnClientStart, this);
-		menu->add("&Start/&Create Server", NULL, OnServerStart, this, FL_MENU_DIVIDER);
-		menu->add("&Start/&Exit", NULL, OnExit, this);
-
-		Fl_Flex* menuFlex = new Fl_Flex(menu->w(), menu->h(), 0);
-		menuFlex->add(menu);
-		menuFlex->fixed(menu, 0);
-		add_resizable(*menuFlex);
-		add(menuFlex);
-	}
-	break;
-
-	// Client pre-connection state
 	case JOIN_GAME:
-	{
-		m_ipInput = new Fl_Input(100, 100, 120, 25, "Enter IP here: ");
-		add(m_ipInput);
-
-		//Forces the textbox to be shown on the screen
-		m_ipInput->value(" ");
-		m_ipInput->value("");
-		m_ipInput->box(FL_ENGRAVED_BOX);
-		m_ipInput->redraw_label();
-
-		//Show connect button to confirm connection
-		Fl_Button* connectBtn = new Fl_Button(270, 260, 100, 50, "Connect");
-		connectBtn->callback(OnJoinServer, (void*)this);
-		add(connectBtn);
-
-		connectBtn->redraw();
-	}
-	break;
+		m_ipInput->show();
+		m_connectBtn->show();
+		break;
 
 
 	//Overlay for ingame and host is the same
 	case HOST:
-	{
 		//Display server IP address for other clients to connect
-		Fl_Output* ipAddress = new Fl_Output(58, 30, 95, 25, "Local IP:");
-		ipAddress->value(m_Host->GetIPAddress().c_str());
-		ipAddress->box(FL_NO_BOX);
+		m_ipAddressBox = new Fl_Output(58, 30, 95, 25, "Local IP:");
+		m_ipAddressBox->value(m_Host->GetIPAddress().c_str());
+		m_ipAddressBox->box(FL_NO_BOX);
 
-		add(ipAddress);
+		add(m_ipAddressBox);
 
-		ipAddress->redraw_label();
-	}
+		m_ipAddressBox->redraw_label();
 
 	case IN_GAME:
-	{
-		m_lobbyOutputLog = new Fl_Output(5, 60, w() - 10, h() - 65);
-		add(m_lobbyOutputLog);
+		m_ipInput->hide();
+		m_connectBtn->hide();
 
-		m_Client->SetOutputLog(m_lobbyOutputLog);
-	}
+		m_lobbyEventLog = new Fl_Text_Display(5, 60, w() - 10, h() - 65);
+		add(m_lobbyEventLog);
+
+		m_Client->SetLogDisplay(m_lobbyEventLog);
 	break;
+
+	case ABOUT:
+
+		break;
+
+	case HELP:
+
+		break;
 	}
 
 	redraw();
@@ -142,7 +146,6 @@ void MainWindow::OnServerStart(Fl_Widget* _widget, void* _userData)
 	std::string ip = mw->m_Host->GetIPAddress();
 	mw->m_Client->Connect(ip);
 
-
 	mw->ChangeLayout(HOST);
 }
 
@@ -167,3 +170,16 @@ void MainWindow::OnExit(Fl_Widget* _widget, void* _userData)
 	MainWindow* mw = (MainWindow*)_userData;
 	mw->hide();
 }
+
+void MainWindow::ShowAbout(Fl_Widget* _widget, void* _userData)
+{
+	MainWindow* mw = (MainWindow*)_userData;
+	mw->ChangeLayout(LayoutType::ABOUT);
+}
+
+void MainWindow::ShowHelp(Fl_Widget* _widget, void* _userData)
+{
+	MainWindow* mw = (MainWindow*)_userData;
+	mw->ChangeLayout(LayoutType::HELP);
+}
+
