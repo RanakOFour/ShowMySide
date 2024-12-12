@@ -84,7 +84,7 @@ int Lobby::handle(int _event)
 
 void Lobby::HandleMouseEvent(int _mouseButton)
 {
-	// Private information form Player is needed for the movement event, hence the need to an entire function
+	// Private information from Player is needed for the movement event, hence the need for an entire function
 	if (_mouseButton == FL_LEFT_MOUSE && !m_chatBox->visible())
 	{
 		pugi::xml_document newEvent = m_clientPlayer->CreateMovementEvent(Fl::event_x(), Fl::event_y());
