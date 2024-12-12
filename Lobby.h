@@ -23,7 +23,7 @@ private:
     int handle(int _event);
 
     /**
-        fds
+        Specific function for mouse events to make handle overload cleaner to look at
     */
     void HandleMouseEvent(int _mouseButton);
 
