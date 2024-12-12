@@ -4,17 +4,18 @@
 
 #pragma once
 class PlayerInfo;
-class HeadlessLobby
+class Server
 {
 private:
 	pugi::xml_document m_logDocument;
 	pugi::xml_document m_lobbyInfo;
 	std::vector<std::shared_ptr<pugi::xml_node>> m_playerXML;
-	std::vector<PlayerInfo*> m_players;
-	int m_playerCount;
+	std::vector<std::shared_ptr<PlayerInfo>> m_playerInfos;
+	int m_nextPlayerID;
+
 public:
-	HeadlessLobby();
-	~HeadlessLobby();
+	Server();
+	~Server();
 
 	/**
 		Generates default PlayerInfo object, then inserts it into m_players and an xml copy into m_lobbyInfo, and references into m_playerXML

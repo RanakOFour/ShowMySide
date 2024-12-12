@@ -5,13 +5,13 @@
 
 #pragma once
 class ServerSocket;
-class HeadlessLobby;
+class Server;
 
 class Host
 {
 private:
-	ServerSocket* m_server;
-	HeadlessLobby* m_lobby;
+	ServerSocket* m_socket;
+	Server* m_server;
 
 	/**
 		Using a thread improves performance compared to having Host inherit from Timer and use Fl timeout events

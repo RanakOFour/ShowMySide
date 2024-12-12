@@ -14,7 +14,7 @@ Lobby::Lobby(std::string& _docToLoad) :
 	m_clientPlayer(nullptr),
 	m_textFromChatbox()
 {
-	icon(ImagePool::GetImage(ImagePool::ImageType::ICON));
+	icon(ImagePool::GetImage(ImageType::ICON).get());
 
 
 	//Loads xml document from text, then copies out the data from the document into m_players
@@ -39,11 +39,11 @@ Lobby::Lobby(std::string& _docToLoad) :
 		start[1] = atoi(startString.substr(startString.find(',') + 1, startString.size()).c_str());
 
 		PlayerInfo currentInfo(id, username, destination, start, shapeNum);
-		m_players.push_back(new Player(currentInfo));
+		m_players.push_back(std::make_shared<Player>(currentInfo));
 	}
 
 	m_clientPlayer = m_players[m_players.size() - 1];
-	add(m_clientPlayer);
+	add(m_clientPlayer.get());
 
 	m_chatBox = new Chatbox();
 	add(m_chatBox);
@@ -63,42 +63,55 @@ int Lobby::handle(int _event)
 {
 	switch (_event)
 	{
+
+	// Enable window to take focus
 	case FL_FOCUS:
 		return 1;
 
+	// Handle mouse event
 	case FL_PUSH:
-		if (Fl::event_button() == FL_LEFT_MOUSE && !m_chatBox->visible())
-		{
-			pugi::xml_document newEvent = m_clientPlayer->CreateMovementEvent(Fl::event_x(), Fl::event_y());
-			m_events.append_copy(newEvent.first_child());
-			m_events.append_copy(newEvent.last_child());
-			return 1;
-		}
-		break;
+		HandleMouseEvent(Fl::event_button());
+		return 1;
 
+	// Keybaord event
 	case FL_KEYDOWN:
 		HandleKeyboardEvent(Fl::event_key());
-		break;
+		return 1;
 	}
 
 	return 0;
+}
+
+void Lobby::HandleMouseEvent(int _mouseButton)
+{
+	// Private information form Player is needed for the movement event, hence the need to an entire function
+	if (_mouseButton == FL_LEFT_MOUSE && !m_chatBox->visible())
+	{
+		pugi::xml_document newEvent = m_clientPlayer->CreateMovementEvent(Fl::event_x(), Fl::event_y());
+		m_events.append_copy(newEvent.first_child());
+		m_events.append_copy(newEvent.last_child());
+	}
 }
 
 void Lobby::HandleKeyboardEvent(int _key)
 {
 	switch (_key)
 	{
+
+	// Open chatbox to type a new message
+	case 'T':
 	case 't':
-		//printf("'t' pressed!\n");
 		if (!m_chatBox->visible())
 		{
 			m_chatBox->Display(0);
 			redraw();
 		}
+
 		break;
 
+	// Open chatbox to type a new username
+	case 'Q':
 	case 'q':
-		//printf("q pressed!\n");
 		if (!m_chatBox->visible())
 		{
 			m_chatBox->Display(1);
@@ -107,13 +120,16 @@ void Lobby::HandleKeyboardEvent(int _key)
 
 		break;
 
+	// Any keyboard event 1-4 will change which character the player is
 	case '1':
 	case '2':
 	case '3':
 	case '4':
 	{
-		pugi::xml_document newEvent = m_clientPlayer->CreateImageEvent((ImagePool::ImageType)(_key - 49));
-		m_events.append_copy(newEvent.child("Event"));
+		pugi::xml_node eventNode = m_events.append_child("Event");
+		eventNode.append_attribute("type").set_value("attr_change");
+		eventNode.append_attribute("attribute").set_value("shape");
+		eventNode.append_attribute("value").set_value(_key - 49);
 	}
 		break;
 	}
@@ -133,7 +149,7 @@ void Lobby::FlushEvents(pugi::xml_document& _document)
 	}
 }
 
-void Lobby::OnTick()
+void Lobby::Update()
 {
 	//GetInput (if any)
 	// On click set Destination (change attr)
@@ -142,7 +158,7 @@ void Lobby::OnTick()
 
 	for (int i = 0; i < m_players.size(); i++)
 	{
-		m_players[i]->OnTick();
+		m_players[i]->Update();
 	}
 
 	m_textFromChatbox = m_chatBox->FlushMessage();
@@ -162,8 +178,11 @@ void Lobby::OnTick()
 		
 		case 1:
 		{
-			pugi::xml_document newEvent = m_clientPlayer->CreateUsernameEvent(m_textFromChatbox);
-			m_events.append_copy(newEvent.child("Event"));
+			// <Event type="attr_change", attribute="username", value=_newName>
+			pugi::xml_node eventNode = m_events.append_child("Event");
+			eventNode.append_attribute("type").set_value("attr_change");
+			eventNode.append_attribute("attribute").set_value("username");
+			eventNode.append_attribute("value").set_value(m_textFromChatbox.c_str());
 			break;
 		}
 		}
@@ -173,19 +192,37 @@ void Lobby::OnTick()
 }
 
 //Creates player object and fills out _playerNode object
-void Lobby::CreateNewPlayer(int _id)
+std::shared_ptr<Player> Lobby::CreateNewPlayer(int _id)
 {
 	//Add player to xml and players vector
-	m_players.push_back(new Player(_id));
-	add(m_players[m_players.size() - 1]);
+	m_players.push_back(std::make_shared<Player>(_id));
+	add(m_players[m_players.size() - 1].get());
+
+	return m_players[m_players.size() - 1];
 }
 
-void Lobby::RemovePlayer(int _id)
+std::shared_ptr<Player> Lobby::RemovePlayer(int _id)
 {
-	if (_id < m_players.size())
+	std::shared_ptr<Player> deletedPlayer = nullptr;
+	int index{ 0 };
+
+	for (int i = 0; i < m_players.size(); i++)
 	{
-		delete m_players[_id];
+		if (m_players[i].get()->GetID() == _id)
+		{
+			index = i;
+			deletedPlayer = m_players[i];
+			break;
+		}
 	}
+
+	if (deletedPlayer)
+	{
+		m_players.erase(m_players.begin() + (index - 1));
+		return deletedPlayer;
+	}
+
+	return nullptr;
 }
 
 void Lobby::ChangeAttribute(int _id, std::string& _attributeName, std::string& _newValue)

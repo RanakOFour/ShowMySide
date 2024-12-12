@@ -1,6 +1,7 @@
 #include "Client.h"
 #include "ClientSocket.h"
 #include "Lobby.h"
+#include "Player.h"
 #include "Pugixml/pugixml.hpp"
 #include "FL/Fl_Text_Buffer.H"
 #include "FL/Fl_Text_Display.H"
@@ -10,7 +11,7 @@
 #include <string>
 
 Client::Client() :
-	Timer(0.25),
+	Timer((double)(1.0f / 120.0f)),
 	m_socket(nullptr),
 	m_lobby(nullptr)
 {
@@ -63,22 +64,21 @@ void Client::OnTick(void* _userData)
 					// Enact event based on event type
 					std::string eventName = currentEvent.attribute("type").value();
 					int playerId = currentEvent.attribute("id").as_int();
-					std::string idString = std::to_string(playerId);
 
 					if (eventName == "new_plr")
 					{
 						//Add player to lobby, send out lobby info
-						m_lobby->CreateNewPlayer(playerId);
+						std::shared_ptr<Player> newPlayer = m_lobby->CreateNewPlayer(playerId);
 						
-						std::string logString = "Player with id " + idString + " has joined\n";
+						std::string logString = "Player with id " + newPlayer.get()->GetUsername() + " has joined\n";
 						m_mainWindowLog->append(logString.c_str());
 					}
 					else if (eventName == "plr_leave")
 					{
 						//Remove player from lobby, resend new lobby info
-						m_lobby->RemovePlayer(currentEvent.attribute("id").as_int());
+						std::shared_ptr<Player> deletedPlayer = m_lobby->RemovePlayer(currentEvent.attribute("id").as_int());
 						
-						std::string logString = "Player with id " + idString + " has left\n";
+						std::string logString = "Player with id " + deletedPlayer.get()->GetUsername() + " has left\n";
 						m_mainWindowLog->append(logString.c_str());
 					}
 					else if (eventName == "attr_change")
@@ -106,7 +106,7 @@ void Client::OnTick(void* _userData)
 
 		if (m_lobby != nullptr)
 		{
-			m_lobby->OnTick();
+			m_lobby->Update();
 
 			//Get any events that need to be sent
 			pugi::xml_document toSend;
@@ -118,8 +118,6 @@ void Client::OnTick(void* _userData)
 			}
 		}
 	}
-
-	Fl::repeat_timeout(1 / 30, Tick, this);
 }
 
 

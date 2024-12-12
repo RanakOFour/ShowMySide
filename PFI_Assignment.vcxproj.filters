@@ -60,7 +60,7 @@
     <ClCompile Include="Messagebox.cpp">
       <Filter>Source Files\GUI</Filter>
     </ClCompile>
-    <ClCompile Include="HeadlessLobby.cpp">
+    <ClCompile Include="Server.cpp">
       <Filter>Source Files\Networking</Filter>
     </ClCompile>
     <ClCompile Include="ImagePool.cpp">
@@ -113,7 +113,7 @@
     <ClInclude Include="Messagebox.h">
       <Filter>Header Files\GUI</Filter>
     </ClInclude>
-    <ClInclude Include="HeadlessLobby.h">
+    <ClInclude Include="Server.h">
       <Filter>Header Files\Networking</Filter>
     </ClInclude>
     <ClInclude Include="ImagePool.h">

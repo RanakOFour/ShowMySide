@@ -3,6 +3,7 @@
 #include "FL/Fl_Double_Window.H"
 #include <string>
 #include <vector>
+#include <memory>
 
 class Player;
 class Chatbox;
@@ -11,8 +12,8 @@ class Lobby :
 {
 private:
     pugi::xml_document m_events;
-    std::vector<Player*> m_players;
-    Player* m_clientPlayer;
+    std::vector<std::shared_ptr<Player>> m_players;
+    std::shared_ptr<Player> m_clientPlayer;
     Chatbox* m_chatBox;
     std::string m_textFromChatbox;
 
@@ -20,6 +21,11 @@ private:
         Overrides Fl_Widget::handle() so that m_clientPlayer's destination will update on a player's click. Will also open the ChatBox when pressing the 't' key.
     */
     int handle(int _event);
+
+    /**
+        fds
+    */
+    void HandleMouseEvent(int _mouseButton);
 
     /**
         Specific function for keyboard events to escape throwing a bunch of code into a single case statement of a switch
@@ -41,17 +47,17 @@ public:
     /*
         Updates player positions. That's all it does right now.
     */
-    void OnTick();
+    void Update();
 
     /**
         Handles new_plr events from the Client
     */
-    void CreateNewPlayer(int _id);
+    std::shared_ptr<Player> CreateNewPlayer(int _id);
 
     /**
         Handles plr_leave events from the Client
     */
-    void RemovePlayer(int _id);
+    std::shared_ptr<Player> RemovePlayer(int _id);
 
     /**
         Handles attr_change events from the Client

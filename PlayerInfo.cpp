@@ -4,7 +4,7 @@
 #include <sstream>
 
 PlayerInfo::PlayerInfo(int _id) :
-	m_imageType(ImagePool::ImageType::TRIANGLE),
+	m_imageType(ImageType::TRIANGLE),
 	m_username("Player " + std::to_string(_id)),
 	m_id(_id)
 {
@@ -15,7 +15,7 @@ PlayerInfo::PlayerInfo(int _id) :
 }
 
 PlayerInfo::PlayerInfo(int _id, std::string& _username, int _destination[], int _current[], int _shape) :
-	m_imageType((ImagePool::ImageType)_shape),
+	m_imageType((ImageType)_shape),
 	m_id(_id),
 	m_username(_username)
 {
@@ -35,7 +35,7 @@ void PlayerInfo::ChangeAttribute(std::string& _attributeName, std::string& _newV
 	// Raw dog _newVal into playerinfo value matching _attributeName
 	if (_attributeName == "shape")
 	{
-		m_imageType = (ImagePool::ImageType)atoi(_newValue.c_str());
+		m_imageType = (ImageType)atoi(_newValue.c_str());
 	}
 	else if (_attributeName == "destination")
 	{
@@ -61,7 +61,7 @@ std::string PlayerInfo::AsXMLString()
 	playerNode.append_attribute("id").set_value(m_id);
 
 	playerNode.append_attribute("username").set_value(m_username.c_str());
-	playerNode.append_attribute("shape").set_value(m_imageType);
+	playerNode.append_attribute("shape").set_value((int)m_imageType);
 
 	//Don't judge
 	playerNode.append_attribute("destination").set_value(std::string(std::to_string(m_currentDestination[0]) + "," + std::to_string(m_currentDestination[1])).c_str());
@@ -71,4 +71,9 @@ std::string PlayerInfo::AsXMLString()
 	playerDoc.save(ss);
 	std::string playerNodeString = ss.str();
 	return playerNodeString;
+}
+
+int PlayerInfo::GetID()
+{
+	return m_id;
 }

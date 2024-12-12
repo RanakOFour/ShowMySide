@@ -125,7 +125,7 @@ std::shared_ptr<ClientSocket> ServerSocket::Accept()
 	return rtn;
 }
 
-pugi::xml_document ServerSocket::OnTick()
+pugi::xml_document ServerSocket::Update()
 {
 	//create document to repackage messages into and return
 	pugi::xml_document currentMessageDoc;
@@ -179,43 +179,40 @@ pugi::xml_document ServerSocket::OnTick()
 
 			messagesToSend = true;
 
-			if (clientMessageAsString.c_str() == "CLOSED")
+			//Parse client message into xml and pass up to Host
+			pugi::xml_document clientEventDoc;
+
+			//Parses document
+			pugi::xml_parse_result clientMessageResult = clientEventDoc.load_string(clientMessageAsString.c_str());
+			if (clientMessageResult.status)
+			{
+				throw std::runtime_error(clientMessageResult.description());
+			}
+
+			//Add message to return document
+			pugi::xml_node clientEvent = clientEventDoc.first_child();
+
+			//Determine message type
+			std::string messageType = clientEvent.attribute("type").value();
+
+			//Add message into list with id
+			pugi::xml_node currentEvent = events.append_child("Event");
+			currentEvent.append_attribute("id").set_value(ci);
+			currentEvent.append_attribute("type").set_value(messageType.c_str());
+
+			//Add additional information based on message type
+			if (messageType == "new_message")
+			{
+				currentEvent.append_attribute("text").set_value(clientEvent.attribute("text").value());
+			}
+			else if (messageType == "attr_change")
+			{
+				currentEvent.append_attribute("attribute").set_value(clientEvent.attribute("attribute").value());
+				currentEvent.append_attribute("value").set_value(clientEvent.attribute("value").value());
+			}
+			else if (messageType == "plr_leave")
 			{
 				m_clients.at(ci)->m_closed = true;
-			}
-			else if (clientMessageAsString.c_str() != NULL)
-			{
-				//Parse client message into xml and pass up to Host
-				pugi::xml_document clientEventDoc;
-
-				//Parses document
-				pugi::xml_parse_result clientMessageResult = clientEventDoc.load_string(clientMessageAsString.c_str());
-				if (clientMessageResult.status)
-				{
-					throw std::runtime_error(clientMessageResult.description());
-				}
-
-				//Add message to return document
-				pugi::xml_node clientEvent = clientEventDoc.first_child();
-
-				//Determine message type (text/delta)
-				std::string messageType = clientEvent.attribute("type").value();
-
-				//Add message into list with id
-				pugi::xml_node currentEvent = events.append_child("Event");
-				currentEvent.append_attribute("id").set_value(ci);
-				currentEvent.append_attribute("type").set_value(messageType.c_str());
-
-				//Add additional information based on message type
-				if (messageType == "new_message")
-				{
-					currentEvent.append_attribute("text").set_value(clientEvent.attribute("text").value());
-				}
-				else if (messageType == "attr_change")
-				{
-					currentEvent.append_attribute("attribute").set_value(clientEvent.attribute("attribute").value());
-					currentEvent.append_attribute("value").set_value(clientEvent.attribute("value").value());
-				}
 			}
 		}
 	}

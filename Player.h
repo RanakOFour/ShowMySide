@@ -8,7 +8,7 @@
 class Messagebox;
 
 /**
- The player as represented inside the Client's Lobby. Numerical information is stored inside the PlayerInfo property, as a copy of it is kept on the Host's HeadlessLobby
+ The player as represented inside the Client's Lobby. Numerical information is stored inside the PlayerInfo property, as a copy of it is kept on the Host's Server
  as the Host does not need all the FLTK information included here. So, I guess this is more a GUI wrapper for PlayerInfo.
 */
 class Player : public Fl_Group
@@ -46,28 +46,15 @@ public:
 	*/
 	pugi::xml_document CreateMovementEvent(int _x, int _y);
 
-
-	/**
-		Returns an XML event to change the image of the character.
-		No actual data in PlayerInfo needs to change as the client will recieve the event from the server aswell.
-	*/
-	pugi::xml_document CreateImageEvent(ImagePool::ImageType _imageType);
-
-	/**
-		Returns an XML event to change the username of the character.
-		No actual data in PlayerInfo needs to change as the client will recieve the event from the server aswell.
-	*/
-	pugi::xml_document CreateUsernameEvent(std::string& _newName);
-
 	/**
 		Sets up Messagebox property to show given message
 	*/
 	void ShowMessage(std::string& _message);
 
 	/**
-		Increments 
+		Increments movement position 
 	*/
-	void OnTick();
+	void Update();
 
 	/**
 		Literally just calls PlayerInfo::AsXMLString(), as all the info is stored there
@@ -75,5 +62,7 @@ public:
 	std::string AsXMLString();
 
 	std::string GetUsername();
+
+	int GetID();
 };
 

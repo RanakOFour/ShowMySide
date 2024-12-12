@@ -20,7 +20,7 @@ Player::Player(int _id) :
 {
 	m_playerImage = new Fl_Box(0, 0, 100, 100, m_playerInfo.m_username.c_str());
 	m_playerImage->label(m_playerInfo.m_username.c_str());
-	m_playerImage->image(ImagePool::GetImage(m_playerInfo.m_imageType));
+	m_playerImage->image(ImagePool::GetImage(m_playerInfo.m_imageType).get());
 	m_messageBox = new Messagebox(x(), y());
 }
 
@@ -34,7 +34,7 @@ Player::Player(PlayerInfo _info) :
 {
 	m_playerImage = new Fl_Box(0, 0, 100, 100, m_playerInfo.m_username.c_str());
 	m_playerImage->label(m_playerInfo.m_username.c_str());
-	m_playerImage->image(ImagePool::GetImage(m_playerInfo.m_imageType));
+	m_playerImage->image(ImagePool::GetImage(m_playerInfo.m_imageType).get());
 	m_messageBox = new Messagebox(x(), y());
 }
 
@@ -50,13 +50,13 @@ void Player::ChangeAttribute(std::string& _attributeName, std::string& _newValue
 
 	if (_attributeName == "shape")
 	{
-		m_playerImage->image(ImagePool::GetImage((ImagePool::ImageType)atoi(_newValue.c_str())));
+		m_playerImage->image(ImagePool::GetImage((ImageType)atoi(_newValue.c_str())).get());
 	}
 	else if (_attributeName == "username")
 	{
 		m_playerImage->label(m_playerInfo.m_username.c_str());
 	}
-	else if (_attributeName == "destination")
+	else if (_attributeName == "start")
 	{
 		m_movementStep = 0;
 	}
@@ -66,42 +66,23 @@ pugi::xml_document Player::CreateMovementEvent(int _destX, int _destY)
 {
 	//We don't need to actually change any values, because they will change when we recieve these events from the server later
 	//The movement step is not accounted for inside of PlayerInfo, so it is set here
+
+
+	// <Event type="attr_change", attribute="start", value=playerImageX,playerImageY>
+	// <Event type="attr_change", attribute="destination", value=_mouseX,_mouseY>
 	m_movementStep = 0;
 
 	pugi::xml_document newEvent;
-
-	pugi::xml_node destinationNode = newEvent.append_child("Event");
-	destinationNode.append_attribute("type").set_value("attr_change");
-	destinationNode.append_attribute("attribute").set_value("destination");
-	destinationNode.append_attribute("value").set_value(std::string(std::to_string(_destX - (w() / 2)) + "," + std::to_string(_destY - (h() / 2))).c_str());
 
 	pugi::xml_node startNode = newEvent.append_child("Event");
 	startNode.append_attribute("type").set_value("attr_change");
 	startNode.append_attribute("attribute").set_value("start");
 	startNode.append_attribute("value").set_value(std::string(std::to_string(m_playerImage->x()) + "," + std::to_string(m_playerImage->y())).c_str());
 
-	return newEvent;
-}
-
-pugi::xml_document Player::CreateImageEvent(ImagePool::ImageType _imageType)
-{
-	pugi::xml_document newEvent;
-	pugi::xml_node eventNode = newEvent.append_child("Event");
-	eventNode.append_attribute("type").set_value("attr_change");
-	eventNode.append_attribute("attribute").set_value("shape");
-	eventNode.append_attribute("value").set_value(_imageType);
-
-	return newEvent;
-}
-
-
-pugi::xml_document Player::CreateUsernameEvent(std::string& _newName)
-{
-	pugi::xml_document newEvent;
-	pugi::xml_node eventNode = newEvent.append_child("Event");
-	eventNode.append_attribute("type").set_value("attr_change");
-	eventNode.append_attribute("attribute").set_value("username");
-	eventNode.append_attribute("value").set_value(_newName.c_str());
+	pugi::xml_node destinationNode = newEvent.append_child("Event");
+	destinationNode.append_attribute("type").set_value("attr_change");
+	destinationNode.append_attribute("attribute").set_value("destination");
+	destinationNode.append_attribute("value").set_value(std::string(std::to_string(_destX - (w() / 2)) + "," + std::to_string(_destY - (h() / 2))).c_str());
 
 	return newEvent;
 }
@@ -111,7 +92,7 @@ void Player::ShowMessage(std::string& _message)
 	m_messageBox->DisplayMessage(_message);
 }
 
-void Player::OnTick()
+void Player::Update()
 {
 
 	//Interpolate linearly from current position to destination
@@ -123,6 +104,8 @@ void Player::OnTick()
 		m_messageBox->position(newX + 20, newY - 100);
 
 		m_movementStep += 0.01;
+
+		printf("Current player position: %d, %d\n", m_playerImage->x(), m_playerImage->y());
 	}
 	else
 	{
@@ -139,4 +122,9 @@ std::string Player::AsXMLString()
 std::string Player::GetUsername()
 {
 	return m_playerInfo.m_username;
+}
+
+int Player::GetID()
+{
+	return m_playerInfo.m_id;
 }

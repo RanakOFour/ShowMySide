@@ -19,7 +19,7 @@ private:
 	/**
 		Probes all clients for any event messages, storing any inside of an XML document, which is returned
 	*/
-	pugi::xml_document OnTick();
+	pugi::xml_document Update();
 
 	/**
 		Checks for any new connections, and returns a smart pointer to a new connection if there is one

@@ -11,7 +11,7 @@ private:
 	/**
 		We want to store the type of image it is, as that's better XML information than having to query what image is being displayed and working backwards
 	*/
-	ImagePool::ImageType m_imageType;
+	ImageType m_imageType;
 	std::string m_username;
 	int m_id;
 	int m_currentDestination[2];
@@ -19,7 +19,7 @@ private:
 
 public:
 	/**
-		Used in HeadlessLobby and Lobby when instantiating a new 'default' player with default settings
+		Used in Server and Lobby when instantiating a new 'default' player with default settings
 	*/
 	PlayerInfo(int _id);
 
@@ -42,5 +42,7 @@ public:
 		Interpolation step is not carried over, as it is not information important to the server
 	*/
 	std::string AsXMLString();
+
+	int GetID();
 };
 

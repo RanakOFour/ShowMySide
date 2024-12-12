@@ -11,7 +11,7 @@
 		The only reason HOST is listed is because the host needs to also add an Fl_Label with the ip address of the machine so that other clients can
 		join.
 	*/
-enum LayoutType
+enum class LayoutType
 {
 	SPLASH_SCREEN = 0,
 	JOIN_GAME = 1,

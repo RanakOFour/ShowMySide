@@ -9,7 +9,6 @@ protected:
 	static void Tick(void* _userData);
 
 public:
-	Timer();
 	Timer(double _duration);
 	virtual ~Timer();
 	virtual void OnTick(void* _userData);

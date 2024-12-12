@@ -1,32 +1,42 @@
 #include "ImagePool.h"
 #include "FL/Fl_PNG_Image.H"
+#include <memory>
 
-//Another weird singletony thing
+//Weird singleton thingy
 static ImagePool* m_self;
 
 ImagePool::ImagePool()
 {
-	m_images[0] = new Fl_PNG_Image("./images/triangle.png");
-	m_images[1] = new Fl_PNG_Image("./images/square.png");
-	m_images[2] = new Fl_PNG_Image("./images/pentagon.png");
-	m_images[3] = new Fl_PNG_Image("./images/hexagon.png");
-	m_images[4] = new Fl_PNG_Image("./images/textbox.png");
-	m_images[5] = new Fl_PNG_Image("./images/icon.png");
-	m_images[6] = new Fl_PNG_Image("./images/splash.png");
+	m_images[0] = std::make_shared<Fl_PNG_Image>("./images/triangle.png");
+	m_images[1] = std::make_shared<Fl_PNG_Image>("./images/square.png");
+	m_images[2] = std::make_shared<Fl_PNG_Image>("./images/pentagon.png");
+	m_images[3] = std::make_shared<Fl_PNG_Image>("./images/hexagon.png");
+	m_images[4] = std::make_shared<Fl_PNG_Image>("./images/textbox.png");
+	m_images[5] = std::make_shared<Fl_PNG_Image>("./images/icon.png");
+	m_images[6] = std::make_shared<Fl_PNG_Image>("./images/splash.png");
+
+
+	// Swap the contents of shared ptrs with resized images so the original ones are deleted from memory
 
 	for (int i = 0; i < 4; i++)
 	{
-		m_images[i] = (Fl_PNG_Image*)m_images[i]->copy(200, 200);
+		Fl_PNG_Image* sizedImage = (Fl_PNG_Image*)m_images[i].get()->copy(200, 200);
+		std::shared_ptr<Fl_PNG_Image> sharedSizedImage = std::shared_ptr<Fl_PNG_Image>(sizedImage);
+		m_images[i].swap(sharedSizedImage);
+
 	}
 
-	m_images[4] = (Fl_PNG_Image*)m_images[4]->copy(200, 75);
+	Fl_PNG_Image* sizedTextbox = (Fl_PNG_Image*)m_images[4].get()->copy(200, 75);
+	std::shared_ptr<Fl_PNG_Image> sharedSizedTextbox = std::shared_ptr<Fl_PNG_Image>(sizedTextbox);
+	m_images[4].swap(sharedSizedTextbox);
 
-	m_images[6] = (Fl_PNG_Image*)m_images[6]->copy(440, 160);
+	Fl_PNG_Image* sizedSplash = (Fl_PNG_Image*)m_images[6].get()->copy(440, 160);
+	std::shared_ptr<Fl_PNG_Image> sharedSizedSplash = std::shared_ptr<Fl_PNG_Image>(sizedSplash);
+	m_images[6].swap(sharedSizedSplash);
 }
 
 ImagePool::~ImagePool()
 {
-	delete m_images;
 }
 
 void ImagePool::Initialise()
@@ -37,7 +47,7 @@ void ImagePool::Initialise()
 	}
 }
 
-Fl_PNG_Image* ImagePool::GetImage(ImageType _index)
+std::shared_ptr<Fl_PNG_Image> ImagePool::GetImage(ImageType _index)
 {
-	return m_self->m_images[_index];
+	return m_self->m_images[(int)_index];
 }
