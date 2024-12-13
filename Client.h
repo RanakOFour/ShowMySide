@@ -15,6 +15,7 @@ private:
 	ClientSocket* m_socket;
 	Lobby* m_lobby;
 	Fl_Text_Buffer* m_mainWindowLog;
+	bool m_loaded;
 
 	/**
 		Routinely checks if there are new events from the server, then applies them to the Lobby.

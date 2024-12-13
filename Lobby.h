@@ -8,14 +8,16 @@
 class Player;
 class Chatbox;
 class Lobby :
-    public Fl_Double_Window
+    public Fl_Double_Window, Timer
 {
 private:
     pugi::xml_document m_events;
     std::vector<std::shared_ptr<Player>> m_players;
     std::shared_ptr<Player> m_clientPlayer;
+    int m_playerId;
     Chatbox* m_chatBox;
     std::string m_textFromChatbox;
+    bool m_closed;
 
     /**
         Overrides Fl_Widget::handle() so that m_clientPlayer's destination will update on a player's click. Will also open the ChatBox when pressing the 't' key.
@@ -32,22 +34,22 @@ private:
     */
     void HandleKeyboardEvent(int _key);
 
+    void OnTick(void* _userData);
+
+    static void CloseWindow(Fl_Widget* _widget, void* _userData);
 public:
     /**
         _docToLoad is an XML document listing all the players in the lobby on join
     */
-    Lobby(std::string& _docToLoad);
+    Lobby();
     ~Lobby();
+
+    void LoadLobbyInformation(std::string& _docToLoad);
 
     /**
         Takes any new events in m_events, and copies out the information into _document before deleting any nodes in m_events.
     */
     void FlushEvents(pugi::xml_document& _document);
-
-    /*
-        Updates player positions. That's all it does right now.
-    */
-    void Update();
 
     /**
         Handles new_plr events from the Client
@@ -70,5 +72,7 @@ public:
     void ShowMessage(int _id, std::string& _message);
 
     std::string GetUsername(int _id);
+
+    bool IsClosed();
 };
 

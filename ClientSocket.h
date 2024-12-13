@@ -30,8 +30,11 @@ public:
 	*/
 	void Send(std::string& _message);
 
-	/*
-		Probes other end of the connection for any messages. Returns true if any information is recieved, which is loaded as a string inside of _message which is then processed by Client or ServerSocket
+	
+	/**
+		Puts any recieved information into _message
 	*/
 	bool Receive(std::string& _message);
+
+	void CloseConnection();
 };

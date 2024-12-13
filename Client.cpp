@@ -13,9 +13,10 @@
 Client::Client() :
 	Timer((double)(1.0f / 120.0f)),
 	m_socket(nullptr),
-	m_lobby(nullptr)
+	m_loaded(false)
 {
 	m_mainWindowLog = new Fl_Text_Buffer();
+	m_lobby = new Lobby();
 }
 
 Client::~Client()
@@ -25,98 +26,102 @@ Client::~Client()
 
 void Client::OnTick(void* _userData)
 {
-	//Don't run before connected to a lobby
-	if (m_socket != nullptr)
+	// No socket == no connection, so there is nothing to be done
+	if (m_socket == nullptr)
 	{
-		pugi::xml_document eventsDocument;
-		std::string eventsFromServer;
+		return;
+	}
 
-		// Loop through getting information from server until it has it all
-		bool dataComplete{ false };
-		while (!dataComplete)
+	pugi::xml_document eventsDocument;
+	std::string eventsFromServer;
+
+	// Loop through getting information from server until it has it all
+	bool dataComplete{ false };
+	while (!dataComplete)
+	{
+		std::string currentDataPull;
+		m_socket->Receive(currentDataPull);
+
+		eventsFromServer.append(currentDataPull);
+		pugi::xml_parse_result result = eventsDocument.load_string(eventsFromServer.c_str());
+		if ((currentDataPull == "" && eventsFromServer == "") || !result.status)
 		{
-			std::string currentDataPull;
-			m_socket->Receive(currentDataPull);
+			dataComplete = true;
+		}
+	}
 
-			eventsFromServer.append(currentDataPull);
-			pugi::xml_parse_result result = eventsDocument.load_string(eventsFromServer.c_str());
-			if ((currentDataPull == "" && eventsFromServer == "") || !result.status)
-			{
-				dataComplete = true;
-			}
+
+	// Process events from server
+	if (eventsFromServer != "")
+	{
+		//printf("Client received: %s", eventsFromServer.c_str());
+
+
+		// First time recieving information from server will be the player information, which will flag m_loaded as true
+		if (!m_loaded)
+		{
+			m_lobby->LoadLobbyInformation(eventsFromServer);
+			m_loaded = true;
 		}
 
-		if (eventsFromServer != "")
+		//Cycle through events from server and apply changes
+		for (pugi::xml_node currentEvent = eventsDocument.first_child().first_child(); currentEvent; currentEvent = currentEvent.next_sibling())
 		{
-			//printf("Client received: %s", eventsFromServer.c_str());
-			//Load lobby information if recieved
-			if (m_lobby == nullptr)
+			// Enact event based on event type
+			std::string eventName = currentEvent.attribute("type").value();
+			int playerId = currentEvent.attribute("id").as_int();
+
+			if (eventName == "new_plr")
 			{
-				m_lobby = new Lobby(eventsFromServer);
-				m_lobby->show();
+				//Add player to lobby, send out lobby info
+				std::shared_ptr<Player> newPlayer = m_lobby->CreateNewPlayer(playerId);
+
+				std::string logString = newPlayer.get()->GetUsername() + " has joined\n";
+				m_mainWindowLog->append(logString.c_str());
 			}
-			else
+			else if (eventName == "plr_leave")
 			{
+				//Remove player from lobby, resend new lobby info
+				std::shared_ptr<Player> deletedPlayer = m_lobby->RemovePlayer(currentEvent.attribute("id").as_int());
 
-				//Cycle through messages and apply changes
-				for (pugi::xml_node currentEvent = eventsDocument.child("Events").first_child(); currentEvent; currentEvent = currentEvent.next_sibling())
-				{
-					// Enact event based on event type
-					std::string eventName = currentEvent.attribute("type").value();
-					int playerId = currentEvent.attribute("id").as_int();
-
-					if (eventName == "new_plr")
-					{
-						//Add player to lobby, send out lobby info
-						std::shared_ptr<Player> newPlayer = m_lobby->CreateNewPlayer(playerId);
-						
-						std::string logString = "Player with id " + newPlayer.get()->GetUsername() + " has joined\n";
-						m_mainWindowLog->append(logString.c_str());
-					}
-					else if (eventName == "plr_leave")
-					{
-						//Remove player from lobby, resend new lobby info
-						std::shared_ptr<Player> deletedPlayer = m_lobby->RemovePlayer(currentEvent.attribute("id").as_int());
-						
-						std::string logString = "Player with id " + deletedPlayer.get()->GetUsername() + " has left\n";
-						m_mainWindowLog->append(logString.c_str());
-					}
-					else if (eventName == "attr_change")
-					{
-						// Change specified attribute
-						std::string attribute = currentEvent.attribute("attribute").value();
-						std::string value = currentEvent.attribute("value").value();
-						m_lobby->ChangeAttribute(playerId, attribute, value);
-					}
-					else if (eventName == "new_message")
-					{
-						std::string text = currentEvent.attribute("text").value();
-						m_lobby->ShowMessage(playerId, text);
-						m_lobby->redraw();
-
-						
-						std::string logString = m_lobby->GetUsername(playerId) + ": " + text + "\n";
-						m_mainWindowLog->append(logString.c_str());
-					}
-
-					//Only other event type is 'new_message', but that is handled by individual clients
-				}
+				std::string logString = deletedPlayer.get()->GetUsername() + " has left\n";
+				m_mainWindowLog->append(logString.c_str());
 			}
+			else if (eventName == "attr_change")
+			{
+				// Change specified attribute
+				std::string attribute = currentEvent.attribute("attribute").value();
+				std::string value = currentEvent.attribute("value").value();
+				m_lobby->ChangeAttribute(playerId, attribute, value);
+			}
+			else if (eventName == "new_message")
+			{
+				std::string text = currentEvent.attribute("text").value();
+				m_lobby->ShowMessage(playerId, text);
+				m_lobby->redraw();
+
+
+				std::string logString = m_lobby->GetUsername(playerId) + ": " + text + "\n";
+				m_mainWindowLog->append(logString.c_str());
+			}
+
+			//Only other event type is 'new_message', but that is handled by individual clients
 		}
+	}
 
-		if (m_lobby != nullptr)
-		{
-			m_lobby->Update();
+	//Get any events that need to be sent
+	pugi::xml_document toSend;
+	m_lobby->FlushEvents(toSend);
 
-			//Get any events that need to be sent
-			pugi::xml_document toSend;
-			m_lobby->FlushEvents(toSend);
+	if (toSend.first_child().first_child())
+	{
+		Send(toSend);
+	}
 
-			if (toSend.child("Event"))
-			{
-				Send(toSend);
-			}
-		}
+	//Stop this function from running on server close
+	if (m_lobby->IsClosed())
+	{
+		m_socket->CloseConnection();
 	}
 }
 
@@ -131,8 +136,8 @@ bool Client::Connect(std::string& _ipToConnect)
 		//printf("Connected successfully!\n");
 
 		pugi::xml_document newPlayerEvent;
-		newPlayerEvent.append_child("Event");
-		newPlayerEvent.child("Event").append_attribute("type").set_value("new_plr");
+		newPlayerEvent.append_child("Events");
+		newPlayerEvent.first_child().append_child("Event").append_attribute("type").set_value("new_plr");
 
 		std::stringstream ss;
 		newPlayerEvent.save(ss);

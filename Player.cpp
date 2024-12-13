@@ -68,8 +68,8 @@ pugi::xml_document Player::CreateMovementEvent(int _destX, int _destY)
 	//The movement step is not accounted for inside of PlayerInfo, so it is set here
 
 
-	// <Event type="attr_change", attribute="start", value=playerImageX,playerImageY>
-	// <Event type="attr_change", attribute="destination", value=_mouseX,_mouseY>
+	// <Event type="attr_change", attribute="start", value=playerImageX,playerImageY, id=m_Id>
+	// <Event type="attr_change", attribute="destination", value=_mouseX,_mouseY, id=m_Id>
 	m_movementStep = 0;
 
 	pugi::xml_document newEvent;
@@ -78,11 +78,13 @@ pugi::xml_document Player::CreateMovementEvent(int _destX, int _destY)
 	startNode.append_attribute("type").set_value("attr_change");
 	startNode.append_attribute("attribute").set_value("start");
 	startNode.append_attribute("value").set_value(std::string(std::to_string(m_playerImage->x()) + "," + std::to_string(m_playerImage->y())).c_str());
+	startNode.append_attribute("id").set_value(m_playerInfo.m_id);
 
 	pugi::xml_node destinationNode = newEvent.append_child("Event");
 	destinationNode.append_attribute("type").set_value("attr_change");
 	destinationNode.append_attribute("attribute").set_value("destination");
 	destinationNode.append_attribute("value").set_value(std::string(std::to_string(_destX - (w() / 2)) + "," + std::to_string(_destY - (h() / 2))).c_str());
+	destinationNode.append_attribute("id").set_value(m_playerInfo.m_id);
 
 	return newEvent;
 }

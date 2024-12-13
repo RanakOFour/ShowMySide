@@ -104,3 +104,13 @@ bool ClientSocket::Receive(std::string& _message)
 	_message = buffer;
 	return true;
 }
+
+void ClientSocket::CloseConnection()
+{
+	int result = closesocket(m_socket);
+
+	if (result == 0)
+	{
+		printf("Connection with server terminated\n");
+	}
+}

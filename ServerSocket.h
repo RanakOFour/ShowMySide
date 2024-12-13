@@ -34,7 +34,7 @@ private:
 	/**
 		Sends server XML from Host to a client, then blacklists them from recieving new events until the server recieves a confirmation
 	*/
-	void SendServerInfo(int _id, std::string _xmlToSend);
+	void SendServerInfo(std::string _xmlToSend);
 
 public:
 	ServerSocket(int _port);

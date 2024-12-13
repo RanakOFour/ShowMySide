@@ -127,11 +127,10 @@ std::shared_ptr<ClientSocket> ServerSocket::Accept()
 
 pugi::xml_document ServerSocket::Update()
 {
-	//create document to repackage messages into and return
-	pugi::xml_document currentMessageDoc;
-	pugi::xml_node events = currentMessageDoc.append_child("Events");
-
 	bool messagesToSend{ false };
+
+	//create document to repackage messages into and return
+	pugi::xml_document clientEventList;
 
 	//Accept any new connections and add them to m_clients, tell host to add them to Lobby
 	std::shared_ptr<ClientSocket> client = Accept();
@@ -173,6 +172,8 @@ pugi::xml_document ServerSocket::Update()
 			}
 		}
 
+		pugi::xml_node clientEventsParent = clientEventList.append_child("Events");
+
 		if(clientMessageAsString != "")
 		{
 			//printf("Message recieved as server: %s\n", clientMessageAsString.c_str());
@@ -189,35 +190,23 @@ pugi::xml_document ServerSocket::Update()
 				throw std::runtime_error(clientMessageResult.description());
 			}
 
-			//Add message to return document
-			pugi::xml_node clientEvent = clientEventDoc.first_child();
-
-			//Determine message type
-			std::string messageType = clientEvent.attribute("type").value();
-
-			//Add message into list with id
-			pugi::xml_node currentEvent = events.append_child("Event");
-			currentEvent.append_attribute("id").set_value(ci);
-			currentEvent.append_attribute("type").set_value(messageType.c_str());
-
-			//Add additional information based on message type
-			if (messageType == "new_message")
+			for (pugi::xml_node currentEvent = clientEventDoc.first_child().first_child(); currentEvent; currentEvent = currentEvent.next_sibling())
 			{
-				currentEvent.append_attribute("text").set_value(clientEvent.attribute("text").value());
-			}
-			else if (messageType == "attr_change")
-			{
-				currentEvent.append_attribute("attribute").set_value(clientEvent.attribute("attribute").value());
-				currentEvent.append_attribute("value").set_value(clientEvent.attribute("value").value());
-			}
-			else if (messageType == "plr_leave")
-			{
-				m_clients.at(ci)->m_closed = true;
+				// Mark clientsocket as closed if player sends plr_leave event
+				std::string messageType = currentEvent.attribute("type").value();
+				
+				if (messageType == "plr_leave")
+				{
+					m_clients.at(ci)->m_closed = true;
+					break;
+				}
+				
+				clientEventsParent.append_copy(currentEvent);
 			}
 		}
 	}
 
-	return currentMessageDoc;
+	return clientEventList;
 }
 
 void ServerSocket::Send(pugi::xml_document& _xmlToSend)
@@ -240,10 +229,10 @@ void ServerSocket::Send(pugi::xml_document& _xmlToSend)
 	}
 }
 
-void ServerSocket::SendServerInfo(int _id, std::string _xmlToSend)
+void ServerSocket::SendServerInfo(std::string _xmlToSend)
 {
-	m_clients.at(_id)->Send(_xmlToSend);
+	m_clients.at(m_clients.size() - 1)->Send(_xmlToSend);
 
 	//This is to blacklist the specific client from reviecing updates until it has recieved and processed the server info
-	m_idJustAdded = _id;
+	m_idJustAdded = m_clients.size() - 1;
 }

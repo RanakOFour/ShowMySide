@@ -7,51 +7,26 @@
 #include "Pugixml/pugixml.hpp"
 #include <memory>
 
-Lobby::Lobby(std::string& _docToLoad) :
+Lobby::Lobby() :
 	Fl_Double_Window(0, 0, 1200, 800, "Lobby"),
+	Timer((double)(1.0f / 120.0f)),
 	m_events(),
 	m_players(),
 	m_clientPlayer(nullptr),
-	m_textFromChatbox()
+	m_playerId(-1),
+	m_textFromChatbox(),
+	m_closed(false)
 {
 	icon(ImagePool::GetImage(ImageType::ICON).get());
 
-
-	//Loads xml document from text, then copies out the data from the document into m_players
-	pugi::xml_document xmlDoc;
-	xmlDoc.load_string(_docToLoad.c_str());
-
-	for (pugi::xml_node currentPlayer = xmlDoc.child("Players").first_child(); currentPlayer; currentPlayer = currentPlayer.next_sibling())
-	{
-		int id = atoi(currentPlayer.attribute("id").value());
-		int shapeNum = atoi(currentPlayer.attribute("shape").value());
-		std::string username = currentPlayer.attribute("username").value();
-		std::string destinationString = currentPlayer.attribute("destination").value();
-		std::string startString = currentPlayer.attribute("start").value();
-		
-		int destination[2];
-		destination[0] = atoi(destinationString.substr(0, destinationString.find(',')).c_str());
-		destination[1] = atoi(destinationString.substr(destinationString.find(',') + 1, destinationString.size()).c_str());
-
-
-		int start[2];
-		start[0] = atoi(startString.substr(0, startString.find(',')).c_str());
-		start[1] = atoi(startString.substr(startString.find(',') + 1, startString.size()).c_str());
-
-		PlayerInfo currentInfo(id, username, destination, start, shapeNum);
-		m_players.push_back(std::make_shared<Player>(currentInfo));
-	}
-
-	m_clientPlayer = m_players[m_players.size() - 1];
-	add(m_clientPlayer.get());
-
 	m_chatBox = new Chatbox();
 	add(m_chatBox);
-	hide();
+
+	m_events.append_child("Events");
+
+	callback(CloseWindow, this);
 
 	end();
-	show();
-	take_focus();
 }
 
 Lobby::~Lobby()
@@ -64,16 +39,13 @@ int Lobby::handle(int _event)
 	switch (_event)
 	{
 
-	// Enable window to take focus
 	case FL_FOCUS:
 		return 1;
 
-	// Handle mouse event
 	case FL_PUSH:
 		HandleMouseEvent(Fl::event_button());
 		return 1;
 
-	// Keybaord event
 	case FL_KEYDOWN:
 		HandleKeyboardEvent(Fl::event_key());
 		return 1;
@@ -88,8 +60,8 @@ void Lobby::HandleMouseEvent(int _mouseButton)
 	if (_mouseButton == FL_LEFT_MOUSE && !m_chatBox->visible())
 	{
 		pugi::xml_document newEvent = m_clientPlayer->CreateMovementEvent(Fl::event_x(), Fl::event_y());
-		m_events.append_copy(newEvent.first_child());
-		m_events.append_copy(newEvent.last_child());
+		m_events.first_child().append_copy(newEvent.first_child());
+		m_events.first_child().append_copy(newEvent.last_child());
 	}
 }
 
@@ -126,7 +98,8 @@ void Lobby::HandleKeyboardEvent(int _key)
 	case '3':
 	case '4':
 	{
-		pugi::xml_node eventNode = m_events.append_child("Event");
+		// <Event type="attr_change", attribute="shape", value=_key-49>
+		pugi::xml_node eventNode = m_events.first_child().append_child("Event");
 		eventNode.append_attribute("type").set_value("attr_change");
 		eventNode.append_attribute("attribute").set_value("shape");
 		eventNode.append_attribute("value").set_value(_key - 49);
@@ -135,21 +108,7 @@ void Lobby::HandleKeyboardEvent(int _key)
 	}
 }
 
-void Lobby::FlushEvents(pugi::xml_document& _document)
-{
-	if (m_events.child("Event") != NULL)
-	{
-		_document.append_child("Event");
-		for (pugi::xml_attribute currentAttr = m_events.child("Event").first_attribute(); currentAttr; currentAttr = currentAttr.next_attribute())
-		{
-			_document.child("Event").append_copy(currentAttr);
-		}
-
-		m_events.remove_child("Event");
-	}
-}
-
-void Lobby::Update()
+void Lobby::OnTick(void* _userData)
 {
 	//GetInput (if any)
 	// On click set Destination (change attr)
@@ -161,34 +120,103 @@ void Lobby::Update()
 		m_players[i]->Update();
 	}
 
-	m_textFromChatbox = m_chatBox->FlushMessage();
+
 	// Handles chatbox text if any
+	m_textFromChatbox = m_chatBox->FlushMessage();
+
 	if (m_textFromChatbox != "")
 	{
 		switch (m_chatBox->m_mode)
 		{
 		case 0:
 		{
-			pugi::xml_node newEvent = m_events.append_child("Event");
+			// <Event type="new_message", text=m_textFromChatbox.c_str()>
+			pugi::xml_node newEvent = m_events.first_child().append_child("Event");
 			newEvent.append_attribute("type").set_value("new_message");
 			newEvent.append_attribute("text").set_value(m_textFromChatbox.c_str());
 
 			break;
 		}
-		
+
 		case 1:
 		{
-			// <Event type="attr_change", attribute="username", value=_newName>
-			pugi::xml_node eventNode = m_events.append_child("Event");
+			// <Event type="attr_change", attribute="username", value=m_textFromChatbox.c_str()>
+			pugi::xml_node eventNode = m_events.first_child().append_child("Event");
 			eventNode.append_attribute("type").set_value("attr_change");
 			eventNode.append_attribute("attribute").set_value("username");
 			eventNode.append_attribute("value").set_value(m_textFromChatbox.c_str());
+
 			break;
 		}
 		}
 	}
 
 	redraw();
+}
+
+void Lobby::CloseWindow(Fl_Widget* _widget, void* _userData)
+{
+	Lobby* _lobby = (Lobby*)_userData;
+
+	//Add player leave event
+	pugi::xml_node eventNode = _lobby->m_events.first_child().append_child("Event");
+	eventNode.append_attribute("type").set_value("plr_leave");
+
+	eventNode.append_attribute("id").set_value(_lobby->m_playerId);
+}
+
+void Lobby::LoadLobbyInformation(std::string& _docToLoad)
+{
+	//Loads xml document from text, then copies out the data from the document into m_players
+	pugi::xml_document xmlDoc;
+	xmlDoc.load_string(_docToLoad.c_str());
+
+	for (pugi::xml_node currentPlayer = xmlDoc.child("Players").first_child(); currentPlayer; currentPlayer = currentPlayer.next_sibling())
+	{
+		int id = atoi(currentPlayer.attribute("id").value());
+		int shapeNum = atoi(currentPlayer.attribute("shape").value());
+		std::string username = currentPlayer.attribute("username").value();
+		std::string destinationString = currentPlayer.attribute("destination").value();
+		std::string startString = currentPlayer.attribute("start").value();
+
+		int destination[2];
+		destination[0] = atoi(destinationString.substr(0, destinationString.find(',')).c_str());
+		destination[1] = atoi(destinationString.substr(destinationString.find(',') + 1, destinationString.size()).c_str());
+
+
+		int start[2];
+		start[0] = atoi(startString.substr(0, startString.find(',')).c_str());
+		start[1] = atoi(startString.substr(startString.find(',') + 1, startString.size()).c_str());
+
+		PlayerInfo currentInfo(id, username, destination, start, shapeNum);
+		m_players.push_back(std::make_shared<Player>(currentInfo));
+	}
+
+	// Client's player is the newest player (last in the list)
+	m_clientPlayer = m_players[m_players.size() - 1];
+	add(m_clientPlayer.get());
+
+	m_playerId = m_clientPlayer->GetID();
+
+	show();
+	redraw();
+}
+
+void Lobby::FlushEvents(pugi::xml_document& _document)
+{
+	if (m_events.first_child().first_child() != NULL)
+	{
+		_document.append_child("Events");
+
+		for (pugi::xml_node currentNode = m_events.first_child().first_child(); currentNode; currentNode = currentNode.next_sibling())
+		{
+			_document.first_child().append_copy(currentNode);
+		}
+
+
+		m_events.reset();
+		m_events.append_child("Events");
+	}
 }
 
 //Creates player object and fills out _playerNode object
@@ -238,4 +266,9 @@ void Lobby::ShowMessage(int _id, std::string& _message)
 std::string Lobby::GetUsername(int _id)
 {
 	return m_players[_id]->GetUsername();
+}
+
+bool Lobby::IsClosed()
+{
+	return m_closed;
 }

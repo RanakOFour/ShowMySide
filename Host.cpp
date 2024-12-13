@@ -50,7 +50,7 @@ void Host::MonitorNetwork()
 				{
 					//Add player to lobby
 					m_server->CreateNewPlayer();
-					m_socket->SendServerInfo(currentEvent.attribute("id").as_int(), m_server->AsXMLString());
+					m_socket->SendServerInfo(m_server->AsXMLString());
 				}
 				else if (eventName == "plr_leave")
 				{
