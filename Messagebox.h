@@ -16,7 +16,7 @@ private:
     /**
         Hides the text and image
     */
-    void OnTick(void* _userData);
+    void OnTick();
 
 public:
     Messagebox(int _playerX, int _playerY);

@@ -21,7 +21,7 @@ private:
 		Routinely checks if there are new events from the server, then applies them to the Lobby.
 		After that, it checks if there are any new events from the Lobby, and sends them off to the server
 	*/
-	void OnTick(void* _userData);
+	void OnTick();
 public:
 	Client();
 	~Client();

@@ -24,7 +24,7 @@ Client::~Client()
 
 }
 
-void Client::OnTick(void* _userData)
+void Client::OnTick()
 {
 	// No socket == no connection, so there is nothing to be done
 	if (m_socket == nullptr)

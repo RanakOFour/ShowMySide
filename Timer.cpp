@@ -1,24 +1,45 @@
 #include "Timer.h"
 
+Timer::Timer()
+{
+	m_duration = 0;
+	m_userdata = (void*)0;
+}
+
 Timer::Timer(double _duration)
 {
 	m_duration = _duration;
 	m_userdata = (void*)0;
-	Fl::add_timeout(_duration, Tick, this);
+	Fl::add_timeout(_duration, TickRepeat, this);
 }
 
 Timer::~Timer()
 {
-	Fl::remove_timeout(Tick, this);
+	if(Fl::has_timeout(TickRepeat, this))
+	{
+		Fl::remove_timeout(TickRepeat, this);
+	}
+
+	if (Fl::has_timeout(TickOnce, this))
+	{
+		Fl::remove_timeout(TickOnce, this);
+	}
 }
 
-void Timer::OnTick(void* _userData)
+void Timer::OnTick()
 {
+	printf("Blarg\n");
 }
 
-void Timer::Tick(void* _userData)
+void Timer::TickRepeat(void* _userData)
 {
 	Timer* timer = (Timer*)_userData;
-	timer->OnTick(_userData);
-	Fl::repeat_timeout(timer->m_duration, Tick, _userData);
+	timer->OnTick();
+	Fl::repeat_timeout(timer->m_duration, TickRepeat, _userData);
+}
+
+void Timer::TickOnce(void* _userData)
+{
+	Timer* timer = (Timer*)_userData;
+	timer->OnTick();
 }

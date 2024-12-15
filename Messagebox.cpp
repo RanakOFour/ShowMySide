@@ -8,7 +8,7 @@
 
 Messagebox::Messagebox(int _playerX, int _playerY) :
 	Fl_Group(_playerX + 20, _playerY - 100, 200, 30, ""),
-	Timer(6),
+	Timer(),
 	m_textBoxImage(nullptr),
 	m_textBox(nullptr)
 {
@@ -31,8 +31,9 @@ Messagebox::~Messagebox()
 }
 
 
-void Messagebox::OnTick(void* _userData)
+void Messagebox::OnTick()
 {
+	printf("MessageTick\n");
 	hide();
 	m_textBox->value("");
 	redraw();
@@ -44,12 +45,18 @@ void Messagebox::DisplayMessage(std::string& _message)
 	{
 		m_textBox->value("");
 		m_textBox->value(_message.c_str());
-		//Fl::add_timeout(6, Tick, (void*)this);
+		if (Fl::has_timeout(TickOnce, this))
+		{
+			Fl::remove_timeout(TickOnce, this);
+		}
+
+		Fl::add_timeout(6, TickOnce, (void*)this);
 	}
 	else
 	{
 		m_textBox->insert(_message.c_str());
 		show();
-		//Fl::add_timeout(6, Tick, (void*)this);
+
+		Fl::add_timeout(6, TickOnce, (void*)this);
 	}
 }
