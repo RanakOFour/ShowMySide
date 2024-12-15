@@ -61,7 +61,7 @@ ServerSocket::ServerSocket(int _port)
 
 	freeaddrinfo(result);
 
-	//Next we need to get the IP address of the host
+	//Next we need to get the IP address of the Server
 	//Open a new socket
 	int sock = socket(AF_INET, SOCK_DGRAM, 0);
 
@@ -131,8 +131,9 @@ pugi::xml_document ServerSocket::Update()
 
 	//create document to repackage messages into and return
 	pugi::xml_document clientEventList;
+	pugi::xml_node clientEventsParent = clientEventList.append_child("Events");
 
-	//Accept any new connections and add them to m_clients, tell host to add them to Lobby
+	//Accept any new connections and add them to m_clients, tell Server to add them to Lobby
 	std::shared_ptr<ClientSocket> client = Accept();
 
 	if (client)
@@ -172,35 +173,25 @@ pugi::xml_document ServerSocket::Update()
 			}
 		}
 
-		pugi::xml_node clientEventsParent = clientEventList.append_child("Events");
-
 		if(clientMessageAsString != "")
 		{
 			//printf("Message recieved as server: %s\n", clientMessageAsString.c_str());
 
 			messagesToSend = true;
 
-			//Parse client message into xml and pass up to Host
-			pugi::xml_document clientEventDoc;
+			//Parse client message into xml and pass up to Server
+			pugi::xml_document currentEventDoc;
 
 			//Parses document
-			pugi::xml_parse_result clientMessageResult = clientEventDoc.load_string(clientMessageAsString.c_str());
+			pugi::xml_parse_result clientMessageResult = currentEventDoc.load_string(clientMessageAsString.c_str());
 			if (clientMessageResult.status)
 			{
 				throw std::runtime_error(clientMessageResult.description());
 			}
 
-			for (pugi::xml_node currentEvent = clientEventDoc.first_child().first_child(); currentEvent; currentEvent = currentEvent.next_sibling())
+			//Copy events from this client into return document
+			for (pugi::xml_node currentEvent = currentEventDoc.first_child().first_child(); currentEvent; currentEvent = currentEvent.next_sibling())
 			{
-				// Mark clientsocket as closed if player sends plr_leave event
-				std::string messageType = currentEvent.attribute("type").value();
-				
-				if (messageType == "plr_leave")
-				{
-					m_clients.at(ci)->m_closed = true;
-					break;
-				}
-				
 				clientEventsParent.append_copy(currentEvent);
 			}
 		}
@@ -235,4 +226,21 @@ void ServerSocket::SendServerInfo(std::string _xmlToSend)
 
 	//This is to blacklist the specific client from reviecing updates until it has recieved and processed the server info
 	m_idJustAdded = m_clients.size() - 1;
+}
+
+void ServerSocket::SetNewPlayerID(int _id)
+{
+	m_clients[m_clients.size() - 1].get()->SetID(_id);
+}
+
+void ServerSocket::RemoveConnection(int _id)
+{
+	for (int i = 0; i < m_clients.size(); i++)
+	{
+		if (m_clients[i].get()->GetID() == _id)
+		{
+			m_clients.erase(m_clients.begin() + i);
+			break;
+		}
+	}
 }

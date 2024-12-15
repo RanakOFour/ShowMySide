@@ -5,7 +5,9 @@
 #include <memory>
 #include <stdexcept>
 
-ClientSocket::ClientSocket() : m_socket(INVALID_SOCKET)
+ClientSocket::ClientSocket() : 
+	m_socket(INVALID_SOCKET),
+	m_id(-1)
 {
 	m_closed = false;
 }
@@ -113,4 +115,14 @@ void ClientSocket::CloseConnection()
 	{
 		printf("Connection with server terminated\n");
 	}
+}
+
+void ClientSocket::SetID(int _id)
+{
+	m_id = _id;
+}
+
+int ClientSocket::GetID()
+{
+	return m_id;
 }

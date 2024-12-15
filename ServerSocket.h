@@ -6,10 +6,10 @@
 #include <string>
 
 class ClientSocket;
-class Host;
+class Server;
 class ServerSocket
 {
-	friend class Host;
+	friend class Server;
 private:
 	std::vector<std::shared_ptr<ClientSocket>> m_clients;
 	SOCKET m_socket;
@@ -32,11 +32,14 @@ private:
 	void Send(pugi::xml_document& _xmlToSend);
 
 	/**
-		Sends server XML from Host to a client, then blacklists them from recieving new events until the server recieves a confirmation
+		Sends server XML from Server to a client, then blacklists them from recieving new events until the server recieves a confirmation
 	*/
 	void SendServerInfo(std::string _xmlToSend);
 
 public:
 	ServerSocket(int _port);
 	~ServerSocket();
+
+	void SetNewPlayerID(int _id);
+	void RemoveConnection(int _id);
 };

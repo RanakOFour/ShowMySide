@@ -5,7 +5,7 @@ class Client;
 class ServerSocket;
 
 /**
-	Container for one end of a peer-to-peer connection. For each ClientSocket on a Client, it connects to another in the Host and that is the basis on which the networking works.
+	Container for one end of a peer-to-peer connection. For each ClientSocket on a Client, it connects to another in the Server and that is the basis on which the networking works.
 	ServerSocket contains a list of all ClientSocket connections.
 */
 class ClientSocket
@@ -15,6 +15,7 @@ private:
 	friend class ServerSocket;
 	SOCKET m_socket;
 	bool m_closed;
+	int m_id;
 
 public:
 	ClientSocket();
@@ -37,4 +38,7 @@ public:
 	bool Receive(std::string& _message);
 
 	void CloseConnection();
+
+	void SetID(int _id);
+	int GetID();
 };

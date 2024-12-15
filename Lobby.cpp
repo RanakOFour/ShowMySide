@@ -9,7 +9,6 @@
 
 Lobby::Lobby() :
 	Fl_Double_Window(0, 0, 1200, 800, "Lobby"),
-	Timer((double)(1.0f / 120.0f)),
 	m_events(),
 	m_players(),
 	m_clientPlayer(nullptr),
@@ -99,59 +98,14 @@ void Lobby::HandleKeyboardEvent(int _key)
 	case '4':
 	{
 		// <Event type="attr_change", attribute="shape", value=_key-49>
-		pugi::xml_node eventNode = m_events.first_child().append_child("Event");
-		eventNode.append_attribute("type").set_value("attr_change");
-		eventNode.append_attribute("attribute").set_value("shape");
-		eventNode.append_attribute("value").set_value(_key - 49);
+		pugi::xml_node newEvent = m_events.first_child().append_child("Event");
+		newEvent.append_attribute("type").set_value("attr_change");
+		newEvent.append_attribute("attribute").set_value("shape");
+		newEvent.append_attribute("value").set_value(_key - 49);
+		newEvent.append_attribute("id").set_value(m_playerId);
 	}
 		break;
 	}
-}
-
-void Lobby::OnTick(void* _userData)
-{
-	//GetInput (if any)
-	// On click set Destination (change attr)
-	// On t open chat box
-	// move characters
-
-	for (int i = 0; i < m_players.size(); i++)
-	{
-		m_players[i]->Update();
-	}
-
-
-	// Handles chatbox text if any
-	m_textFromChatbox = m_chatBox->FlushMessage();
-
-	if (m_textFromChatbox != "")
-	{
-		switch (m_chatBox->m_mode)
-		{
-		case 0:
-		{
-			// <Event type="new_message", text=m_textFromChatbox.c_str()>
-			pugi::xml_node newEvent = m_events.first_child().append_child("Event");
-			newEvent.append_attribute("type").set_value("new_message");
-			newEvent.append_attribute("text").set_value(m_textFromChatbox.c_str());
-
-			break;
-		}
-
-		case 1:
-		{
-			// <Event type="attr_change", attribute="username", value=m_textFromChatbox.c_str()>
-			pugi::xml_node eventNode = m_events.first_child().append_child("Event");
-			eventNode.append_attribute("type").set_value("attr_change");
-			eventNode.append_attribute("attribute").set_value("username");
-			eventNode.append_attribute("value").set_value(m_textFromChatbox.c_str());
-
-			break;
-		}
-		}
-	}
-
-	redraw();
 }
 
 void Lobby::CloseWindow(Fl_Widget* _widget, void* _userData)
@@ -161,8 +115,10 @@ void Lobby::CloseWindow(Fl_Widget* _widget, void* _userData)
 	//Add player leave event
 	pugi::xml_node eventNode = _lobby->m_events.first_child().append_child("Event");
 	eventNode.append_attribute("type").set_value("plr_leave");
-
 	eventNode.append_attribute("id").set_value(_lobby->m_playerId);
+
+	_lobby->m_closed = true;
+	_lobby->hide();
 }
 
 void Lobby::LoadLobbyInformation(std::string& _docToLoad)
@@ -190,15 +146,59 @@ void Lobby::LoadLobbyInformation(std::string& _docToLoad)
 
 		PlayerInfo currentInfo(id, username, destination, start, shapeNum);
 		m_players.push_back(std::make_shared<Player>(currentInfo));
+		add(m_players[m_players.size() - 1].get());
 	}
 
 	// Client's player is the newest player (last in the list)
 	m_clientPlayer = m_players[m_players.size() - 1];
-	add(m_clientPlayer.get());
 
 	m_playerId = m_clientPlayer->GetID();
 
 	show();
+	redraw();
+}
+
+void Lobby::Update()
+{
+	// Update each player's position
+	for (int i = 0; i < m_players.size(); i++)
+	{
+		m_players[i]->Update();
+	}
+
+
+	// Check for chatbox messsage
+	m_textFromChatbox = m_chatBox->FlushMessage();
+
+	if (m_textFromChatbox != "")
+	{
+		switch (m_chatBox->m_mode)
+		{
+		case 0:
+		{
+			// <Event type="new_message", text=m_textFromChatbox.c_str()>
+			pugi::xml_node newEvent = m_events.first_child().append_child("Event");
+			newEvent.append_attribute("type").set_value("new_message");
+			newEvent.append_attribute("text").set_value(m_textFromChatbox.c_str());
+			newEvent.append_attribute("id").set_value(m_playerId);
+
+			break;
+		}
+
+		case 1:
+		{
+			// <Event type="attr_change", attribute="username", value=m_textFromChatbox.c_str()>
+			pugi::xml_node newEvent = m_events.first_child().append_child("Event");
+			newEvent.append_attribute("type").set_value("attr_change");
+			newEvent.append_attribute("attribute").set_value("username");
+			newEvent.append_attribute("value").set_value(m_textFromChatbox.c_str());
+			newEvent.append_attribute("id").set_value(m_playerId);
+
+			break;
+		}
+		}
+	}
+
 	redraw();
 }
 
@@ -246,7 +246,7 @@ std::shared_ptr<Player> Lobby::RemovePlayer(int _id)
 
 	if (deletedPlayer)
 	{
-		m_players.erase(m_players.begin() + (index - 1));
+		m_players.erase(m_players.begin() + index);
 		return deletedPlayer;
 	}
 

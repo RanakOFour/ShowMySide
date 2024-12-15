@@ -70,8 +70,6 @@ pugi::xml_document Player::CreateMovementEvent(int _destX, int _destY)
 
 	// <Event type="attr_change", attribute="start", value=playerImageX,playerImageY, id=m_Id>
 	// <Event type="attr_change", attribute="destination", value=_mouseX,_mouseY, id=m_Id>
-	m_movementStep = 0;
-
 	pugi::xml_document newEvent;
 
 	pugi::xml_node startNode = newEvent.append_child("Event");
@@ -107,7 +105,7 @@ void Player::Update()
 
 		m_movementStep += 0.01;
 
-		printf("Current player position: %d, %d\n", m_playerImage->x(), m_playerImage->y());
+		//printf("Current player position: %d, %d\n", m_playerImage->x(), m_playerImage->y());
 	}
 	else
 	{

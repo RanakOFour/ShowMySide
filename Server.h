@@ -1,41 +1,36 @@
+#include "Timer.h"
 #include "Pugixml/pugixml.hpp"
-#include <vector>
-#include <memory>
+#include <string>
+#include <thread>
 
 #pragma once
-class PlayerInfo;
+class ServerSocket;
+class ServerRecords;
+
 class Server
 {
 private:
-	pugi::xml_document m_logDocument;
-	pugi::xml_document m_lobbyInfo;
-	std::vector<std::shared_ptr<pugi::xml_node>> m_playerXML;
-	std::vector<std::shared_ptr<PlayerInfo>> m_playerInfos;
-	int m_nextPlayerID;
+	ServerSocket* m_socket;
+	ServerRecords* m_records;
 
+	/**
+		Using a thread improves performance compared to having Server inherit from Timer and use Fl timeout events
+	*/
+	std::thread m_networkingThread;
+	bool m_serverClosed;
 public:
-	Server();
+	Server(int _port, double _tickTime);
 	~Server();
 
 	/**
-		Generates default PlayerInfo object, then inserts it into m_players and an xml copy into m_lobbyInfo, and references into m_playerXML
+		Handles all the server messages and runs inside of m_networkingThread
 	*/
-	void CreateNewPlayer();
+	void MonitorNetwork();
 
 	/**
-		Deletes specified player from all sources
+		Stops server thread and tells clients to disconnect from the server, then shuts down the server
 	*/
-	void RemovePlayer(int _id);
-
-	/**
-		Takes XML values and applies changes
-	*/
-	void ChangeAttribute(int _id, std::string& _attributeName, std::string& _newValue);
-	
-	/**
-		
-	*/
-	void LogEvent(pugi::xml_node& _eventXML);
-	std::string AsXMLString();
+	bool CloseServer();
+	std::string GetIPAddress();
 };
 

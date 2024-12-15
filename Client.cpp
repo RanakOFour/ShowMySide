@@ -109,8 +109,12 @@ void Client::OnTick(void* _userData)
 		}
 	}
 
-	//Get any events that need to be sent
 	pugi::xml_document toSend;
+	
+	//Update lobby with new information
+	m_lobby->Update();
+
+	//Get any events that need to be sent
 	m_lobby->FlushEvents(toSend);
 
 	if (toSend.first_child().first_child())
@@ -118,10 +122,12 @@ void Client::OnTick(void* _userData)
 		Send(toSend);
 	}
 
-	//Stop this function from running on server close
+	//Stop this function from running on server 
 	if (m_lobby->IsClosed())
 	{
 		m_socket->CloseConnection();
+		delete m_socket;
+		m_socket = nullptr;
 	}
 }
 

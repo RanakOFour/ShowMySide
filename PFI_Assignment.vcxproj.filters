@@ -48,7 +48,7 @@
     <ClCompile Include="Timer.cpp">
       <Filter>Source Files\GUI</Filter>
     </ClCompile>
-    <ClCompile Include="Host.cpp">
+    <ClCompile Include="Server.cpp">
       <Filter>Source Files\Networking</Filter>
     </ClCompile>
     <ClCompile Include="Client.cpp">
@@ -60,7 +60,7 @@
     <ClCompile Include="Messagebox.cpp">
       <Filter>Source Files\GUI</Filter>
     </ClCompile>
-    <ClCompile Include="Server.cpp">
+    <ClCompile Include="ServerRecords.cpp">
       <Filter>Source Files\Networking</Filter>
     </ClCompile>
     <ClCompile Include="ImagePool.cpp">
@@ -98,7 +98,7 @@
     <ClInclude Include="Timer.h">
       <Filter>Header Files\GUI</Filter>
     </ClInclude>
-    <ClInclude Include="Host.h">
+    <ClInclude Include="Server.h">
       <Filter>Header Files\Networking</Filter>
     </ClInclude>
     <ClInclude Include="Client.h">
@@ -113,7 +113,7 @@
     <ClInclude Include="Messagebox.h">
       <Filter>Header Files\GUI</Filter>
     </ClInclude>
-    <ClInclude Include="Server.h">
+    <ClInclude Include="ServerRecords.h">
       <Filter>Header Files\Networking</Filter>
     </ClInclude>
     <ClInclude Include="ImagePool.h">

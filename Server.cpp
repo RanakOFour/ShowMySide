@@ -1,17 +1,24 @@
 #include "Server.h"
-#include "PlayerInfo.h"
-#include <vector>
-#include <sstream>
+#include "Lobby.h"
+#include "Timer.h"
+#include "ServerSocket.h"
+#include "ServerRecords.h"
+#include "Pugixml/pugixml.hpp"
+#include <stdexcept>
+#include <thread>
 
-Server::Server() :
-	m_logDocument(),
-	m_lobbyInfo(),
-	m_playerXML(),
-	m_playerInfos(),
-	m_nextPlayerID(0)
+Server::Server(int _port, double _tickTimer) :
+	m_socket(nullptr),
+	m_records(nullptr),
+	m_serverClosed(false)
 {
-	m_logDocument.append_child("Event").append_attribute("LobbyCreated").set_value("rightnow");
-	m_lobbyInfo.append_child("Players");
+	m_socket = new ServerSocket(_port);
+	m_records = new ServerRecords();
+
+	// Set network monitoring on another thread so that it doesn't conflist with client stuff
+	// Also using fltk timeout gets messed up when you have too many timers aparrently
+	// Also it needs to be a pointer so that it can be instantiated here, after the server and lobby have been instantiated
+	m_networkingThread = std::thread(&Server::MonitorNetwork, this);
 }
 
 Server::~Server()
@@ -19,62 +26,77 @@ Server::~Server()
 
 }
 
-void Server::CreateNewPlayer()
+void Server::MonitorNetwork()
 {
-	//Add new playerinfo to players vector, then to
-	m_playerInfos.push_back(std::make_shared<PlayerInfo>(m_nextPlayerID));
-
-	//Make a pointer to a new XML player node in m_lobbyInfo
-	std::shared_ptr<pugi::xml_node> newPlayerNode = std::make_shared<pugi::xml_node>(m_lobbyInfo.child("Players").append_child("Player"));
-
-	// Pass new playerInfo into XML document, and hook up the new node into m_playerXML
-	pugi::xml_document playerNodeDoc;
-
-	// I need to use m_playerInfos.size() - 1, as the next id may not be the player's position if a player leaves
-	playerNodeDoc.load_string(m_playerInfos[m_playerInfos.size() - 1].get()->AsXMLString().c_str());
-
-	pugi::xml_node playerNode = playerNodeDoc.child("Player");
-
-	//Copy across the new player values into the xml
-	newPlayerNode->append_attribute("id").set_value(playerNode.attribute("id").value());
-	newPlayerNode->append_attribute("username").set_value(playerNode.attribute("username").value());
-	newPlayerNode->append_attribute("shape").set_value(playerNode.attribute("shape").value());
-	newPlayerNode->append_attribute("destination").set_value(playerNode.attribute("destination").value());
-	newPlayerNode->append_attribute("start").set_value(playerNode.attribute("start").value());
-	m_playerXML.push_back(newPlayerNode);
-	m_nextPlayerID++;
-}
-
-void Server::RemovePlayer(int _id)
-{
-	for (int i = 0; i < m_playerInfos.size(); i++)
+	while (!m_serverClosed)
 	{
-		if (m_playerInfos[i].get()->GetID() == _id)
+		//Get repackaged xml message from serversocket
+		pugi::xml_document eventsFromClient = m_socket->Update();
+
+		if (eventsFromClient.child("Events").first_child() != NULL)
 		{
-			m_playerInfos.erase(m_playerInfos.begin() + (i - 1));
-			break;
+			//printf("Server messages recieved\n");
+
+			//Cycle through messages and apply changes
+			for (pugi::xml_node currentEvent = eventsFromClient.child("Events").first_child(); currentEvent; currentEvent = currentEvent.next_sibling())
+			{
+				m_records->LogEvent(currentEvent);
+
+				// Enact event based on event type
+				std::string eventName = currentEvent.attribute("type").value();
+				//printf("Parsing current event type: %s\n", eventName.c_str());
+
+				if (eventName == "new_plr")
+				{
+					//Add player to lobby and tag id to message so clients know what the player's id is without needing to keep track themselves
+					int newPlayersId = m_records->CreateNewPlayer();
+					currentEvent.append_attribute("id").set_value(newPlayersId);
+					m_socket->SetNewPlayerID(newPlayersId);
+
+					m_socket->SendServerInfo(m_records->AsXMLString());
+				}
+				else if (eventName == "plr_leave")
+				{
+					//Remove player from lobby
+					m_records->RemovePlayer(currentEvent.attribute("id").as_int());
+					m_socket->RemoveConnection(currentEvent.attribute("id").as_int());
+				}
+				else if (eventName == "attr_change")
+				{
+					// Change specified attribute
+					std::string attribute = currentEvent.attribute("attribute").value();
+					std::string value = currentEvent.attribute("value").value();
+					m_records->ChangeAttribute(currentEvent.attribute("id").as_int(), attribute, value);
+				}
+
+				m_records->LogEvent(currentEvent);
+				//Only other event type is 'new_message', but that is handled by individual clients
+			}
+
+			//Ship events out to the clients
+			m_socket->Send(eventsFromClient);
 		}
 	}
 }
 
-
-void Server::ChangeAttribute(int _id, std::string& _attributeName, std::string& _newValue)
+bool Server::CloseServer()
 {
-	m_playerInfos[_id]->ChangeAttribute(_attributeName, _newValue);
-	m_playerXML[_id]->attribute(_attributeName.c_str()).set_value(_newValue.c_str());
+	// End the thread, then send out close_server event
+	m_serverClosed = true;
+	m_networkingThread.join();
+
+	pugi::xml_document closeServerMessage;
+	pugi::xml_node closeEvent = closeServerMessage.append_child("Event");
+	closeEvent.append_attribute("type").set_value("close_server");
+
+	m_socket->Send(closeServerMessage);
+
+	//m_socket->CloseConnections();
+
+	return true;
 }
 
-void Server::LogEvent(pugi::xml_node& _eventXML)
+std::string Server::GetIPAddress()
 {
-	m_logDocument.insert_child_after("Event", _eventXML);
-	m_logDocument.save_file("./Log/headless.txt");
-}
-
-std::string Server::AsXMLString()
-{
-	std::stringstream ss;
-	m_lobbyInfo.save(ss);
-	std::string lobbyAsString = ss.str();
-	printf("Lobby Info:\n%s", lobbyAsString.c_str());
-	return lobbyAsString;
+	return m_socket->m_ipAddress;
 }

@@ -1,6 +1,6 @@
 #include "MainWindow.h"
 #include "Timer.h"
-#include "Host.h"
+#include "Server.h"
 #include "Client.h"
 #include "ImagePool.h"
 #include "MenuWrapper.h"
@@ -21,7 +21,7 @@
 MainWindow::MainWindow(int _w, int _h, std::string _name)
 	: Fl_Double_Window(200, 200, _w, _h, "Show My Side"),
 	m_Client(nullptr),
-	m_Host(nullptr),
+	m_Server(nullptr),
 	m_menuWrapper(nullptr),
 	m_splashImage(nullptr),
 	m_ipInput(nullptr),
@@ -67,13 +67,13 @@ MainWindow::~MainWindow()
 {
 }
 
-bool MainWindow::AttemptConnection(std::string& _ipAddress)
-{
-	return m_Client->Connect(_ipAddress);
-}
-
 void MainWindow::ChangeLayout(LayoutType _newState)
 {
+	//Skips hiding the menubar
+	for (int i = 1; i < children(); i++)
+	{
+		child(i)->hide();
+	}
 
 	switch (_newState)
 	{
@@ -83,11 +83,11 @@ void MainWindow::ChangeLayout(LayoutType _newState)
 		break;
 
 
-	//Overlay for ingame and host is the same
-	case LayoutType::HOST:
+	//Overlay for ingame and Server is the same
+	case LayoutType::Server:
 		//Display server IP address for other clients to connect
 		m_ipAddressBox = new Fl_Output(58, 30, 95, 25, "Local IP:");
-		m_ipAddressBox->value(m_Host->GetIPAddress().c_str());
+		m_ipAddressBox->value(m_Server->GetIPAddress().c_str());
 		m_ipAddressBox->box(FL_NO_BOX);
 
 		add(m_ipAddressBox);
@@ -118,42 +118,38 @@ void MainWindow::ChangeLayout(LayoutType _newState)
 
 void MainWindow::OnClientStart(Fl_Widget* _widget, void* _userData)
 {
-
 	MainWindow* mw = (MainWindow*)_userData;
+
 	//Start client
 	mw->m_Client = new Client();
-
-
 	mw->ChangeLayout(LayoutType::JOIN_GAME);
 }
 
 void MainWindow::OnServerStart(Fl_Widget* _widget, void* _userData)
 {
-
 	MainWindow* mw = (MainWindow*)_userData;
-	//Start a new host and connect client to it
+	//Start a new Server and connect client to it
 	
 							 //port, timer duration
-	mw->m_Host = new Host(8080, 0.25);
+	mw->m_Server = new Server(8080, 0.25);
 
 	mw->m_Client = new Client();
 
-	std::string ip = mw->m_Host->GetIPAddress();
+	std::string ip = mw->m_Server->GetIPAddress();
 	mw->m_Client->Connect(ip);
 
-	mw->ChangeLayout(LayoutType::HOST);
+	mw->ChangeLayout(LayoutType::Server);
 }
 
 void MainWindow::OnJoinServer(Fl_Widget* _widget, void* _userData)
 {
-
 	MainWindow* mw = (MainWindow*)_userData;
 
 	std::string ip = mw->m_ipInput->value();
 
 	printf("IP: %s\n", ip.c_str());
 
-	if (mw->AttemptConnection(ip))
+	if (mw->m_Client->Connect(ip))
 	{
 		mw->ChangeLayout(LayoutType::IN_GAME);
 	}

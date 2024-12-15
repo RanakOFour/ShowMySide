@@ -8,7 +8,7 @@
 class Player;
 class Chatbox;
 class Lobby :
-    public Fl_Double_Window, Timer
+    public Fl_Double_Window
 {
 private:
     pugi::xml_document m_events;
@@ -34,8 +34,6 @@ private:
     */
     void HandleKeyboardEvent(int _key);
 
-    void OnTick(void* _userData);
-
     static void CloseWindow(Fl_Widget* _widget, void* _userData);
 public:
     /**
@@ -45,6 +43,12 @@ public:
     ~Lobby();
 
     void LoadLobbyInformation(std::string& _docToLoad);
+
+    /**
+       Handles part of the core client loop, where after recieving and processing info from the server, the lobby then updates all it's information and events, before they are then grabbed
+       by the client from FlushEvents(), and sent back to the server
+   */
+    void Update();
 
     /**
         Takes any new events in m_events, and copies out the information into _document before deleting any nodes in m_events.
@@ -75,4 +79,3 @@ public:
 
     bool IsClosed();
 };
-

@@ -8,14 +8,14 @@
 
 /**
 		There are only 3 different layouts, in reality. The empty screen when the program boots, the join game screen, then the normal gameplay screen.
-		The only reason HOST is listed is because the host needs to also add an Fl_Label with the ip address of the machine so that other clients can
+		The only reason Server is listed is because the Server needs to also add an Fl_Label with the ip address of the machine so that other clients can
 		join.
 	*/
 enum class LayoutType
 {
 	SPLASH_SCREEN = 0,
 	JOIN_GAME = 1,
-	HOST = 2,
+	Server = 2,
 	IN_GAME = 3,
 	ABOUT = 4,
 	HELP = 5
@@ -24,13 +24,13 @@ enum class LayoutType
 
 class ServerSocket;
 class ClientSocket;
-class Host;
+class Server;
 class Client;
 class MenuWrapper;
 class MainWindow : public Fl_Double_Window
 {
 private:
-	Host* m_Host;
+	Server* m_Server;
 	Client* m_Client;
 	MenuWrapper* m_menuWrapper;
 	Fl_Box* m_splashImage;
@@ -38,11 +38,6 @@ private:
 	Fl_Output* m_ipAddressBox;
 	Fl_Button* m_connectBtn;
 	Fl_Text_Display* m_lobbyEventLog;
-
-	/**
-		Called in OnJoinServer() to take the IPv4 address from an Fl_Input widget and pass it to the Client to connect. Returns true on a succesful connection
-	*/
-	bool AttemptConnection(std::string& _ipAddress);
 
 public:
 	MainWindow(int _w, int _h, std::string _name);
