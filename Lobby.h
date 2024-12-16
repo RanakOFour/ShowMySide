@@ -56,6 +56,12 @@ public:
     void FlushEvents(pugi::xml_document& _document);
 
     /**
+        Loops through m_players to find player with matching id and returns index in list.
+        If the id is not found, return -1
+    */
+    int FindPlayer(int _id);
+
+    /**
         Handles new_plr events from the Client
     */
     std::shared_ptr<Player> CreateNewPlayer(int _id);

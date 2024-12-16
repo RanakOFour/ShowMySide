@@ -219,6 +219,19 @@ void Lobby::FlushEvents(pugi::xml_document& _document)
 	}
 }
 
+int Lobby::FindPlayer(int _id)
+{
+	for (int i = 0; i < m_players.size(); i++)
+	{
+		if (m_players[i]->GetID() == _id)
+		{
+			return i;
+		}
+	}
+
+	return -1;
+}
+
 //Creates player object and fills out _playerNode object
 std::shared_ptr<Player> Lobby::CreateNewPlayer(int _id)
 {
@@ -231,41 +244,26 @@ std::shared_ptr<Player> Lobby::CreateNewPlayer(int _id)
 
 std::shared_ptr<Player> Lobby::RemovePlayer(int _id)
 {
-	std::shared_ptr<Player> deletedPlayer = nullptr;
-	int index{ 0 };
-
-	for (int i = 0; i < m_players.size(); i++)
-	{
-		if (m_players[i].get()->GetID() == _id)
-		{
-			index = i;
-			deletedPlayer = m_players[i];
-			break;
-		}
-	}
-
-	if (deletedPlayer)
-	{
-		m_players.erase(m_players.begin() + index);
-		return deletedPlayer;
-	}
+	int playerIndex = FindPlayer(_id);
+	std::shared_ptr<Player> deletedPlayer = m_players[playerIndex];
+	m_players.erase(m_players.begin() + playerIndex);
 
 	return nullptr;
 }
 
 void Lobby::ChangeAttribute(int _id, std::string& _attributeName, std::string& _newValue)
 {
-	m_players[_id]->ChangeAttribute(_attributeName, _newValue);
+	m_players[FindPlayer(_id)]->ChangeAttribute(_attributeName, _newValue);
 }
 
 void Lobby::ShowMessage(int _id, std::string& _message)
 {
-	m_players[_id]->ShowMessage(_message);
+	m_players[FindPlayer(_id)]->ShowMessage(_message);
 }
 
 std::string Lobby::GetUsername(int _id)
 {
-	return m_players[_id]->GetUsername();
+	return m_players[FindPlayer(_id)]->GetUsername();
 }
 
 bool Lobby::IsClosed()

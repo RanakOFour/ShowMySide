@@ -19,6 +19,19 @@ ServerRecords::~ServerRecords()
 
 }
 
+int ServerRecords::FindPlayer(int _id)
+{
+	for (int i = 0; i < m_playerInfos.size(); i++)
+	{
+		if (m_playerInfos[i]->GetID() == _id)
+		{
+			return i;
+		}
+	}
+
+	return -1;
+}
+
 int ServerRecords::CreateNewPlayer()
 {
 	//Add new playerinfo to players vector, then to xml_node vector
@@ -49,21 +62,19 @@ int ServerRecords::CreateNewPlayer()
 
 void ServerRecords::RemovePlayer(int _id)
 {
-	for (int i = 0; i < m_playerInfos.size(); i++)
-	{
-		if (m_playerInfos[i].get()->GetID() == _id)
-		{
-			m_playerInfos.erase(m_playerInfos.begin() + i);
-			break;
-		}
-	}
+	int playerIndex = FindPlayer(_id);
+	std::shared_ptr<PlayerInfo> deletedPlayer = m_playerInfos[playerIndex];
+	m_lobbyInfo.first_child().remove_child(*m_playerXML[playerIndex].get());
+	m_playerXML.erase(m_playerXML.begin() + playerIndex);
+	m_playerInfos.erase(m_playerInfos.begin() + playerIndex);
 }
 
 
 void ServerRecords::ChangeAttribute(int _id, std::string& _attributeName, std::string& _newValue)
 {
-	m_playerInfos[_id]->ChangeAttribute(_attributeName, _newValue);
-	m_playerXML[_id]->attribute(_attributeName.c_str()).set_value(_newValue.c_str());
+	int playerIndex = FindPlayer(_id);
+	m_playerInfos[playerIndex]->ChangeAttribute(_attributeName, _newValue);
+	m_playerXML[playerIndex]->attribute(_attributeName.c_str()).set_value(_newValue.c_str());
 }
 
 void ServerRecords::LogEvent(pugi::xml_node& _eventXML)

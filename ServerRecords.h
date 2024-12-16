@@ -18,6 +18,12 @@ public:
 	~ServerRecords();
 
 	/**
+		Loops through m_players to find player with matching id and returns index in list.
+        If the id is not found, return -1
+	*/
+	int FindPlayer(int _id);
+
+	/**
 		Generates default PlayerInfo object, then inserts it into m_players and an xml copy into m_lobbyInfo, and references into m_playerXML
 	*/
 	int CreateNewPlayer();

@@ -120,6 +120,12 @@ void MainWindow::OnClientStart(Fl_Widget* _widget, void* _userData)
 {
 	MainWindow* mw = (MainWindow*)_userData;
 
+	if (mw->m_Client)
+	{
+		delete mw->m_Client;
+		mw->m_Client = nullptr;
+	}
+
 	//Start client
 	mw->m_Client = new Client();
 	mw->ChangeLayout(LayoutType::JOIN_GAME);
@@ -130,6 +136,17 @@ void MainWindow::OnServerStart(Fl_Widget* _widget, void* _userData)
 	MainWindow* mw = (MainWindow*)_userData;
 	//Start a new Server and connect client to it
 	
+	if (mw->m_Client)
+	{
+		delete mw->m_Client;
+		mw->m_Client = nullptr;
+	}
+
+	if (mw->m_Server)
+	{
+		delete mw->m_Server;
+		mw->m_Server = nullptr;
+	}
 							 //port, timer duration
 	mw->m_Server = new Server(8080, 0.25);
 

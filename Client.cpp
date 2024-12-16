@@ -81,10 +81,11 @@ void Client::OnTick()
 			}
 			else if (eventName == "plr_leave")
 			{
-				//Remove player from lobby, resend new lobby info
-				std::shared_ptr<Player> deletedPlayer = m_lobby->RemovePlayer(currentEvent.attribute("id").as_int());
+				//Remove player from lobby
+				std::string playerName = m_lobby->GetUsername(playerId);
+				std::shared_ptr<Player> deletedPlayer = m_lobby->RemovePlayer(playerId);
 
-				std::string logString = deletedPlayer.get()->GetUsername() + " has left\n";
+				std::string logString = playerName + " has left\n";
 				m_mainWindowLog->append(logString.c_str());
 			}
 			else if (eventName == "attr_change")
