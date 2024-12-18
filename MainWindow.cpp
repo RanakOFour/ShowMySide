@@ -4,9 +4,8 @@
 #include "Client.h"
 #include "ImagePool.h"
 #include "MenuWrapper.h"
-#include <string>
-#include <iostream>
-#include <thread>
+#include "FileTextDisplay.h"
+
 #include <FL/Fl_Group.H>
 #include <FL/Fl_Multiline_Input.H>
 #include <FL/Fl_Menu_Bar.H>
@@ -17,6 +16,12 @@
 #include <FL/Fl_Button.H>
 #include "FL/Fl_Box.H"
 
+#include <string>
+#include <iostream>
+#include <thread>
+#include <memory>
+#include <fstream>
+
 
 MainWindow::MainWindow(int _w, int _h, std::string _name)
 	: Fl_Double_Window(200, 200, _w, _h, "Show My Side"),
@@ -26,23 +31,36 @@ MainWindow::MainWindow(int _w, int _h, std::string _name)
 	m_splashImage(nullptr),
 	m_ipInput(nullptr),
 	m_ipAddressBox(nullptr),
-	m_lobbyEventLog(nullptr)
+	m_lobbyEventLogDisplay(nullptr)
 {
 	end();
 
-	//Menubar with a box in a group so the menubar resizes correctly
-	m_menuWrapper = new MenuWrapper(this);
-	add(m_menuWrapper);
+	//Set minimum size to 640, 360
+	size_range(_w, _h);
 
-	m_splashImage = new Fl_Box(100, 100, _w - 200, _h - 200, "");
+	//Menubar with a box in a group so the menubar resizes correctly
+	m_menuWrapper = std::make_shared<MenuWrapper>(this);
+	add(m_menuWrapper.get());
+
+	// Splash image shown on startup
+	m_splashImage = std::make_shared<Fl_Box>(100, 100, _w - 200, _h - 200, "");
 	m_splashImage->image(ImagePool::GetImage(ImageType::SPLASH).get());
-	add(m_splashImage);
+	add(m_splashImage.get());
 	m_splashImage->show();
 
-	m_ipInput = new Fl_Input(100, 100, 120, 25, "Enter IP here: ");
-	add(m_ipInput);
+	resizable(m_splashImage.get());
+	icon(ImagePool::GetImage(ImageType::ICON).get());
 
-	//Forces the textbox to be shown on the screen
+
+	// Create the rest of the widgets and hide them
+	m_aboutText = std::make_shared<FileTextDisplay>("./text/about.txt", _w, _h);
+	add((Fl_Widget*)m_aboutText.get());
+	m_aboutText->hide();
+
+	m_ipInput = std::make_shared<Fl_Input>(100, 100, 120, 25, "Enter IP here: ");
+	add(m_ipInput.get());
+
+	//Forces the textbox to be shown on the screen when first shown
 	m_ipInput->value(" ");
 	m_ipInput->value("");
 	m_ipInput->box(FL_ENGRAVED_BOX);
@@ -50,17 +68,19 @@ MainWindow::MainWindow(int _w, int _h, std::string _name)
 	m_ipInput->hide();
 
 	//Show connect button to confirm connection
-	m_connectBtn = new Fl_Button(270, 260, 100, 50, "Connect");
+	m_connectBtn = std::make_shared<Fl_Button>(270, 260, 100, 50, "Connect");
 	m_connectBtn->callback(OnJoinServer, (void*)this);
-	add(m_connectBtn);
+	add(m_connectBtn.get());
 	m_connectBtn->hide();
 
-	//Set minimum size to 640, 360
-	size_range(_w, _h);
+	m_lobbyEventLogDisplay = std::make_shared<Fl_Text_Display>(5, 60, w() - 10, h() - 65);
+	add(m_lobbyEventLogDisplay.get());
+	m_lobbyEventLogDisplay->hide();
 
-
-	resizable(m_splashImage);
-	icon(ImagePool::GetImage(ImageType::ICON).get());
+	m_ipAddressBox = std::make_shared<Fl_Output>(58, 30, 95, 25, "Local IP:");
+	m_ipAddressBox->box(FL_NO_BOX);
+	add(m_ipAddressBox.get());
+	m_ipAddressBox->hide();
 }
 
 MainWindow::~MainWindow()
@@ -82,34 +102,23 @@ void MainWindow::ChangeLayout(LayoutType _newState)
 		m_connectBtn->show();
 		break;
 
-
 	//Overlay for ingame and Server is the same
-	case LayoutType::Server:
+	case LayoutType::SERVER:
 		//Display server IP address for other clients to connect
-		m_ipAddressBox = new Fl_Output(58, 30, 95, 25, "Local IP:");
 		m_ipAddressBox->value(m_Server->GetIPAddress().c_str());
-		m_ipAddressBox->box(FL_NO_BOX);
-
-		add(m_ipAddressBox);
-
+		m_ipAddressBox->show();
 		m_ipAddressBox->redraw_label();
 
 	case LayoutType::IN_GAME:
-		m_ipInput->hide();
-		m_connectBtn->hide();
-
-		m_lobbyEventLog = new Fl_Text_Display(5, 60, w() - 10, h() - 65);
-		add(m_lobbyEventLog);
-
-		m_Client->SetLogDisplay(m_lobbyEventLog);
+		m_lobbyEventLogDisplay->show();
+		m_Client->SetLogDisplay(m_lobbyEventLogDisplay.get());
 	break;
 
 	case LayoutType::ABOUT:
-
+		m_aboutText->show();
 		break;
 
 	case LayoutType::HELP:
-
 		break;
 	}
 
@@ -120,14 +129,8 @@ void MainWindow::OnClientStart(Fl_Widget* _widget, void* _userData)
 {
 	MainWindow* mw = (MainWindow*)_userData;
 
-	if (mw->m_Client)
-	{
-		delete mw->m_Client;
-		mw->m_Client = nullptr;
-	}
-
 	//Start client
-	mw->m_Client = new Client();
+	mw->m_Client = std::make_shared<Client>();
 	mw->ChangeLayout(LayoutType::JOIN_GAME);
 }
 
@@ -136,26 +139,15 @@ void MainWindow::OnServerStart(Fl_Widget* _widget, void* _userData)
 	MainWindow* mw = (MainWindow*)_userData;
 	//Start a new Server and connect client to it
 	
-	if (mw->m_Client)
-	{
-		delete mw->m_Client;
-		mw->m_Client = nullptr;
-	}
-
-	if (mw->m_Server)
-	{
-		delete mw->m_Server;
-		mw->m_Server = nullptr;
-	}
 							 //port, timer duration
-	mw->m_Server = new Server(8080, 0.25);
+	mw->m_Server = std::make_shared<Server>(8080);
 
-	mw->m_Client = new Client();
+	mw->m_Client = std::make_shared<Client>();
 
 	std::string ip = mw->m_Server->GetIPAddress();
 	mw->m_Client->Connect(ip);
 
-	mw->ChangeLayout(LayoutType::Server);
+	mw->ChangeLayout(LayoutType::SERVER);
 }
 
 void MainWindow::OnJoinServer(Fl_Widget* _widget, void* _userData)
@@ -183,11 +175,5 @@ void MainWindow::ShowAbout(Fl_Widget* _widget, void* _userData)
 {
 	MainWindow* mw = (MainWindow*)_userData;
 	mw->ChangeLayout(LayoutType::ABOUT);
-}
-
-void MainWindow::ShowHelp(Fl_Widget* _widget, void* _userData)
-{
-	MainWindow* mw = (MainWindow*)_userData;
-	mw->ChangeLayout(LayoutType::HELP);
 }
 

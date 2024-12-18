@@ -1,23 +1,30 @@
 #include "Timer.h"
+#include "Chatbox.h"
+#include "ClientPlayer.h"
 #include "Pugixml/pugixml.hpp"
+
 #include "FL/Fl_Double_Window.H"
+
 #include <string>
 #include <vector>
 #include <memory>
 
+#pragma once
+
 class Player;
-class Chatbox;
+
 class Lobby :
     public Fl_Double_Window
 {
 private:
     pugi::xml_document m_events;
     std::vector<std::shared_ptr<Player>> m_players;
-    std::shared_ptr<Player> m_clientPlayer;
+    Chatbox m_chatBox;
+    ClientPlayer m_clientPlayer;
     int m_playerId;
-    Chatbox* m_chatBox;
     std::string m_textFromChatbox;
     bool m_closed;
+    bool m_hasLoaded;
 
     /**
         Overrides Fl_Widget::handle() so that m_clientPlayer's destination will update on a player's click. Will also open the ChatBox when pressing the 't' key.
@@ -84,4 +91,6 @@ public:
     std::string GetUsername(int _id);
 
     bool IsClosed();
+
+    bool IsLoaded();
 };

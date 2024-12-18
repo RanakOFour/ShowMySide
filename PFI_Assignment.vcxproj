@@ -44,6 +44,7 @@
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
+    <EnableASAN>false</EnableASAN>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -141,7 +142,9 @@
   <ItemGroup>
     <ClCompile Include="Chatbox.cpp" />
     <ClCompile Include="Client.cpp" />
+    <ClCompile Include="ClientPlayer.cpp" />
     <ClCompile Include="ClientSocket.cpp" />
+    <ClCompile Include="FileTextDisplay.cpp" />
     <ClCompile Include="ServerRecords.cpp" />
     <ClCompile Include="ImagePool.cpp" />
     <ClCompile Include="Lobby.cpp" />
@@ -160,7 +163,9 @@
   <ItemGroup>
     <ClInclude Include="Chatbox.h" />
     <ClInclude Include="Client.h" />
+    <ClInclude Include="ClientPlayer.h" />
     <ClInclude Include="ClientSocket.h" />
+    <ClInclude Include="FileTextDisplay.h" />
     <ClInclude Include="ServerRecords.h" />
     <ClInclude Include="ImagePool.h" />
     <ClInclude Include="Lobby.h" />

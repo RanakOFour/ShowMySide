@@ -81,6 +81,12 @@
     <ClCompile Include="MenuWrapper.cpp">
       <Filter>Source Files\GUI</Filter>
     </ClCompile>
+    <ClCompile Include="FileTextDisplay.cpp">
+      <Filter>Source Files\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="ClientPlayer.cpp">
+      <Filter>Source Files\GUI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MainWindow.h">
@@ -132,6 +138,12 @@
       <Filter>Header Files\Networking</Filter>
     </ClInclude>
     <ClInclude Include="MenuWrapper.h">
+      <Filter>Header Files\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="FileTextDisplay.h">
+      <Filter>Header Files\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="ClientPlayer.h">
       <Filter>Header Files\GUI</Filter>
     </ClInclude>
   </ItemGroup>

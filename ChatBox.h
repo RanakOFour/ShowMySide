@@ -1,14 +1,16 @@
-#pragma once
 #include "FL/Fl_Group.H"
 #include "FL/Fl_Input.H"
-#include "FL/Fl_Button.H"
+
 #include <string>
+#include <memory>
+
+#pragma once
 
 class Chatbox :
     public Fl_Group
 {
 private:
-    Fl_Input* m_textBox;
+    std::shared_ptr<Fl_Input> m_textBox;
 
     int handle(int _event);
 public:
@@ -22,6 +24,7 @@ public:
         For example, entering a new username or sending out a message.
     */
     void Display(int _mode);
+
     std::string FlushMessage();
 };
 

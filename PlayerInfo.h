@@ -1,9 +1,12 @@
 #include "ImagePool.h"
 #include "Pugixml/pugixml.hpp"
+
 #include "FL/Fl_PNG_Image.H"
+
 #include <string>
 
 #pragma once
+
 class PlayerInfo
 {
 	friend class Player;

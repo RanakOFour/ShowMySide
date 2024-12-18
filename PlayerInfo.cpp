@@ -1,6 +1,7 @@
 #include "PlayerInfo.h"
 #include "ImagePool.h"
 #include "Pugixml/pugixml.hpp"
+
 #include <sstream>
 
 PlayerInfo::PlayerInfo(int _id) :
@@ -16,8 +17,8 @@ PlayerInfo::PlayerInfo(int _id) :
 
 PlayerInfo::PlayerInfo(int _id, std::string& _username, int _destination[], int _current[], int _shape) :
 	m_imageType((ImageType)_shape),
-	m_id(_id),
-	m_username(_username)
+	m_username(_username),
+	m_id(_id)
 {
 	m_currentDestination[0] = _destination[0];
 	m_currentDestination[1] = _destination[1];
@@ -37,16 +38,17 @@ void PlayerInfo::ChangeAttribute(std::string& _attributeName, std::string& _newV
 	{
 		m_imageType = (ImageType)atoi(_newValue.c_str());
 	}
+	else if (_attributeName == "start")
+	{
+		m_startingPosition[0] = atoi(_newValue.substr(0, _newValue.find(',')).c_str());
+		m_startingPosition[1] = atoi(_newValue.substr(_newValue.find(',') + 1, _newValue.size()).c_str());
+	}
 	else if (_attributeName == "destination")
 	{
 		m_currentDestination[0] = atoi(_newValue.substr(0, _newValue.find(',')).c_str());
 		m_currentDestination[1] = atoi(_newValue.substr(_newValue.find(',') + 1, _newValue.size()).c_str());
 	}
-	else if (_attributeName == "start")
-	{
-		m_startingPosition[0] = atoi(_newValue.substr(0, _newValue.find(',')).c_str());
-		m_startingPosition[1] = atoi(_newValue.substr(_newValue.find(',')+ 1, _newValue.size()).c_str());
-	}
+	
 	else if (_attributeName == "username")
 	{
 		m_username = _newValue;
@@ -63,9 +65,9 @@ std::string PlayerInfo::AsXMLString()
 	playerNode.append_attribute("username").set_value(m_username.c_str());
 	playerNode.append_attribute("shape").set_value((int)m_imageType);
 
-	//Don't judge
-	playerNode.append_attribute("destination").set_value(std::string(std::to_string(m_currentDestination[0]) + "," + std::to_string(m_currentDestination[1])).c_str());
+	// Set start and end as text "X,Y"
 	playerNode.append_attribute("start").set_value(std::string(std::to_string(m_startingPosition[0]) + "," + std::to_string(m_startingPosition[1])).c_str());
+	playerNode.append_attribute("destination").set_value(std::string(std::to_string(m_currentDestination[0]) + "," + std::to_string(m_currentDestination[1])).c_str());
 
 	std::stringstream ss;
 	playerDoc.save(ss);

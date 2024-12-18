@@ -1,9 +1,12 @@
 #include "Pugixml/pugixml.hpp"
+
 #include <vector>
 #include <memory>
 
 #pragma once
+
 class PlayerInfo;
+
 class ServerRecords
 {
 private:
@@ -39,9 +42,10 @@ public:
 	void ChangeAttribute(int _id, std::string& _attributeName, std::string& _newValue);
 	
 	/**
-		
+		Add eventXML into m_logDocument
 	*/
 	void LogEvent(pugi::xml_node& _eventXML);
+
 	std::string AsXMLString();
 };
 

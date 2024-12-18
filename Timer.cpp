@@ -1,15 +1,16 @@
 #include "Timer.h"
+#include "Messagebox.h"
+
+#include <memory>
 
 Timer::Timer()
 {
-	m_duration = 0;
-	m_userdata = (void*)0;
+	m_duration = 1;
 }
 
 Timer::Timer(double _duration)
 {
 	m_duration = _duration;
-	m_userdata = (void*)0;
 	Fl::add_timeout(_duration, TickRepeat, this);
 }
 

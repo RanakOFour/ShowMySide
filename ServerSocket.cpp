@@ -220,12 +220,9 @@ void ServerSocket::Send(pugi::xml_document& _xmlToSend)
 	}
 }
 
-void ServerSocket::SendServerInfo(std::string _xmlToSend)
+void ServerSocket::SendServerInfo(int _index, std::string _xmlToSend)
 {
-	m_clients.at(m_clients.size() - 1)->Send(_xmlToSend);
-
-	//This is to blacklist the specific client from reviecing updates until it has recieved and processed the server info
-	m_idJustAdded = m_clients.size() - 1;
+	m_clients.at(_index)->Send(_xmlToSend);
 }
 
 void ServerSocket::SetNewPlayerID(int _id)

@@ -7,20 +7,17 @@
 
 
 Messagebox::Messagebox(int _playerX, int _playerY) :
-	Fl_Group(_playerX + 20, _playerY - 100, 200, 30, ""),
 	Timer(),
-	m_textBoxImage(nullptr),
-	m_textBox(nullptr)
+	Fl_Group(_playerX + 20, _playerY - 100, 200, 30, ""),
+	m_textBoxImage(_playerX + 20, _playerY - 100, 200, 30, ""),
+	m_textBox(_playerX + 35, _playerY - 120, 175, 75)
 {
-	m_textBoxImage = new Fl_Box(_playerX + 20, _playerY - 100, 200, 30, "");
-	m_textBoxImage->image(ImagePool::GetImage(ImageType::TEXTBOX).get());
-	m_textBox = new Fl_Multiline_Output(_playerX + 35, _playerY - 120, 175, 75, 0);
-	m_textBox->box(FL_NO_BOX);
+	m_textBoxImage.image(ImagePool::GetImage(ImageType::TEXTBOX).get());
+	
+	m_textBox.box(FL_NO_BOX);
 
-	add(m_textBox);
-	add(m_textBoxImage);
-	m_textBoxImage->show();
-	m_textBox->show();
+	m_textBoxImage.show();
+	m_textBox.show();
 	hide();
 	end();
 }
@@ -34,29 +31,24 @@ Messagebox::~Messagebox()
 void Messagebox::OnTick()
 {
 	printf("MessageTick\n");
+	m_textBox.value("");
 	hide();
-	m_textBox->value("");
 	redraw();
 }
 
 void Messagebox::DisplayMessage(std::string& _message)
 {
-	if (m_textBox->value() != "")
+	if (m_textBox.value() != "")
 	{
-		m_textBox->value("");
-		m_textBox->value(_message.c_str());
-		if (Fl::has_timeout(TickOnce, this))
-		{
-			Fl::remove_timeout(TickOnce, this);
-		}
+		m_textBox.value(_message.c_str());
 
-		Fl::add_timeout(6, TickOnce, (void*)this);
+		Fl::repeat_timeout(6, TickOnce, this);
 	}
 	else
 	{
-		m_textBox->insert(_message.c_str());
+		m_textBox.insert(_message.c_str());
 		show();
 
-		Fl::add_timeout(6, TickOnce, (void*)this);
+		Fl::add_timeout(6, TickOnce, this);
 	}
 }

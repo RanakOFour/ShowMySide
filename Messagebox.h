@@ -1,17 +1,19 @@
 #include "Timer.h"
+
 #include "FL/Fl_Group.H"
-#include "FL/Fl_Box.H"
 #include "FL/Fl_Multiline_Output.H"
+#include "FL/Fl_Box.H"
+
 #include <string>
+#include <memory>
 
 #pragma once
 
-class Messagebox : public Fl_Group,
-    private Timer
+class Messagebox : public Timer, public Fl_Group
 {
 private:
-    Fl_Multiline_Output* m_textBox;
-    Fl_Box* m_textBoxImage;
+    Fl_Multiline_Output m_textBox;
+    Fl_Box m_textBoxImage;
 
     /**
         Hides the text and image

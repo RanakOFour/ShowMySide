@@ -1,10 +1,11 @@
 #include <FL/Fl_Timer.H>
 
+#include <memory>
+
 #pragma once
 class Timer
 {
 protected:
-	void* m_userdata;
 	double m_duration;
 	static void TickRepeat(void* _userData);
 	static void TickOnce(void* _userData);

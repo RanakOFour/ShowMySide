@@ -1,10 +1,12 @@
 #include "FL/Fl_Double_Window.H"
+#include "FL/Fl_Box.H"
 #include "FL/Fl_Input.H"
 #include "FL/Fl_Output.H"
 #include "FL/Fl_Button.H"
 #include "FL/Fl_Text_Display.H"
-#include "FL/Fl_Box.H"
+
 #include <string>
+#include <memory>
 
 /**
 		There are only 3 different layouts, in reality. The empty screen when the program boots, the join game screen, then the normal gameplay screen.
@@ -15,29 +17,31 @@ enum class LayoutType
 {
 	SPLASH_SCREEN = 0,
 	JOIN_GAME = 1,
-	Server = 2,
+	SERVER = 2,
 	IN_GAME = 3,
 	ABOUT = 4,
 	HELP = 5
 };
 
-
-class ServerSocket;
-class ClientSocket;
 class Server;
 class Client;
 class MenuWrapper;
+class FileTextDisplay;
+
 class MainWindow : public Fl_Double_Window
 {
 private:
-	Server* m_Server;
-	Client* m_Client;
-	MenuWrapper* m_menuWrapper;
-	Fl_Box* m_splashImage;
-	Fl_Input* m_ipInput;
-	Fl_Output* m_ipAddressBox;
-	Fl_Button* m_connectBtn;
-	Fl_Text_Display* m_lobbyEventLog;
+	std::shared_ptr<Server> m_Server;
+	std::shared_ptr<Client> m_Client;
+	std::shared_ptr<FileTextDisplay> m_aboutText;
+	std::shared_ptr<MenuWrapper> m_menuWrapper;
+
+	std::shared_ptr<Fl_Box> m_splashImage;
+	std::shared_ptr<Fl_Input> m_ipInput;
+	std::shared_ptr<Fl_Output> m_ipAddressBox;
+	std::shared_ptr<Fl_Button> m_connectBtn;
+	std::shared_ptr<Fl_Text_Display> m_lobbyEventLogDisplay;
+	std::shared_ptr<Fl_Text_Display> m_serverInfoDisplay;
 
 public:
 	MainWindow(int _w, int _h, std::string _name);
@@ -54,5 +58,4 @@ public:
 	static void OnServerStart(Fl_Widget* _widget, void* _userData);
 	static void OnExit(Fl_Widget* _widget, void* _userData);
 	static void ShowAbout(Fl_Widget* _widget, void* _userData);
-	static void ShowHelp(Fl_Widget* _widget, void* _userData);
 };

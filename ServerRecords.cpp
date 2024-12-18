@@ -1,5 +1,6 @@
 #include "ServerRecords.h"
 #include "PlayerInfo.h"
+
 #include <vector>
 #include <sstream>
 
@@ -11,7 +12,7 @@ ServerRecords::ServerRecords() :
 	m_nextPlayerID(0)
 {
 	m_logDocument.append_child("Event").append_attribute("LobbyCreated").set_value("rightnow");
-	m_lobbyInfo.append_child("Players");
+	m_lobbyInfo.append_child("ServerInfo").append_attribute("version").set_value("4.20.69");
 }
 
 ServerRecords::~ServerRecords()
@@ -38,13 +39,13 @@ int ServerRecords::CreateNewPlayer()
 	m_playerInfos.push_back(std::make_shared<PlayerInfo>(m_nextPlayerID));
 
 	//Make a pointer to a new XML player node in m_lobbyInfo
-	std::shared_ptr<pugi::xml_node> newPlayerNode = std::make_shared<pugi::xml_node>(m_lobbyInfo.child("Players").append_child("Player"));
+	std::shared_ptr<pugi::xml_node> newPlayerNode = std::make_shared<pugi::xml_node>(m_lobbyInfo.child("ServerInfo").append_child("Player"));
 
 	// Pass new playerInfo into XML document, and hook up the new node into m_playerXML
 	pugi::xml_document playerNodeDoc;
 
 	// I need to use m_playerInfos.size() - 1, as the next id may not be the player's position if a player leaves
-	playerNodeDoc.load_string(m_playerInfos[m_playerInfos.size() - 1].get()->AsXMLString().c_str());
+	playerNodeDoc.load_string(m_playerInfos[m_playerInfos.size() - 1]->AsXMLString().c_str());
 
 	pugi::xml_node playerNode = playerNodeDoc.child("Player");
 
@@ -63,16 +64,17 @@ int ServerRecords::CreateNewPlayer()
 void ServerRecords::RemovePlayer(int _id)
 {
 	int playerIndex = FindPlayer(_id);
+
 	std::shared_ptr<PlayerInfo> deletedPlayer = m_playerInfos[playerIndex];
 	m_lobbyInfo.first_child().remove_child(*m_playerXML[playerIndex].get());
 	m_playerXML.erase(m_playerXML.begin() + playerIndex);
 	m_playerInfos.erase(m_playerInfos.begin() + playerIndex);
 }
 
-
 void ServerRecords::ChangeAttribute(int _id, std::string& _attributeName, std::string& _newValue)
 {
 	int playerIndex = FindPlayer(_id);
+
 	m_playerInfos[playerIndex]->ChangeAttribute(_attributeName, _newValue);
 	m_playerXML[playerIndex]->attribute(_attributeName.c_str()).set_value(_newValue.c_str());
 }
@@ -80,7 +82,7 @@ void ServerRecords::ChangeAttribute(int _id, std::string& _attributeName, std::s
 void ServerRecords::LogEvent(pugi::xml_node& _eventXML)
 {
 	m_logDocument.insert_child_after("Event", _eventXML);
-	m_logDocument.save_file("./Log/headless.txt");
+	m_logDocument.save_file("./logs/serverlog.txt");
 }
 
 std::string ServerRecords::AsXMLString()

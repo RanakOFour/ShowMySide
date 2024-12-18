@@ -7,8 +7,8 @@ Chatbox::Chatbox() :
 	Fl_Group(0, 0, 300, 300, ""),
 	m_mode(-1)
 {
-	m_textBox = new Fl_Input(550, 375, 200, 50, "Enter Text");
-	add(m_textBox);
+	m_textBox = std::make_shared<Fl_Input>(550, 375, 200, 50, "Enter Text");
+	add(m_textBox.get());
 	end();
 
 	m_textBox->show();

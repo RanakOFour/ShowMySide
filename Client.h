@@ -1,21 +1,27 @@
 #include "Timer.h"
+#include "Lobby.h"
 #include "Pugixml/pugixml.hpp"
+
 #include "FL/Fl_Text_Buffer.H"
 #include "FL/Fl_Text_Display.H"
+
 #include <string>
+#include <memory>
 
 #pragma once
+
 class ClientSocket;
 class Lobby;
 
-//This is a clientsocket wrapper
+/**
+	Interface for all clientside logic
+*/
 class Client : public Timer
 {
 private:
-	ClientSocket* m_socket;
-	Lobby* m_lobby;
-	Fl_Text_Buffer* m_mainWindowLog;
-	bool m_loaded;
+	std::unique_ptr<ClientSocket> m_socket;
+	Lobby m_lobby;
+	Fl_Text_Buffer m_mainWindowLog;
 
 	/**
 		Routinely checks if there are new events from the server, then applies them to the Lobby.
@@ -42,6 +48,6 @@ public:
 	*/
 	void SetLogDisplay(Fl_Text_Display* _outputLog);
 
-	Lobby* GetLobby();
+	std::shared_ptr<Lobby> GetLobby();
 };
 

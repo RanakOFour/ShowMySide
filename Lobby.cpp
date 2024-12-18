@@ -1,25 +1,26 @@
 #include "Lobby.h"
-#include "Timer.h"
 #include "Player.h"
 #include "PlayerInfo.h"
 #include "ChatBox.h"
 #include "ImagePool.h"
+#include "ClientPlayer.h"
 #include "Pugixml/pugixml.hpp"
+
+#include <vector>
 #include <memory>
 
 Lobby::Lobby() :
 	Fl_Double_Window(0, 0, 1200, 800, "Lobby"),
 	m_events(),
 	m_players(),
-	m_clientPlayer(nullptr),
+	m_chatBox(),
+	m_clientPlayer(),
 	m_playerId(-1),
 	m_textFromChatbox(),
-	m_closed(false)
+	m_closed(false),
+	m_hasLoaded(false)
 {
 	icon(ImagePool::GetImage(ImageType::ICON).get());
-
-	m_chatBox = new Chatbox();
-	add(m_chatBox);
 
 	m_events.append_child("Events");
 
@@ -56,9 +57,14 @@ int Lobby::handle(int _event)
 void Lobby::HandleMouseEvent(int _mouseButton)
 {
 	// Private information from Player is needed for the movement event, hence the need for an entire function
-	if (_mouseButton == FL_LEFT_MOUSE && !m_chatBox->visible())
+
+	// That is dumb, if it's needed it shouldn't be private, different approach required
+	// ClientPlayer : Player with Create__Event()?
+	// :thumbs_up:
+	if (_mouseButton == FL_LEFT_MOUSE && !m_chatBox.visible())
 	{
-		pugi::xml_document newEvent = m_clientPlayer->CreateMovementEvent(Fl::event_x(), Fl::event_y());
+		
+		pugi::xml_document newEvent = m_clientPlayer.CreateMovementEvent(Fl::event_x(), Fl::event_y());
 		m_events.first_child().append_copy(newEvent.first_child());
 		m_events.first_child().append_copy(newEvent.last_child());
 	}
@@ -72,9 +78,9 @@ void Lobby::HandleKeyboardEvent(int _key)
 	// Open chatbox to type a new message
 	case 'T':
 	case 't':
-		if (!m_chatBox->visible())
+		if (!m_chatBox.visible())
 		{
-			m_chatBox->Display(0);
+			m_chatBox.Display(0);
 			redraw();
 		}
 
@@ -83,12 +89,18 @@ void Lobby::HandleKeyboardEvent(int _key)
 	// Open chatbox to type a new username
 	case 'Q':
 	case 'q':
-		if (!m_chatBox->visible())
+		if (!m_chatBox.visible())
 		{
-			m_chatBox->Display(1);
+			m_chatBox.Display(1);
 			redraw();
 		}
 
+		break;
+
+	// Create server info request event
+	case 'H':
+	case 'h':
+		m_events.first_child().append_child("Event").append_attribute("type").set_value("server_info_pls");
 		break;
 
 	// Any keyboard event 1-4 will change which character the player is
@@ -127,7 +139,7 @@ void Lobby::LoadLobbyInformation(std::string& _docToLoad)
 	pugi::xml_document xmlDoc;
 	xmlDoc.load_string(_docToLoad.c_str());
 
-	for (pugi::xml_node currentPlayer = xmlDoc.child("Players").first_child(); currentPlayer; currentPlayer = currentPlayer.next_sibling())
+	for (pugi::xml_node currentPlayer = xmlDoc.child("ServerInfo").first_child(); currentPlayer; currentPlayer = currentPlayer.next_sibling())
 	{
 		int id = atoi(currentPlayer.attribute("id").value());
 		int shapeNum = atoi(currentPlayer.attribute("shape").value());
@@ -145,14 +157,20 @@ void Lobby::LoadLobbyInformation(std::string& _docToLoad)
 		start[1] = atoi(startString.substr(startString.find(',') + 1, startString.size()).c_str());
 
 		PlayerInfo currentInfo(id, username, destination, start, shapeNum);
-		m_players.push_back(std::make_shared<Player>(currentInfo));
+		std::shared_ptr<Player> newPlayer = std::make_shared<Player>(currentInfo);
+		m_players.push_back(newPlayer);
 		add(m_players[m_players.size() - 1].get());
 	}
 
 	// Client's player is the newest player (last in the list)
-	m_clientPlayer = m_players[m_players.size() - 1];
+	m_clientPlayer.SetClientPlayer(m_players[m_players.size() - 1]);
 
-	m_playerId = m_clientPlayer->GetID();
+	m_playerId = m_clientPlayer.GetID();
+
+	m_hasLoaded = true;
+
+	//Add chatbox here so it gets drawn over the players
+	add(m_chatBox);
 
 	show();
 	redraw();
@@ -168,11 +186,11 @@ void Lobby::Update()
 
 
 	// Check for chatbox messsage
-	m_textFromChatbox = m_chatBox->FlushMessage();
+	m_textFromChatbox = m_chatBox.FlushMessage();
 
 	if (m_textFromChatbox != "")
 	{
-		switch (m_chatBox->m_mode)
+		switch (m_chatBox.m_mode)
 		{
 		case 0:
 		{
@@ -239,6 +257,10 @@ std::shared_ptr<Player> Lobby::CreateNewPlayer(int _id)
 	m_players.push_back(std::make_shared<Player>(_id));
 	add(m_players[m_players.size() - 1].get());
 
+	//Puts the chatbox at the back of the list of children so it gets drawn over everything else
+	remove(m_chatBox);
+	add(m_chatBox);
+
 	return m_players[m_players.size() - 1];
 }
 
@@ -269,4 +291,9 @@ std::string Lobby::GetUsername(int _id)
 bool Lobby::IsClosed()
 {
 	return m_closed;
+}
+
+bool Lobby::IsLoaded()
+{
+	return m_hasLoaded;
 }

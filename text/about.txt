@@ -1,0 +1,11 @@
+Main Menu:
+- Press 'Start' to Create/Join a server
+- Join Server:
+  - Enter IP Address into the input box, the press 'Join' to join
+
+Lobby:
+- Click anywhere on the screen to move
+- Press 'Q' to type new username
+- Press 'T' to type chat message
+- Press 'H' to request server information
+- Press enter after typing new username/message to change username/send message

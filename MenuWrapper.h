@@ -1,6 +1,8 @@
 #include "FL/Fl_Flex.H"
 #include "FL/Fl_Menu_Bar.H"
 
+#include <memory>
+
 class MainWindow;
 
 /**
@@ -10,7 +12,7 @@ class MenuWrapper :
     public Fl_Flex
 {
 private:
-    Fl_Menu_Bar* m_menuBar;
+    std::shared_ptr<Fl_Menu_Bar> m_menuBar;
 
 public:
     MenuWrapper(MainWindow* _mwWithEvents);

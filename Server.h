@@ -1,25 +1,28 @@
 #include "Timer.h"
+#include "ServerSocket.h"
+#include "ServerRecords.h"
 #include "Pugixml/pugixml.hpp"
+
 #include <string>
 #include <thread>
+#include <memory>
 
 #pragma once
-class ServerSocket;
-class ServerRecords;
 
 class Server
 {
 private:
-	ServerSocket* m_socket;
-	ServerRecords* m_records;
+	ServerSocket m_socket;
+	ServerRecords m_records;
 
 	/**
-		Using a thread improves performance compared to having Server inherit from Timer and use Fl timeout events
+		Using a thread improves performance compared to having Server inherit from Timer and use Fl timeout events.
+		This also helps keep server seperate from as much of the client's performance as possible
 	*/
 	std::thread m_networkingThread;
 	bool m_serverClosed;
 public:
-	Server(int _port, double _tickTime);
+	Server(int _port);
 	~Server();
 
 	/**
@@ -31,6 +34,7 @@ public:
 		Stops server thread and tells clients to disconnect from the server, then shuts down the server
 	*/
 	bool CloseServer();
+
 	std::string GetIPAddress();
 };
 
