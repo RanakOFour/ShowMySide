@@ -63,6 +63,13 @@ void Server::MonitorNetwork()
 					std::string value = currentEvent.attribute("value").value();
 					m_records.ChangeAttribute(currentEvent.attribute("id").as_int(), attribute, value);
 				}
+				else if (eventName == "move")
+				{
+					std::string start = currentEvent.attribute("start").value();
+					std::string destination = currentEvent.attribute("destination").value();
+					m_records.ChangeAttribute(currentEvent.attribute("id").as_int(), "start", start);
+					m_records.ChangeAttribute(currentEvent.attribute("id").as_int(), "destination", destination);
+				}
 				else if (eventName == "server_info_pls")
 				{
 					m_socket.SendServerInfo(m_records.FindPlayer(currentEvent.attribute("id").as_int()), m_records.AsXMLString());

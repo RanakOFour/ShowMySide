@@ -4,6 +4,7 @@
 #include "ChatBox.h"
 #include "ImagePool.h"
 #include "ClientPlayer.h"
+#include "Encryption.h"
 #include "Pugixml/pugixml.hpp"
 
 #include <vector>
@@ -66,7 +67,6 @@ void Lobby::HandleMouseEvent(int _mouseButton)
 		
 		pugi::xml_document newEvent = m_clientPlayer.CreateMovementEvent(Fl::event_x(), Fl::event_y());
 		m_events.first_child().append_copy(newEvent.first_child());
-		m_events.first_child().append_copy(newEvent.last_child());
 	}
 }
 
@@ -197,7 +197,10 @@ void Lobby::Update()
 			// <Event type="new_message", text=m_textFromChatbox.c_str()>
 			pugi::xml_node newEvent = m_events.first_child().append_child("Event");
 			newEvent.append_attribute("type").set_value("new_message");
-			newEvent.append_attribute("text").set_value(m_textFromChatbox.c_str());
+
+			std::string encryptedMessage = Encryption::Encrypt(m_textFromChatbox, m_clientPlayer.GetUsername());
+
+			newEvent.append_attribute("text").set_value(encryptedMessage.c_str());
 			newEvent.append_attribute("id").set_value(m_playerId);
 
 			break;
@@ -270,7 +273,7 @@ std::shared_ptr<Player> Lobby::RemovePlayer(int _id)
 	return nullptr;
 }
 
-void Lobby::ChangeAttribute(int _id, std::string& _attributeName, std::string& _newValue)
+void Lobby::ChangeAttribute(int _id, std::string _attributeName, std::string& _newValue)
 {
 	m_players[FindPlayer(_id)]->ChangeAttribute(_attributeName, _newValue);
 }

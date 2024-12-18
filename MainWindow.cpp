@@ -62,7 +62,7 @@ MainWindow::MainWindow(int _w, int _h, std::string _name)
 	m_ipInput.hide();
 
 	//Show connect button to confirm connection
-	m_connectBtn.callback(OnJoinServer, (void*)this);
+	m_connectBtn.callback(OnJoinServer, this);
 	add(m_connectBtn);
 	m_connectBtn.hide();
 
@@ -72,6 +72,8 @@ MainWindow::MainWindow(int _w, int _h, std::string _name)
 	m_ipAddressBox.box(FL_NO_BOX);
 	add(m_ipAddressBox);
 	m_ipAddressBox.hide();
+
+	callback(OnExit, this);
 }
 
 MainWindow::~MainWindow()
@@ -160,6 +162,16 @@ void MainWindow::OnExit(Fl_Widget* _widget, void* _userData)
 {
 	MainWindow* mw = (MainWindow*)_userData;
 	mw->hide();
+
+	if (mw->m_Client)
+	{
+		mw->m_Client->Close();
+	}
+
+	if (mw->m_Server)
+	{
+		mw->m_Server->CloseServer();
+	}
 }
 
 void MainWindow::ShowAbout(Fl_Widget* _widget, void* _userData)

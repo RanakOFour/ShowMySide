@@ -71,7 +71,7 @@ void ServerRecords::RemovePlayer(int _id)
 	m_playerInfos.erase(m_playerInfos.begin() + playerIndex);
 }
 
-void ServerRecords::ChangeAttribute(int _id, std::string& _attributeName, std::string& _newValue)
+void ServerRecords::ChangeAttribute(int _id, std::string _attributeName, std::string& _newValue)
 {
 	int playerIndex = FindPlayer(_id);
 

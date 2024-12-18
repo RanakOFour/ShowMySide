@@ -35,5 +35,7 @@ FileTextDisplay::FileTextDisplay(const char* _fileName, int _parentW, int _paren
 
 FileTextDisplay::~FileTextDisplay()
 {
+	//Stops Fl_Text_Buffer errors on close
+	buffer(NULL);
 
 }

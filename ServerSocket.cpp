@@ -1,6 +1,9 @@
 #include "ServerSocket.h"
 #include "ClientSocket.h"
 #include "pugixml/pugixml.hpp"
+
+#include "FL/fl_ask.H"
+
 #include <ws2tcpip.h>
 #include <stdexcept>
 #include <sstream>
@@ -211,7 +214,14 @@ void ServerSocket::Send(pugi::xml_document& _xmlToSend)
 		//Avoids sending both update and initial stuff in the same frame because the xml won't parse correctly
 		if (i != m_idJustAdded)
 		{
-			m_clients.at(i)->Send(xmlAsString);
+			try
+			{
+				m_clients.at(i)->Send(xmlAsString);
+			}
+			catch (const std::exception& e)
+			{
+				fl_alert(e.what());
+			}
 		}
 		else
 		{
@@ -222,7 +232,14 @@ void ServerSocket::Send(pugi::xml_document& _xmlToSend)
 
 void ServerSocket::SendServerInfo(int _index, std::string _xmlToSend)
 {
-	m_clients.at(_index)->Send(_xmlToSend);
+	try
+	{
+		m_clients.at(_index)->Send(_xmlToSend);
+	}
+	catch (const std::exception& e)
+	{
+		fl_alert(e.what());
+	}
 }
 
 void ServerSocket::SetNewPlayerID(int _id)

@@ -20,5 +20,6 @@ public:
 	pugi::xml_document CreateMovementEvent(int _x, int _y);
 
 	int GetID();
+	std::string GetUsername();
 };
 

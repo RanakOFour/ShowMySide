@@ -12,7 +12,5 @@ private:
 public:
 	FileTextDisplay(const char* _fileName, int _parentW, int _parentH);
 	~FileTextDisplay();
-
-	std::shared_ptr<Fl_Text_Buffer> GetBuffer();
 };
 

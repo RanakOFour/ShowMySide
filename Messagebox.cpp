@@ -1,9 +1,11 @@
 #include "Messagebox.h"
 #include "Timer.h"
 #include "ImagePool.h"
+
 #include "FL/Fl_Window.H"
 #include "FL/Fl_Box.H"
 #include "FL/Fl_Multiline_Output.H"
+#include "FL/fl_ask.H"
 
 
 Messagebox::Messagebox(int _playerX, int _playerY) :
@@ -38,6 +40,8 @@ void Messagebox::OnTick()
 
 void Messagebox::DisplayMessage(std::string& _message)
 {
+	//fl_alert("Message to show: %s", _message.c_str());
+
 	if (m_textBox.value() != "")
 	{
 		m_textBox.value(_message.c_str());

@@ -39,7 +39,7 @@ public:
 	/**
 		Takes XML values and applies changes
 	*/
-	void ChangeAttribute(int _id, std::string& _attributeName, std::string& _newValue);
+	void ChangeAttribute(int _id, std::string _attributeName, std::string& _newValue);
 	
 	/**
 		Add eventXML into m_logDocument

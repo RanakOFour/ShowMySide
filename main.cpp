@@ -1,6 +1,7 @@
 #include "Wsa.h"
 #include "MainWindow.h"
 #include "ImagePool.h"
+
 #include <iostream>
 
 int main(int argc, char** argv)

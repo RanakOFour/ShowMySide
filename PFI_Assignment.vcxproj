@@ -114,7 +114,7 @@
       <AdditionalIncludeDirectories>fltk\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>fltk\lib;ws2_32.lib;wsa_2.lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>fltk.lib;fltk_forms.lib;fltk_images.lib;fltk_jpeg.lib;fltk_png.lib;fltk_z.lib;ws2_32.lib;gdiplus.lib;comctl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -131,7 +131,7 @@
       <AdditionalIncludeDirectories>fltk\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -144,6 +144,7 @@
     <ClCompile Include="Client.cpp" />
     <ClCompile Include="ClientPlayer.cpp" />
     <ClCompile Include="ClientSocket.cpp" />
+    <ClCompile Include="Encryption.cpp" />
     <ClCompile Include="FileTextDisplay.cpp" />
     <ClCompile Include="ServerRecords.cpp" />
     <ClCompile Include="ImagePool.cpp" />
@@ -165,6 +166,7 @@
     <ClInclude Include="Client.h" />
     <ClInclude Include="ClientPlayer.h" />
     <ClInclude Include="ClientSocket.h" />
+    <ClInclude Include="Encryption.h" />
     <ClInclude Include="FileTextDisplay.h" />
     <ClInclude Include="ServerRecords.h" />
     <ClInclude Include="ImagePool.h" />

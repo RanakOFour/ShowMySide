@@ -2,6 +2,7 @@
 #include "ClientSocket.h"
 #include "Lobby.h"
 #include "Player.h"
+#include "Encryption.h"
 #include "Pugixml/pugixml.hpp"
 
 #include "FL/Fl_Text_Buffer.H"
@@ -106,14 +107,24 @@ void Client::OnTick()
 					std::string value = currentEvent.attribute("value").value();
 					m_lobby.ChangeAttribute(playerId, attribute, value);
 				}
+				else if (eventName == "move")
+				{
+					std::string start = currentEvent.attribute("start").value();
+					std::string dest = currentEvent.attribute("destination").value();
+
+					m_lobby.ChangeAttribute(playerId, "start", start);
+					m_lobby.ChangeAttribute(playerId, "destination", dest);
+				}
 				else if (eventName == "new_message")
 				{
-					std::string text = currentEvent.attribute("text").value();
-					m_lobby.ShowMessage(playerId, text);
+					std::string cipherText = currentEvent.attribute("text").as_string();
+					std::string message = Encryption::Decrypt(cipherText, m_lobby.GetUsername(playerId));
+
+					m_lobby.ShowMessage(playerId, message);
 					m_lobby.redraw();
 
 
-					std::string logString = m_lobby.GetUsername(playerId) + ": " + text + "\n";
+					std::string logString = m_lobby.GetUsername(playerId) + ": " + message + "\n";
 					m_mainWindowLog.append(logString.c_str());
 				}
 				else if (eventName == "close_server")
@@ -189,4 +200,13 @@ void Client::Send(pugi::xml_document& _nodeToSend)
 void Client::SetLogDisplay(Fl_Text_Display* _outputLog)
 {
 	_outputLog->buffer(m_mainWindowLog);
+}
+
+void Client::Close()
+{
+	m_lobby.Closed(true);
+	if (m_socket)
+	{
+		m_socket->CloseConnection();
+	}
 }

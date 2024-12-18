@@ -81,7 +81,7 @@ public:
     /**
         Handles attr_change events from the Client
     */
-    void ChangeAttribute(int _id, std::string& _attributeName, std::string& _newValue);
+    void ChangeAttribute(int _id, std::string _attributeName, std::string& _newValue);
 
     /**
         Handles new_message events from the Client
