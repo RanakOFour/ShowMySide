@@ -47,7 +47,5 @@ public:
 		Sets value of m_mainWindowLog. This isn't done in the constructor m_mainWindowLog only starts to exist (It's created in MainWindow::ChangeLayout()) after the client has been initalised.
 	*/
 	void SetLogDisplay(Fl_Text_Display* _outputLog);
-
-	std::shared_ptr<Lobby> GetLobby();
 };
 

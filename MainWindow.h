@@ -1,3 +1,6 @@
+#include "FileTextDisplay.h"
+#include "MenuWrapper.h"
+
 #include "FL/Fl_Double_Window.H"
 #include "FL/Fl_Box.H"
 #include "FL/Fl_Input.H"
@@ -23,25 +26,26 @@ enum class LayoutType
 	HELP = 5
 };
 
+#pragma once
+
 class Server;
 class Client;
-class MenuWrapper;
-class FileTextDisplay;
 
 class MainWindow : public Fl_Double_Window
 {
 private:
-	std::shared_ptr<Server> m_Server;
-	std::shared_ptr<Client> m_Client;
-	std::shared_ptr<FileTextDisplay> m_aboutText;
-	std::shared_ptr<MenuWrapper> m_menuWrapper;
 
-	std::shared_ptr<Fl_Box> m_splashImage;
-	std::shared_ptr<Fl_Input> m_ipInput;
-	std::shared_ptr<Fl_Output> m_ipAddressBox;
-	std::shared_ptr<Fl_Button> m_connectBtn;
-	std::shared_ptr<Fl_Text_Display> m_lobbyEventLogDisplay;
-	std::shared_ptr<Fl_Text_Display> m_serverInfoDisplay;
+	//m_Server and m_Client are not initialised in the constructor, so they are pointers
+	std::unique_ptr<Server> m_Server;
+	std::unique_ptr<Client> m_Client;
+	FileTextDisplay m_aboutText;
+	MenuWrapper m_menuWrapper;
+
+	Fl_Box m_splashImage;
+	Fl_Input m_ipInput;
+	Fl_Output m_ipAddressBox;
+	Fl_Button m_connectBtn;
+	Fl_Text_Display m_lobbyEventLogDisplay;
 
 public:
 	MainWindow(int _w, int _h, std::string _name);

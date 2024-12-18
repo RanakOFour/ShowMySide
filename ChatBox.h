@@ -10,7 +10,7 @@ class Chatbox :
     public Fl_Group
 {
 private:
-    std::shared_ptr<Fl_Input> m_textBox;
+    Fl_Input m_textBox;
 
     int handle(int _event);
 public:

@@ -3,6 +3,7 @@
 
 #include <memory>
 
+#pragma once
 class MainWindow;
 
 /**

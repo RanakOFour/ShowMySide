@@ -1349,7 +1349,7 @@
         <mxCell id="Zk-lUvr1Ify4-O8CAQBF-1" value="Encryption" style="swimlane;whiteSpace=wrap;html=1;" vertex="1" parent="1">
           <mxGeometry x="5783" y="364" width="2307" height="1150" as="geometry" />
         </mxCell>
-        <mxCell id="Zk-lUvr1Ify4-O8CAQBF-2" value="" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="Zk-lUvr1Ify4-O8CAQBF-1">
+        <mxCell id="Zk-lUvr1Ify4-O8CAQBF-2" value="What do I want?&lt;div&gt;- Easy enough to implement&lt;/div&gt;&lt;div&gt;- Required minimum existing code changes&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;- What is popular?&lt;/div&gt;&lt;div&gt;3DES, AES, RSA&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="Zk-lUvr1Ify4-O8CAQBF-1">
           <mxGeometry x="38" y="46" width="471" height="206" as="geometry" />
         </mxCell>
       </root>

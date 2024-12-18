@@ -5,13 +5,13 @@
 
 Chatbox::Chatbox() :
 	Fl_Group(0, 0, 300, 300, ""),
+	m_textBox(550, 375, 200, 50, "Enter Text"),
 	m_mode(-1)
 {
-	m_textBox = std::make_shared<Fl_Input>(550, 375, 200, 50, "Enter Text");
-	add(m_textBox.get());
+	add(m_textBox);
 	end();
 
-	m_textBox->show();
+	m_textBox.show();
 	hide();
 }
 
@@ -25,7 +25,7 @@ int Chatbox::handle(int _event)
 	switch (_event)
 	{
 	case FL_FOCUS:
-		m_textBox->take_focus();
+		m_textBox.take_focus();
 		return 1;
 
 	case FL_KEYDOWN:
@@ -50,11 +50,11 @@ void Chatbox::Display(int _mode)
 	switch (m_mode)
 	{
 	case 0:
-		m_textBox->label("Enter message:");
+		m_textBox.label("Enter message:");
 		break;
 
 	case 1:
-		m_textBox->label("Enter new username:");
+		m_textBox.label("Enter new username:");
 		break;
 	}
 
@@ -66,8 +66,8 @@ std::string Chatbox::FlushMessage()
 {
 	if (!visible())
 	{
-		std::string toReturn = m_textBox->value();
-		m_textBox->value("");
+		std::string toReturn = m_textBox.value();
+		m_textBox.value("");
 
 		return toReturn;
 	}

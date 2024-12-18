@@ -7,9 +7,10 @@
 #include <fstream>
 #include <memory>
 
-FileTextDisplay::FileTextDisplay(const char* _fileName, int _parentW, int _parentH) : Fl_Text_Display(5, 35, _parentW - 10, _parentH - 40)
+FileTextDisplay::FileTextDisplay(const char* _fileName, int _parentW, int _parentH) : 
+	Fl_Text_Display(5, 35, _parentW - 10, _parentH - 40),
+	m_textBuffer()
 {
-	m_textBuffer = std::make_shared<Fl_Text_Buffer>();
 
 	std::ifstream aboutTextFile(_fileName);
 	if (!aboutTextFile.is_open())
@@ -22,22 +23,17 @@ FileTextDisplay::FileTextDisplay(const char* _fileName, int _parentW, int _paren
 	int currentIndex{ 0 };
 	while (std::getline(aboutTextFile, textString))
 	{
-		m_textBuffer->insert(currentIndex, textString.c_str());
+		m_textBuffer.insert(currentIndex, textString.c_str());
 		currentIndex += (int)textString.size();
 
-		m_textBuffer->insert(currentIndex, "\n");
+		m_textBuffer.insert(currentIndex, "\n");
 		++currentIndex;
 	}
 
-	buffer(m_textBuffer.get());
+	buffer(m_textBuffer);
 }
 
 FileTextDisplay::~FileTextDisplay()
 {
 
-}
-
-std::shared_ptr<Fl_Text_Buffer> FileTextDisplay::GetBuffer()
-{
-	return m_textBuffer;
 }

@@ -90,6 +90,8 @@ public:
 
     std::string GetUsername(int _id);
 
+    void Closed(bool _closed);
+
     bool IsClosed();
 
     bool IsLoaded();

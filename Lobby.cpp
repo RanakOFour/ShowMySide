@@ -229,11 +229,8 @@ void Lobby::FlushEvents(pugi::xml_document& _document)
 		for (pugi::xml_node currentNode = m_events.first_child().first_child(); currentNode; currentNode = currentNode.next_sibling())
 		{
 			_document.first_child().append_copy(currentNode);
+			m_events.first_child().remove_child(currentNode);
 		}
-
-
-		m_events.reset();
-		m_events.append_child("Events");
 	}
 }
 
@@ -286,6 +283,11 @@ void Lobby::ShowMessage(int _id, std::string& _message)
 std::string Lobby::GetUsername(int _id)
 {
 	return m_players[FindPlayer(_id)]->GetUsername();
+}
+
+void Lobby::Closed(bool _closed)
+{
+	m_closed = _closed;
 }
 
 bool Lobby::IsClosed()

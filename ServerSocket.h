@@ -29,7 +29,8 @@ public:
 	~ServerSocket();
 
 	/**
-		Probes all clients for any event messages, storing any inside of an XML document, which is returned
+		Probes all clients for any event messages, storing any inside of an XML document, which is returned.
+		Called in Server::MonitorNetwork() once per loop
 	*/
 	pugi::xml_document Update();
 

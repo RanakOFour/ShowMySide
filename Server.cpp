@@ -35,7 +35,7 @@ void Server::MonitorNetwork()
 		{
 			//printf("Server messages recieved\n");
 
-			//Cycle through messages and apply changes
+			//Cycle through events and apply changes based on event type
 			for (pugi::xml_node currentEvent = eventsFromClient.child("Events").first_child(); currentEvent; currentEvent = currentEvent.next_sibling())
 			{
 				m_records.LogEvent(currentEvent);
@@ -46,7 +46,6 @@ void Server::MonitorNetwork()
 
 				if (eventName == "new_plr")
 				{
-					//Add player to lobby and tag id to message so clients know what the player's id is without needing to keep track themselves
 					int newPlayersId = m_records.CreateNewPlayer();
 					currentEvent.append_attribute("id").set_value(newPlayersId);
 					m_socket.SetNewPlayerID(newPlayersId);
@@ -55,13 +54,11 @@ void Server::MonitorNetwork()
 				}
 				else if (eventName == "plr_leave")
 				{
-					//Remove player from lobby
 					m_records.RemovePlayer(currentEvent.attribute("id").as_int());
 					m_socket.RemoveConnection(currentEvent.attribute("id").as_int());
 				}
 				else if (eventName == "attr_change")
 				{
-					// Change specified attribute
 					std::string attribute = currentEvent.attribute("attribute").value();
 					std::string value = currentEvent.attribute("value").value();
 					m_records.ChangeAttribute(currentEvent.attribute("id").as_int(), attribute, value);
@@ -75,7 +72,7 @@ void Server::MonitorNetwork()
 				//Only other event types are 'new_message' and 'close_server', but that is handled by individual clients
 			}
 
-			//Ship events out to the clients
+			//Echo events out to the clients
 			m_socket.Send(eventsFromClient);
 		}
 	}

@@ -30,7 +30,7 @@ Messagebox::~Messagebox()
 
 void Messagebox::OnTick()
 {
-	printf("MessageTick\n");
+	//printf("MessageTick\n");
 	m_textBox.value("");
 	hide();
 	redraw();

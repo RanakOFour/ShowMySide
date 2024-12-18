@@ -3,9 +3,11 @@
 #include "Lobby.h"
 #include "Player.h"
 #include "Pugixml/pugixml.hpp"
+
 #include "FL/Fl_Text_Buffer.H"
 #include "FL/Fl_Text_Display.H"
 #include "FL/fl_ask.H"
+
 #include <iostream>
 #include <stdexcept>
 #include <sstream>
@@ -62,7 +64,6 @@ void Client::OnTick()
 			if (!m_lobby.IsLoaded())
 			{
 				m_lobby.LoadLobbyInformation(eventsFromServer);
-				fl_alert("Lobby loaded successfully");
 			}
 			else
 			{
@@ -117,7 +118,11 @@ void Client::OnTick()
 				}
 				else if (eventName == "close_server")
 				{
-					
+					m_socket->CloseConnection();
+					m_socket.reset();
+					m_socket = nullptr;
+
+					m_lobby.Closed(true);
 				}
 
 				//Only other event type is 'new_message', but that is handled by individual clients
@@ -125,25 +130,21 @@ void Client::OnTick()
 		}
 	}
 
-	pugi::xml_document toSend;
-	
-	//Update lobby with new information
-	m_lobby.Update();
-
-	//Get any events that need to be sent
-	m_lobby.FlushEvents(toSend);
-
-	// toSend will always have at least <Events> node as a child
-	if (toSend.first_child().first_child())
+	if (!m_lobby.IsClosed())
 	{
-		Send(toSend);
-	}
+		pugi::xml_document toSend;
 
-	//Stop this function from running on server 
-	if (m_lobby.IsClosed())
-	{
-		m_socket->CloseConnection();
-		m_socket = nullptr;
+		//Update lobby with new information
+		m_lobby.Update();
+
+		//Get any events that need to be sent
+		m_lobby.FlushEvents(toSend);
+
+		// toSend will always have at least <Events> node as a child
+		if (toSend.first_child().first_child())
+		{
+			Send(toSend);
+		}
 	}
 }
 
@@ -156,6 +157,7 @@ bool Client::Connect(std::string& _ipToConnect)
 	{
 		//Request xml info then apply
 		//printf("Connected successfully!\n");
+
 
 		pugi::xml_document newPlayerEvent;
 		newPlayerEvent.append_child("Events");
@@ -187,9 +189,4 @@ void Client::Send(pugi::xml_document& _nodeToSend)
 void Client::SetLogDisplay(Fl_Text_Display* _outputLog)
 {
 	_outputLog->buffer(m_mainWindowLog);
-}
-
-std::shared_ptr<Lobby> Client::GetLobby()
-{
-	return std::make_shared<Lobby>(m_lobby);
 }

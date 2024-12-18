@@ -1,6 +1,7 @@
 #include <winsock2.h>
 #include <string>
 
+#pragma once
 class Client;
 class ServerSocket;
 
