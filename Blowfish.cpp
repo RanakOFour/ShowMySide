@@ -8,21 +8,23 @@
 #include <memory>
 
 
-//Compiler does not enjoy me making it a smart pointer
-static Blowfish* self;
+
+// The compiler does not agree with this being a smart pointer
+static Blowfish* m_self;
 
 void Blowfish::Initialise()
 {
-	if (self == nullptr)
+	if (m_self == nullptr)
 	{
-		self = new Blowfish();
+		m_self = new Blowfish();
 	}
 }
 
 Blowfish::Blowfish() :
-	pBox{ 0 },
+	pBox{ 0	},
 	sBox{ 0 }
 {
+	// Load pBox values 
 	std::fstream file("./text/pBox.txt");
 	std::string currentBox;
 
@@ -35,7 +37,7 @@ Blowfish::Blowfish() :
 		for (int j = 0; j < 4; j++)
 		{
 			int64_t shift = (32 - (8 * (j + 1)));
-			pBox[i] += (int64_t)((int64_t)currentBox[j] << shift);
+			pBox[i] += ((int64_t)currentBox[j] << shift);
 		}
 
 		currentBox = "";
@@ -57,7 +59,7 @@ Blowfish::Blowfish() :
 			for (int l = 0; l < 8; l++)
 			{
 				int64_t shift = (64 - (8 * (l + 1)));
-				sBox[i][j][k] += (int64_t)((int64_t)currentBox[l] << shift);
+				sBox[i][j][k] += ((int64_t)currentBox[l] << shift);
 			}
 
 
@@ -86,13 +88,19 @@ int32_t Blowfish::F(int32_t _Lp)
 	int8_t split[4];
 	int64_t sOut[4];
 
+	/* 
+		Take 8 bits from _Lp, then get the 3 right most bits and use as col value (0-7),
+		then use the remaining 5 bits for row value (0-31)
+	*/
+
 	for (int i = 0; i < 4; i++)
 	{
 		split[i] = _Lp >> (32 - (8 * (i + 1)));
 		int8_t col = split[i] >> 5;
 		int8_t row = split[i] >> 3;
 
-		// All the bits in the row before the 8 bit slice shifted up 8 minus the same bits with the slice will leave just the slice
+		// All the bits in the row before the 8 bit slice shifted up 8 minus
+		// the same bits with the slice will leave just the slice
 		sOut[i] = sBox[i][col][row];
 
 		switch(i)
@@ -125,7 +133,7 @@ int64_t Blowfish::encode(int64_t _input)
 
 		right = fResult ^ right;
 
-		// Swap left and right for nect iteration
+		// Swap left and right for next iteration
 		int64_t temp = left;
 		left = right;
 		right = temp;
@@ -179,7 +187,7 @@ int64_t Blowfish::decode(int64_t _cipher)
 
 void Blowfish::Encrypt(std::string _input, std::vector<char>& _output)
 {
-	if (self == nullptr)
+	if (m_self == nullptr)
 	{
 		return;
 	}
@@ -197,7 +205,7 @@ void Blowfish::Encrypt(std::string _input, std::vector<char>& _output)
 			++currentIndex;
 		}
 
-		int64_t encodedBytes = self->encode(nextByte);
+		int64_t encodedBytes = m_self->encode(nextByte);
 
 		//Unload encrypted bytes into toReturn
 		for (int i = 0; i < 8 && currentIndex < _input.size() + 1; i++)
@@ -211,7 +219,7 @@ void Blowfish::Encrypt(std::string _input, std::vector<char>& _output)
 
 void Blowfish::Decrypt(std::string _cipher, std::vector<char>& _output)
 {
-	if (self == nullptr)
+	if (m_self == nullptr)
 	{
 		return;
 	}
@@ -229,7 +237,7 @@ void Blowfish::Decrypt(std::string _cipher, std::vector<char>& _output)
 			++currentIndex;
 		}
 
-		int64_t decodedBytes = self->decode(nextByte);
+		int64_t decodedBytes = m_self->decode(nextByte);
 
 		//Unload encrypted bytes into toReturn
 		for (int i = 0; i < 8 && currentIndex < _cipher.size() + 1; i++)

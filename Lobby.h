@@ -94,7 +94,7 @@ public:
 
     void Closed(bool _closed);
 
-    bool IsClosed();
+    bool Closed();
 
     bool IsLoaded();
 };

@@ -2,13 +2,11 @@
 #include "ClientSocket.h"
 #include "pugixml/pugixml.hpp"
 
-#include "FL/fl_ask.H"
 
 #include <ws2tcpip.h>
 #include <stdexcept>
 #include <sstream>
 #include <string>
-#include <iostream>
 #include <memory>
 #include <vector>
 
@@ -64,12 +62,11 @@ ServerSocket::ServerSocket(int _port)
 
 	freeaddrinfo(result);
 
-	//Next we need to get the IP address of the Server
-	//Open a new socket
+	//Next  to get the IP address of the Server another socket is opened and probed for it's IPv4 address
 	int sock = socket(AF_INET, SOCK_DGRAM, 0);
 
 	if (sock == -1) {
-		std::cerr << "Could not socket\n";
+		throw std::runtime_error("Could not socket\n");
 	}
 
 	sockaddr_in loopback;
@@ -77,20 +74,22 @@ ServerSocket::ServerSocket(int _port)
 	loopback.sin_family = AF_INET;
 	loopback.sin_addr.s_addr = 1337;
 	
-	// using debug port
+	// using whatever port
 	loopback.sin_port = htons(9);
 
 	//connect socket at loopback address
-	if (connect(sock, reinterpret_cast<sockaddr*>(&loopback), sizeof(loopback)) == -1) {
+	if (connect(sock, reinterpret_cast<sockaddr*>(&loopback), sizeof(loopback)) == -1)
+	{
 		::closesocket(sock);
-		std::cerr << "Could not connect\n";
+		throw std::runtime_error("Could not connect\n");
 	}
 
 	// Get socket information from loopback
 	socklen_t addrlen = sizeof(loopback);
-	if (getsockname(sock, reinterpret_cast<sockaddr*>(&loopback), &addrlen) == -1) {
+	if (getsockname(sock, reinterpret_cast<sockaddr*>(&loopback), &addrlen) == -1)
+	{
 		::closesocket(sock);
-		std::cerr << "Could not getsockname\n";
+		throw std::runtime_error("Could not getsockname\n");
 	}
 
 	// Socket is no longer needed
@@ -98,8 +97,9 @@ ServerSocket::ServerSocket(int _port)
 
 	// Get the ip address from loopback's socket information
 	char buffer[22];
-	if (inet_ntop(AF_INET, &loopback.sin_addr, buffer, INET_ADDRSTRLEN) == 0x0) {
-		std::cerr << "Could not inet_ntop\n";
+	if (inet_ntop(AF_INET, &loopback.sin_addr, buffer, INET_ADDRSTRLEN) == 0x0)
+	{
+		throw std::runtime_error("Could not inet_ntop\n");
 	}
 
 	m_ipAddress = buffer;
@@ -225,6 +225,7 @@ void ServerSocket::Send(pugi::xml_document& _xmlToSend)
 
 void ServerSocket::SendTo(int _index, std::string _xmlToSend)
 {
+	
 	m_clients.at(_index)->Send(_xmlToSend);
 }
 

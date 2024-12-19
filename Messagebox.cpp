@@ -5,7 +5,6 @@
 #include "FL/Fl_Window.H"
 #include "FL/Fl_Box.H"
 #include "FL/Fl_Multiline_Output.H"
-#include "FL/fl_ask.H"
 
 
 Messagebox::Messagebox(int _playerX, int _playerY) :

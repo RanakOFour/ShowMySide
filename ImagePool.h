@@ -19,6 +19,7 @@ enum class ImageType
 
 class ImagePool
 {
+
 private:
 	std::shared_ptr<Fl_PNG_Image> m_images[7];
 	ImagePool();

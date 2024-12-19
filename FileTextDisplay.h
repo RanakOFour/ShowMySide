@@ -4,6 +4,8 @@
 #include <memory>
 
 #pragma once
+
+/** Generic %Fl_Text_Display implementation that reads text from a file into the buffer */
 class FileTextDisplay : public Fl_Text_Display
 {
 private:

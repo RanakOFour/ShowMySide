@@ -6,9 +6,7 @@
 
 #include "FL/Fl_Text_Buffer.H"
 #include "FL/Fl_Text_Display.H"
-#include "FL/fl_ask.H"
 
-#include <iostream>
 #include <stdexcept>
 #include <sstream>
 #include <string>
@@ -67,11 +65,11 @@ void Client::OnTick()
 			}
 			else
 			{
-				std::string otherText = "Server Version: ";
-				otherText.append(eventsDocument.child("ServerInfo").attribute("version").as_string());
+				std::string serverInfo = "Server Version: ";
+				serverInfo.append(eventsDocument.child("ServerInfo").attribute("version").as_string());
 
-				fl_message(otherText.c_str());
-				m_lobby.take_focus();
+				
+				m_mainWindowLog.append(serverInfo.c_str());
 			}
 		}
 		else
@@ -103,12 +101,9 @@ void Client::OnTick()
 					//If the first player has left, the server has closed
 					if (playerId == 0)
 					{
-						m_socket->CloseConnection();
-						m_socket.reset(NULL);
-
 						m_lobby.Closed(true);
 						m_lobby.hide();
-						fl_message("Server closed");
+						m_mainWindowLog.append("Server closed due to host leaving\n");
 						break;
 					}
 				}
@@ -156,7 +151,7 @@ void Client::OnTick()
 		Send(toSend);
 	}
 
-	if(m_lobby.IsClosed())
+	if(m_lobby.Closed())
 	{
 		//If a socket is present then the user has closed the lobby, and it still needs to send off the plr_leave event
 		if (m_socket != nullptr)
@@ -207,10 +202,7 @@ void Client::Send(pugi::xml_document& _nodeToSend)
 
 void Client::SetLogDisplay(Fl_Text_Display* _outputLog)
 {
-	if (!_outputLog->buffer())
-	{
-		_outputLog->buffer(m_mainWindowLog);
-	}
+	_outputLog->buffer(m_mainWindowLog);
 }
 
 void Client::Close()
@@ -224,5 +216,5 @@ void Client::Close()
 
 bool Client::Closed()
 {
-	return m_lobby.IsClosed();
+	return m_lobby.Closed();
 }

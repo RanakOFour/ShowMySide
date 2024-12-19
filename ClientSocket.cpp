@@ -1,7 +1,6 @@
 #include "ClientSocket.h"
 #include "Blowfish.h"
 
-#include <iostream>
 #include <ws2tcpip.h>
 #include <string>
 #include <memory>

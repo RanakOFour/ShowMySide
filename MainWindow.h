@@ -34,10 +34,11 @@ class Client;
 class MainWindow : public Timer, public Fl_Double_Window
 {
 private:
-
-	//m_Server and m_Client are not initialised in the constructor, so they are pointers
+	///@{
+	/** m_Server and m_Client are not initialised in the constructor, so they are pointers */
 	std::unique_ptr<Server> m_Server;
 	std::unique_ptr<Client> m_Client;
+	/// @}
 	FileTextDisplay m_aboutText;
 	MenuWrapper m_menuWrapper;
 
@@ -58,9 +59,16 @@ public:
 	*/
 	void ChangeLayout(LayoutType _newState);
 
+
+	
+	///@{ @name FLTK Events
+	/**
+		Used mainly by the MenuWrapper and buttons 
+	*/
 	static void OnJoinServer(Fl_Widget* _widget, void* _userData);
 	static void OnClientStart(Fl_Widget* _widget, void* _userData);
 	static void OnServerStart(Fl_Widget* _widget, void* _userData);
 	static void OnExit(Fl_Widget* _widget, void* _userData);
 	static void ShowAbout(Fl_Widget* _widget, void* _userData);
+	///@}
 };

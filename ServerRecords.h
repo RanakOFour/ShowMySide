@@ -26,7 +26,14 @@ public:
 	*/
 	int FindPlayer(int _id);
 
+	/**
+		Returns m_nextPlayerID
+	*/
 	int GetNextPlayerID();
+
+	/**
+		Returns size of m_playerInfos
+	*/
 	int GetNextPlayerIndex();
 
 	/**

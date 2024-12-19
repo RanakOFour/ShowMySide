@@ -6,6 +6,7 @@
 
 #pragma once
 
+/** A text box that is shown in the middle of the Lobby window during certain events */
 class Chatbox :
     public Fl_Group
 {

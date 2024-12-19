@@ -9,6 +9,7 @@
 
 #pragma once
 
+/**Text bubble that appears next to a parent Player when DisplayMessage() is called*/
 class Messagebox : public Timer, public Fl_Group
 {
 private:

@@ -13,7 +13,6 @@
 #include "FL/Fl_Text_Display.H"
 
 #include <string>
-#include <iostream>
 #include <thread>
 #include <memory>
 #include <fstream>
@@ -92,6 +91,7 @@ void MainWindow::OnTick()
 			m_Server = nullptr;
 		}
 
+		m_lobbyEventLogDisplay.buffer(NULL);
 		m_Client = nullptr;
 
 		ChangeLayout(LayoutType::SPLASH_SCREEN);
@@ -185,11 +185,14 @@ void MainWindow::OnExit(Fl_Widget* _widget, void* _userData)
 
 	if (mw->m_Client)
 	{
+		mw->m_lobbyEventLogDisplay.buffer(NULL);
+		mw->m_Client->Close();
 		mw->m_Client.reset();
 	}
 
 	if (mw->m_Server)
 	{
+		mw->m_Server->CloseServer();
 		mw->m_Server.reset();
 	}
 }

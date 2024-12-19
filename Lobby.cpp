@@ -296,7 +296,7 @@ void Lobby::Closed(bool _closed)
 	}
 }
 
-bool Lobby::IsClosed()
+bool Lobby::Closed()
 {
 	return m_closed;
 }

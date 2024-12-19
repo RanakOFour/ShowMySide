@@ -2,8 +2,18 @@
 #include "FL/Fl_PNG_Image.H"
 #include <memory>
 
-//Weird singleton thingy
+
+// Weird singletony thing, the compiler doesn't like it being a smart pointer
 static ImagePool* m_self;
+
+void ImagePool::Initialise()
+{
+	if (m_self == nullptr)
+	{
+		m_self = new ImagePool();
+		printf("Initialised ImagePool\n");
+	}
+}
 
 ImagePool::ImagePool()
 {
@@ -37,15 +47,6 @@ ImagePool::ImagePool()
 
 ImagePool::~ImagePool()
 {
-}
-
-void ImagePool::Initialise()
-{
-	if (m_self == nullptr)
-	{
-		m_self = new ImagePool();
-		printf("Initialised ImagePool\n");
-	}
 }
 
 std::shared_ptr<Fl_PNG_Image> ImagePool::GetImage(ImageType _index)

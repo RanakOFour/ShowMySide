@@ -25,6 +25,10 @@ private:
 	std::shared_ptr<ClientSocket> Accept();
 
 public:
+
+	/**
+		Used in Server::Server() constructor
+	*/
 	ServerSocket(int _port);
 	~ServerSocket();
 
@@ -35,12 +39,13 @@ public:
 	pugi::xml_document Update();
 
 	/**
-		Converts given xml document into a string which is then shipped off to all clients
+		Converts given xml document into a string which is then encrypted
+		and shipped off to all clients
 	*/
 	void Send(pugi::xml_document& _xmlToSend);
 
 	/**
-		Sends server XML from Server to a client
+		Sends server XML from Server to a single client
 	*/
 	void SendTo(int _index, std::string _xmlToSend);
 
