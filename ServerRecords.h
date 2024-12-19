@@ -26,6 +26,9 @@ public:
 	*/
 	int FindPlayer(int _id);
 
+	int GetNextPlayerID();
+	int GetNextPlayerIndex();
+
 	/**
 		Generates default PlayerInfo object, then inserts it into m_players and an xml copy into m_lobbyInfo, and references into m_playerXML
 	*/

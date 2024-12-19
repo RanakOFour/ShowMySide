@@ -1,8 +1,10 @@
 #include "Wsa.h"
 #include "MainWindow.h"
 #include "ImagePool.h"
+#include "Blowfish.h"
 
 #include <iostream>
+#include <string>
 
 int main(int argc, char** argv)
 {
@@ -11,7 +13,8 @@ int main(int argc, char** argv)
 	printf("Initialized Winsock\n");
 
 	ImagePool::Initialise();
-	printf("Initialsed image pool\n");
+
+	Blowfish::Initialise();
 
 	MainWindow win(640, 360, "ShowMySide");
 	win.show();

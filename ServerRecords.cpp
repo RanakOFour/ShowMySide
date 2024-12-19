@@ -33,6 +33,16 @@ int ServerRecords::FindPlayer(int _id)
 	return -1;
 }
 
+int ServerRecords::GetNextPlayerID()
+{
+	return m_nextPlayerID;
+}
+
+int ServerRecords::GetNextPlayerIndex()
+{
+	return m_playerInfos.size();
+}
+
 int ServerRecords::CreateNewPlayer()
 {
 	//Add new playerinfo to players vector, then to xml_node vector

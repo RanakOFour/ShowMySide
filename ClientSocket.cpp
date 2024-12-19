@@ -1,4 +1,5 @@
 #include "ClientSocket.h"
+#include "Blowfish.h"
 
 #include <iostream>
 #include <ws2tcpip.h>
@@ -75,7 +76,12 @@ bool ClientSocket::Connect(std::string& _serverName)
 
 void ClientSocket::Send(std::string& _message)
 {
-	int bytes = ::send(m_socket, _message.c_str(), _message.length(), 0);
+	std::vector<char> encryptedXML;
+	Blowfish::Encrypt(_message, encryptedXML);
+	std::string messageToSend = std::string(encryptedXML.begin(), encryptedXML.end());
+	//printf("Encrypt: %s\n", messageToSend.c_str());
+
+	int bytes = ::send(m_socket, messageToSend.c_str(), messageToSend.length(), 0);
 	if (bytes <= 0)
 	{
 		throw std::runtime_error("Failed to send data");
@@ -88,7 +94,12 @@ void ClientSocket::Send(std::string& _message)
 
 bool ClientSocket::Receive(std::string& _message)
 {
-	char buffer[128] = { 0 };
+	if (m_closed)
+	{
+		return false;
+	}
+
+	char buffer[256] = { 0 };
 	int bytes = ::recv(m_socket, buffer, sizeof(buffer) - 1, 0);
 	if (bytes == SOCKET_ERROR)
 	{
@@ -104,7 +115,13 @@ bool ClientSocket::Receive(std::string& _message)
 		return false;
 	}
 
-	_message = buffer;
+	std::string encrypedMessage = std::string(buffer, bytes);
+
+	std::vector<char> decryptedChar;
+	Blowfish::Decrypt(encrypedMessage, decryptedChar);
+	_message = std::string(decryptedChar.begin(), decryptedChar.end());
+	//printf("Decrypt Pre: %s\nDecrypt Post: %s\n", encrypedMessage.c_str(), _message.c_str());
+
 	return true;
 }
 
@@ -116,6 +133,8 @@ void ClientSocket::CloseConnection()
 	{
 		printf("Connection with server terminated\n");
 	}
+
+	m_closed = true;
 }
 
 void ClientSocket::SetID(int _id)
@@ -126,4 +145,9 @@ void ClientSocket::SetID(int _id)
 int ClientSocket::GetID()
 {
 	return m_id;
+}
+
+bool ClientSocket::Closed()
+{
+	return m_closed;
 }

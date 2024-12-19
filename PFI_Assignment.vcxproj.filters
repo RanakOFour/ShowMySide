@@ -87,8 +87,8 @@
     <ClCompile Include="ClientPlayer.cpp">
       <Filter>Source Files\GUI</Filter>
     </ClCompile>
-    <ClCompile Include="Encryption.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="Blowfish.cpp">
+      <Filter>Source Files\Networking</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -149,8 +149,8 @@
     <ClInclude Include="ClientPlayer.h">
       <Filter>Header Files\GUI</Filter>
     </ClInclude>
-    <ClInclude Include="Encryption.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="Blowfish.h">
+      <Filter>Header Files\Networking</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

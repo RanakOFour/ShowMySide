@@ -47,10 +47,11 @@ void Server::MonitorNetwork()
 				if (eventName == "new_plr")
 				{
 					int newPlayersId = m_records.CreateNewPlayer();
-					currentEvent.append_attribute("id").set_value(newPlayersId);
-					m_socket.SetNewPlayerID(newPlayersId);
+					m_socket.SetNewPlayerID(m_records.FindPlayer(newPlayersId));
+					m_socket.SendTo(m_records.FindPlayer(newPlayersId), m_records.AsXMLString());
 
-					m_socket.SendServerInfo(m_records.FindPlayer(newPlayersId), m_records.AsXMLString());
+					currentEvent.append_attribute("id").set_value(newPlayersId);
+					
 				}
 				else if (eventName == "plr_leave")
 				{
@@ -72,7 +73,7 @@ void Server::MonitorNetwork()
 				}
 				else if (eventName == "server_info_pls")
 				{
-					m_socket.SendServerInfo(m_records.FindPlayer(currentEvent.attribute("id").as_int()), m_records.AsXMLString());
+					m_socket.SendTo(m_records.FindPlayer(currentEvent.attribute("id").as_int()), m_records.AsXMLString());
 				}
 
 				m_records.LogEvent(currentEvent);
@@ -91,13 +92,12 @@ bool Server::CloseServer()
 	m_serverClosed = true;
 	m_networkingThread.join();
 
-	pugi::xml_document closeServerMessage;
-	pugi::xml_node closeEvent = closeServerMessage.append_child("Events").append_child("Event");
-	closeEvent.append_attribute("type").set_value("close_server");
+	pugi::xml_document closeEvent;
+	pugi::xml_node eventNode = closeEvent.append_child("Events");
+	eventNode.append_child("Event").append_attribute("type").set_value("close_server");
 
-	m_socket.Send(closeServerMessage);
-
-	//m_socket->CloseConnections();
+	m_socket.Send(closeEvent);
+	m_socket.Close();
 
 	return true;
 }

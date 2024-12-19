@@ -90,6 +90,8 @@ public:
 
     std::string GetUsername(int _id);
 
+    std::string GetClientUsername();
+
     void Closed(bool _closed);
 
     bool IsClosed();

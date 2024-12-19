@@ -17,7 +17,7 @@ private:
 	std::vector<std::shared_ptr<ClientSocket>> m_clients;
 	SOCKET m_socket;
 	std::string m_ipAddress;
-	int m_idJustAdded;
+	int m_newPlayerID;
 
 	/**
 		Checks for any new connections, and returns a smart pointer to a new connection if there is one
@@ -40,10 +40,11 @@ public:
 	void Send(pugi::xml_document& _xmlToSend);
 
 	/**
-		Sends server XML from Server to a client, then blacklists them from recieving new events until the server recieves a confirmation
+		Sends server XML from Server to a client
 	*/
-	void SendServerInfo(int _index, std::string _xmlToSend);
+	void SendTo(int _index, std::string _xmlToSend);
 
 	void SetNewPlayerID(int _id);
 	void RemoveConnection(int _id);
+	void Close();
 };

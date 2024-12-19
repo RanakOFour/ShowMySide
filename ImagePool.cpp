@@ -44,6 +44,7 @@ void ImagePool::Initialise()
 	if (m_self == nullptr)
 	{
 		m_self = new ImagePool();
+		printf("Initialised ImagePool\n");
 	}
 }
 

@@ -15,7 +15,7 @@
 ServerSocket::ServerSocket(int _port)
 	: m_socket(INVALID_SOCKET),
 	m_clients(),
-	m_idJustAdded(-1)
+	m_newPlayerID(-1)
 {
 	//Pre stuff
 	addrinfo hints = { 0 };
@@ -211,40 +211,27 @@ void ServerSocket::Send(pugi::xml_document& _xmlToSend)
 
 	for (size_t i = 0; i < m_clients.size(); i++)
 	{
-		//Avoids sending both update and initial stuff in the same frame because the xml won't parse correctly
-		if (i != m_idJustAdded)
+		//Stops new player from receiving duplicate create new player events
+		if(m_clients.at(i)->GetID() != m_newPlayerID)
 		{
-			try
-			{
-				m_clients.at(i)->Send(xmlAsString);
-			}
-			catch (const std::exception& e)
-			{
-				fl_alert(e.what());
-			}
+			m_clients.at(i)->Send(xmlAsString);
 		}
 		else
 		{
-			m_idJustAdded = -1;
+			m_newPlayerID = -1;
 		}
 	}
 }
 
-void ServerSocket::SendServerInfo(int _index, std::string _xmlToSend)
+void ServerSocket::SendTo(int _index, std::string _xmlToSend)
 {
-	try
-	{
-		m_clients.at(_index)->Send(_xmlToSend);
-	}
-	catch (const std::exception& e)
-	{
-		fl_alert(e.what());
-	}
+	m_clients.at(_index)->Send(_xmlToSend);
 }
 
 void ServerSocket::SetNewPlayerID(int _id)
 {
 	m_clients[m_clients.size() - 1].get()->SetID(_id);
+	m_newPlayerID = _id;
 }
 
 void ServerSocket::RemoveConnection(int _id)
@@ -256,5 +243,15 @@ void ServerSocket::RemoveConnection(int _id)
 			m_clients.erase(m_clients.begin() + i);
 			break;
 		}
+	}
+}
+
+void ServerSocket::Close()
+{
+	while(m_clients.size() > 0)
+	{
+		m_clients[0]->CloseConnection();
+		m_clients[0].reset();
+		m_clients.erase(m_clients.begin());
 	}
 }

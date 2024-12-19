@@ -4,7 +4,6 @@
 #include "ChatBox.h"
 #include "ImagePool.h"
 #include "ClientPlayer.h"
-#include "Encryption.h"
 #include "Pugixml/pugixml.hpp"
 
 #include <vector>
@@ -101,6 +100,7 @@ void Lobby::HandleKeyboardEvent(int _key)
 	case 'H':
 	case 'h':
 		m_events.first_child().append_child("Event").append_attribute("type").set_value("server_info_pls");
+		m_events.first_child().child("Event").append_attribute("id").set_value(m_playerId);
 		break;
 
 	// Any keyboard event 1-4 will change which character the player is
@@ -162,11 +162,8 @@ void Lobby::LoadLobbyInformation(std::string& _docToLoad)
 		add(m_players[m_players.size() - 1].get());
 	}
 
-	// Client's player is the newest player (last in the list)
 	m_clientPlayer.SetClientPlayer(m_players[m_players.size() - 1]);
-
 	m_playerId = m_clientPlayer.GetID();
-
 	m_hasLoaded = true;
 
 	//Add chatbox here so it gets drawn over the players
@@ -197,10 +194,7 @@ void Lobby::Update()
 			// <Event type="new_message", text=m_textFromChatbox.c_str()>
 			pugi::xml_node newEvent = m_events.first_child().append_child("Event");
 			newEvent.append_attribute("type").set_value("new_message");
-
-			std::string encryptedMessage = Encryption::Encrypt(m_textFromChatbox, m_clientPlayer.GetUsername());
-
-			newEvent.append_attribute("text").set_value(encryptedMessage.c_str());
+			newEvent.append_attribute("text").set_value(m_textFromChatbox.c_str());
 			newEvent.append_attribute("id").set_value(m_playerId);
 
 			break;
@@ -288,9 +282,18 @@ std::string Lobby::GetUsername(int _id)
 	return m_players[FindPlayer(_id)]->GetUsername();
 }
 
+std::string Lobby::GetClientUsername()
+{
+	return m_players[FindPlayer(m_playerId)]->GetUsername();
+}
+
 void Lobby::Closed(bool _closed)
 {
 	m_closed = _closed;
+	if (m_closed)
+	{
+		hide();
+	}
 }
 
 bool Lobby::IsClosed()

@@ -40,10 +40,20 @@ pugi::xml_document ClientPlayer::CreateMovementEvent(int _x, int _y)
 
 int ClientPlayer::GetID()
 {
+	if (m_clientPlayer == nullptr)
+	{
+		return -1;
+	}
+
 	return m_clientPlayer->GetID();
 }
 
 std::string ClientPlayer::GetUsername()
 {
+	if (m_clientPlayer == nullptr)
+	{
+		return "";
+	}
+
 	return m_clientPlayer->GetUsername();
 }

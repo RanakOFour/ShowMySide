@@ -1,5 +1,6 @@
 #include "FileTextDisplay.h"
 #include "MenuWrapper.h"
+#include "Timer.h"
 
 #include "FL/Fl_Double_Window.H"
 #include "FL/Fl_Box.H"
@@ -22,8 +23,7 @@ enum class LayoutType
 	JOIN_GAME = 1,
 	SERVER = 2,
 	IN_GAME = 3,
-	ABOUT = 4,
-	HELP = 5
+	ABOUT = 4
 };
 
 #pragma once
@@ -31,7 +31,7 @@ enum class LayoutType
 class Server;
 class Client;
 
-class MainWindow : public Fl_Double_Window
+class MainWindow : public Timer, public Fl_Double_Window
 {
 private:
 
@@ -47,6 +47,7 @@ private:
 	Fl_Button m_connectBtn;
 	Fl_Text_Display m_lobbyEventLogDisplay;
 
+	void OnTick();
 public:
 	MainWindow(int _w, int _h, std::string _name);
 	~MainWindow();

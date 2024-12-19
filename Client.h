@@ -49,5 +49,7 @@ public:
 	void SetLogDisplay(Fl_Text_Display* _outputLog);
 
 	void Close();
+
+	bool Closed();
 };
 

@@ -2,7 +2,6 @@
 #include "ClientSocket.h"
 #include "Lobby.h"
 #include "Player.h"
-#include "Encryption.h"
 #include "Pugixml/pugixml.hpp"
 
 #include "FL/Fl_Text_Buffer.H"
@@ -25,7 +24,7 @@ Client::Client() :
 
 Client::~Client()
 {
-
+	m_mainWindowLog.call_predelete_callbacks();
 }
 
 void Client::OnTick()
@@ -71,7 +70,8 @@ void Client::OnTick()
 				std::string otherText = "Server Version: ";
 				otherText.append(eventsDocument.child("ServerInfo").attribute("version").as_string());
 
-				fl_alert(otherText.c_str());
+				fl_message(otherText.c_str());
+				m_lobby.take_focus();
 			}
 		}
 		else
@@ -99,6 +99,18 @@ void Client::OnTick()
 
 					std::string logString = playerName + " has left\n";
 					m_mainWindowLog.append(logString.c_str());
+
+					//If the first player has left, the server has closed
+					if (playerId == 0)
+					{
+						m_socket->CloseConnection();
+						m_socket.reset(NULL);
+
+						m_lobby.Closed(true);
+						m_lobby.hide();
+						fl_message("Server closed");
+						break;
+					}
 				}
 				else if (eventName == "attr_change")
 				{
@@ -117,9 +129,7 @@ void Client::OnTick()
 				}
 				else if (eventName == "new_message")
 				{
-					std::string cipherText = currentEvent.attribute("text").as_string();
-					std::string message = Encryption::Decrypt(cipherText, m_lobby.GetUsername(playerId));
-
+					std::string message = currentEvent.attribute("text").value();
 					m_lobby.ShowMessage(playerId, message);
 					m_lobby.redraw();
 
@@ -127,34 +137,32 @@ void Client::OnTick()
 					std::string logString = m_lobby.GetUsername(playerId) + ": " + message + "\n";
 					m_mainWindowLog.append(logString.c_str());
 				}
-				else if (eventName == "close_server")
-				{
-					m_socket->CloseConnection();
-					m_socket.reset();
-					m_socket = nullptr;
 
-					m_lobby.Closed(true);
-				}
-
-				//Only other event type is 'new_message', but that is handled by individual clients
 			}
 		}
 	}
 
-	if (!m_lobby.IsClosed())
+	pugi::xml_document toSend;
+
+	//Update lobby with new information
+	m_lobby.Update();
+
+	//Get any events that need to be sent
+	m_lobby.FlushEvents(toSend);
+
+	// toSend will always have at least <Events> node as a child
+	if (toSend.first_child().first_child())
 	{
-		pugi::xml_document toSend;
+		Send(toSend);
+	}
 
-		//Update lobby with new information
-		m_lobby.Update();
-
-		//Get any events that need to be sent
-		m_lobby.FlushEvents(toSend);
-
-		// toSend will always have at least <Events> node as a child
-		if (toSend.first_child().first_child())
+	if(m_lobby.IsClosed())
+	{
+		//If a socket is present then the user has closed the lobby, and it still needs to send off the plr_leave event
+		if (m_socket != nullptr)
 		{
-			Send(toSend);
+			m_socket->CloseConnection();
+			m_socket = nullptr;
 		}
 	}
 }
@@ -199,7 +207,10 @@ void Client::Send(pugi::xml_document& _nodeToSend)
 
 void Client::SetLogDisplay(Fl_Text_Display* _outputLog)
 {
-	_outputLog->buffer(m_mainWindowLog);
+	if (!_outputLog->buffer())
+	{
+		_outputLog->buffer(m_mainWindowLog);
+	}
 }
 
 void Client::Close()
@@ -209,4 +220,9 @@ void Client::Close()
 	{
 		m_socket->CloseConnection();
 	}
+}
+
+bool Client::Closed()
+{
+	return m_lobby.IsClosed();
 }

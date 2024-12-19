@@ -20,7 +20,8 @@
 
 
 MainWindow::MainWindow(int _w, int _h, std::string _name)
-	: Fl_Double_Window(200, 200, _w, _h, "Show My Side"),
+	: Timer((double)(1.0f / 30.0f)),
+	Fl_Double_Window(200, 200, _w, _h, "Show My Side"),
 	m_Client(nullptr),
 	m_Server(nullptr),
 	m_aboutText("./text/about.txt", _w, _h),
@@ -78,6 +79,23 @@ MainWindow::MainWindow(int _w, int _h, std::string _name)
 
 MainWindow::~MainWindow()
 {
+	m_aboutText.buffer(NULL);
+}
+
+void MainWindow::OnTick()
+{
+	if (m_Client && m_Client->Closed())
+	{
+		if (m_Server)
+		{
+			m_Server->CloseServer();
+			m_Server = nullptr;
+		}
+
+		m_Client = nullptr;
+
+		ChangeLayout(LayoutType::SPLASH_SCREEN);
+	}
 }
 
 void MainWindow::ChangeLayout(LayoutType _newState)
@@ -90,6 +108,10 @@ void MainWindow::ChangeLayout(LayoutType _newState)
 
 	switch (_newState)
 	{
+	case LayoutType::SPLASH_SCREEN:
+		m_splashImage.show();
+		break;
+
 	case LayoutType::JOIN_GAME:
 		m_ipInput.show();
 		m_connectBtn.show();
@@ -104,14 +126,10 @@ void MainWindow::ChangeLayout(LayoutType _newState)
 
 	case LayoutType::IN_GAME:
 		m_lobbyEventLogDisplay.show();
-		m_Client->SetLogDisplay(&m_lobbyEventLogDisplay);
 	break;
 
 	case LayoutType::ABOUT:
 		m_aboutText.show();
-		break;
-
-	case LayoutType::HELP:
 		break;
 	}
 
@@ -139,6 +157,7 @@ void MainWindow::OnServerStart(Fl_Widget* _widget, void* _userData)
 
 	std::string ip = mw->m_Server->GetIPAddress();
 	mw->m_Client->Connect(ip);
+	mw->m_Client->SetLogDisplay(&(mw->m_lobbyEventLogDisplay));
 
 	mw->ChangeLayout(LayoutType::SERVER);
 }
@@ -153,6 +172,7 @@ void MainWindow::OnJoinServer(Fl_Widget* _widget, void* _userData)
 
 	if (mw->m_Client->Connect(ip))
 	{
+		mw->m_Client->SetLogDisplay(&(mw->m_lobbyEventLogDisplay));
 		mw->ChangeLayout(LayoutType::IN_GAME);
 	}
 }
@@ -165,12 +185,12 @@ void MainWindow::OnExit(Fl_Widget* _widget, void* _userData)
 
 	if (mw->m_Client)
 	{
-		mw->m_Client->Close();
+		mw->m_Client.reset();
 	}
 
 	if (mw->m_Server)
 	{
-		mw->m_Server->CloseServer();
+		mw->m_Server.reset();
 	}
 }
 

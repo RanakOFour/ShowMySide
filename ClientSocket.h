@@ -31,7 +31,6 @@ public:
 		Ships off _message to the other end of the connection
 	*/
 	void Send(std::string& _message);
-
 	
 	/**
 		Puts any recieved information into _message
@@ -42,4 +41,5 @@ public:
 
 	void SetID(int _id);
 	int GetID();
+	bool Closed();
 };
