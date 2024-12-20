@@ -12,8 +12,7 @@
 
 ServerSocket::ServerSocket(int _port)
 	: m_socket(INVALID_SOCKET),
-	m_clients(),
-	m_newPlayerID(-1)
+	m_clients()
 {
 	//Pre stuff
 	addrinfo hints = { 0 };
@@ -130,8 +129,6 @@ std::shared_ptr<ClientSocket> ServerSocket::Accept()
 
 pugi::xml_document ServerSocket::Update()
 {
-	bool messagesToSend{ false };
-
 	//create document to repackage messages into and return
 	pugi::xml_document clientEventList;
 	pugi::xml_node clientEventsParent = clientEventList.append_child("Events");
@@ -162,25 +159,13 @@ pugi::xml_document ServerSocket::Update()
 		//recieved messages are put into here
 		std::string clientMessageAsString;
 
-		// Loop through getting information from server until it has it all
-		bool dataComplete{ false };
-		while (!dataComplete)
-		{
-			std::string currentDataPull;
-			m_clients.at(ci)->Receive(currentDataPull);
-
-			clientMessageAsString.append(currentDataPull);
-			if (currentDataPull == "")
-			{
-				dataComplete = true;
-			}
-		}
+		m_clients.at(ci)->Receive(clientMessageAsString);
+		
 
 		if(clientMessageAsString != "")
 		{
 			//printf("Message recieved as server: %s\n", clientMessageAsString.c_str());
 
-			messagesToSend = true;
 
 			//Parse client message into xml and pass up to Server
 			pugi::xml_document currentEventDoc;
@@ -209,17 +194,9 @@ void ServerSocket::Send(pugi::xml_document& _xmlToSend)
 	_xmlToSend.save(ss);
 	std::string xmlAsString = ss.str();
 
-	for (size_t i = 0; i < m_clients.size(); i++)
+	for (size_t ci = 0; ci < m_clients.size(); ci++)
 	{
-		//Stops new player from receiving duplicate create new player events
-		if(m_clients.at(i)->GetID() != m_newPlayerID)
-		{
-			m_clients.at(i)->Send(xmlAsString);
-		}
-		else
-		{
-			m_newPlayerID = -1;
-		}
+		m_clients[ci]->Send(xmlAsString);
 	}
 }
 
@@ -232,7 +209,6 @@ void ServerSocket::SendTo(int _index, std::string _xmlToSend)
 void ServerSocket::SetNewPlayerID(int _id)
 {
 	m_clients[m_clients.size() - 1].get()->SetID(_id);
-	m_newPlayerID = _id;
 }
 
 void ServerSocket::RemoveConnection(int _id)

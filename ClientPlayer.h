@@ -12,13 +12,8 @@ private:
 	std::shared_ptr<Player> m_clientPlayer;
 
 public:
-	ClientPlayer();
+	ClientPlayer(int _id);
 	~ClientPlayer();
-
-	/**
-		Assigns m_clientPlayer
-	*/
-	void SetClientPlayer(std::shared_ptr<Player> _player);
 
 	/**
 		Takes in the mouse's coordinates and returns a move Event in the form
@@ -28,5 +23,6 @@ public:
 
 	int GetID();
 	std::string GetUsername();
+	std::shared_ptr<Player> GetPlayer();
 };
 

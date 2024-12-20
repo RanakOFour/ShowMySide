@@ -46,6 +46,7 @@ private:
 	Fl_Input m_ipInput;
 	Fl_Output m_ipAddressBox;
 	Fl_Button m_connectBtn;
+	Fl_Button m_lobbyBtn;
 	Fl_Text_Display m_lobbyEventLogDisplay;
 
 	void OnTick();
@@ -70,5 +71,6 @@ public:
 	static void OnServerStart(Fl_Widget* _widget, void* _userData);
 	static void OnExit(Fl_Widget* _widget, void* _userData);
 	static void ShowAbout(Fl_Widget* _widget, void* _userData);
+	static void ShowLobby(Fl_Widget* _widget, void* _userData);
 	///@}
 };

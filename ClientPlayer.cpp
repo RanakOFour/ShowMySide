@@ -5,19 +5,15 @@
 
 #include <memory>
 
-ClientPlayer::ClientPlayer() :
+ClientPlayer::ClientPlayer(int _id) :
 	m_clientPlayer(nullptr)
 {
+	m_clientPlayer = std::make_shared<Player>(_id);
 }
 
 ClientPlayer::~ClientPlayer()
 {
 
-}
-
-void ClientPlayer::SetClientPlayer(std::shared_ptr<Player> _player)
-{
-	m_clientPlayer.swap(_player);
 }
 
 pugi::xml_document ClientPlayer::CreateMovementEvent(int _x, int _y)
@@ -56,4 +52,11 @@ std::string ClientPlayer::GetUsername()
 	}
 
 	return m_clientPlayer->GetUsername();
+}
+
+std::shared_ptr<Player> ClientPlayer::GetPlayer()
+{
+
+	std::shared_ptr<Player> playerPtr = std::shared_ptr<Player>(m_clientPlayer);
+	return playerPtr;
 }

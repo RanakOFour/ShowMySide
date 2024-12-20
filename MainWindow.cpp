@@ -29,6 +29,7 @@ MainWindow::MainWindow(int _w, int _h, std::string _name)
 	m_ipInput(100, 100, 120, 25, "Enter IP here: "),
 	m_ipAddressBox(58, 30, 95, 25, "Local IP:"),
 	m_connectBtn(270, 260, 100, 50, "Connect"),
+	m_lobbyBtn(233, 300, 175, 50, "Return to Lobby History"),
 	m_lobbyEventLogDisplay(5, 60, w() - 10, h() - 65)
 {
 	end();
@@ -65,6 +66,10 @@ MainWindow::MainWindow(int _w, int _h, std::string _name)
 	m_connectBtn.callback(OnJoinServer, this);
 	add(m_connectBtn);
 	m_connectBtn.hide();
+
+	m_lobbyBtn.callback(ShowLobby, this);
+	add(m_lobbyBtn);
+	m_lobbyBtn.hide();
 
 	add(m_lobbyEventLogDisplay);
 	m_lobbyEventLogDisplay.hide();
@@ -130,6 +135,10 @@ void MainWindow::ChangeLayout(LayoutType _newState)
 
 	case LayoutType::ABOUT:
 		m_aboutText.show();
+		if (m_Client)
+		{
+			m_lobbyBtn.show();
+		}
 		break;
 	}
 
@@ -158,6 +167,7 @@ void MainWindow::OnServerStart(Fl_Widget* _widget, void* _userData)
 	std::string ip = mw->m_Server->GetIPAddress();
 	mw->m_Client->Connect(ip);
 	mw->m_Client->SetLogDisplay(&(mw->m_lobbyEventLogDisplay));
+
 
 	mw->ChangeLayout(LayoutType::SERVER);
 }
@@ -201,5 +211,19 @@ void MainWindow::ShowAbout(Fl_Widget* _widget, void* _userData)
 {
 	MainWindow* mw = (MainWindow*)_userData;
 	mw->ChangeLayout(LayoutType::ABOUT);
+}
+
+void MainWindow::ShowLobby(Fl_Widget* _widget, void* _userData)
+{
+	MainWindow* mw = (MainWindow*)_userData;
+
+	if (mw->m_Server)
+	{
+		mw->ChangeLayout(LayoutType::SERVER);
+	}
+	else
+	{
+		mw->ChangeLayout(LayoutType::IN_GAME);
+	}
 }
 

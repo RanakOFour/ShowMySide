@@ -78,7 +78,6 @@ void ClientSocket::Send(std::string& _message)
 	std::vector<char> encryptedXML;
 	Blowfish::Encrypt(_message, encryptedXML);
 	std::string messageToSend = std::string(encryptedXML.begin(), encryptedXML.end());
-	//printf("Encrypt: %s\n", messageToSend.c_str());
 
 	int bytes = ::send(m_socket, messageToSend.c_str(), messageToSend.length(), 0);
 	if (bytes <= 0)
@@ -87,41 +86,56 @@ void ClientSocket::Send(std::string& _message)
 	}
 	else
 	{
-		//printf("Bytes sent on socket %d: %d\n", (int)m_socket, bytes);
+		printf("Bytes sent on socket %d: %d\n", (int)m_socket, bytes);
 	}
 }
 
-bool ClientSocket::Receive(std::string& _message)
+void ClientSocket::Receive(std::string& _message)
 {
 	if (m_closed)
 	{
-		return false;
+		return;
 	}
 
-	char buffer[256] = { 0 };
-	int bytes = ::recv(m_socket, buffer, sizeof(buffer) - 1, 0);
-	if (bytes == SOCKET_ERROR)
+	std::string receivedText;
+	std::string currentTextPull;
+	int totalBytes{ 0 };
+
+	do
 	{
-		if (WSAGetLastError() != WSAEWOULDBLOCK)
+		currentTextPull = "";
+		char buffer[256] = { 0 };
+		int bytes = ::recv(m_socket, buffer, sizeof(buffer) - 1, 0);
+
+		//Leave the loop when bytes returns WSAEWOULDBLOCK
+		// It is a non-fatal error and just means that the non-blocking socket couldn't do it's thing
+		if (bytes == SOCKET_ERROR)
 		{
-			throw std::runtime_error("Read failed");
+			if (WSAGetLastError() != WSAEWOULDBLOCK)
+			{
+				throw std::runtime_error("Read failed");
+			}
+			break;
 		}
-		return false;
-	}
-	else if (bytes == 0)
+
+		currentTextPull.append(buffer, bytes);
+		receivedText.append(currentTextPull);
+
+		totalBytes += bytes;
+
+	} while (currentTextPull != "");
+
+	if (receivedText == "")
 	{
-		m_closed = true;
-		return false;
+		return;
 	}
 
-	std::string encrypedMessage = std::string(buffer, bytes);
+	printf("Bytes recieved: %d\n", totalBytes);
 
 	std::vector<char> decryptedChar;
-	Blowfish::Decrypt(encrypedMessage, decryptedChar);
+	Blowfish::Decrypt(receivedText, decryptedChar);
 	_message = std::string(decryptedChar.begin(), decryptedChar.end());
 	//printf("Decrypt Pre: %s\nDecrypt Post: %s\n", encrypedMessage.c_str(), _message.c_str());
-
-	return true;
 }
 
 void ClientSocket::CloseConnection()

@@ -40,6 +40,11 @@ int ServerRecords::GetNextPlayerID()
 
 int ServerRecords::GetNextPlayerIndex()
 {
+	if (m_nextPlayerID == 0)
+	{
+		return 0;
+	}
+
 	return m_playerInfos.size();
 }
 
@@ -91,7 +96,7 @@ void ServerRecords::ChangeAttribute(int _id, std::string _attributeName, std::st
 
 void ServerRecords::LogEvent(pugi::xml_node& _eventXML)
 {
-	m_logDocument.insert_child_after("Event", _eventXML);
+	m_logDocument.append_copy(_eventXML);
 	m_logDocument.save_file("./logs/serverlog.txt");
 }
 

@@ -64,7 +64,7 @@ void Lobby::HandleMouseEvent(int _mouseButton)
 	if (_mouseButton == FL_LEFT_MOUSE && !m_chatBox.visible())
 	{
 		
-		pugi::xml_document newEvent = m_clientPlayer.CreateMovementEvent(Fl::event_x(), Fl::event_y());
+		pugi::xml_document newEvent = m_clientPlayer->CreateMovementEvent(Fl::event_x(), Fl::event_y());
 		m_events.first_child().append_copy(newEvent.first_child());
 	}
 }
@@ -101,6 +101,7 @@ void Lobby::HandleKeyboardEvent(int _key)
 	case 'h':
 		m_events.first_child().append_child("Event").append_attribute("type").set_value("server_info_pls");
 		m_events.first_child().child("Event").append_attribute("id").set_value(m_playerId);
+		
 		break;
 
 	// Any keyboard event 1-4 will change which character the player is
@@ -162,8 +163,7 @@ void Lobby::LoadLobbyInformation(std::string& _docToLoad)
 		add(m_players[m_players.size() - 1].get());
 	}
 
-	m_clientPlayer.SetClientPlayer(m_players[m_players.size() - 1]);
-	m_playerId = m_clientPlayer.GetID();
+	
 	m_hasLoaded = true;
 
 	//Add chatbox here so it gets drawn over the players
@@ -247,13 +247,28 @@ int Lobby::FindPlayer(int _id)
 //Creates player object and fills out _playerNode object
 std::shared_ptr<Player> Lobby::CreateNewPlayer(int _id)
 {
-	//Add player to xml and players vector
-	m_players.push_back(std::make_shared<Player>(_id));
+	if (m_playerId == -1)
+	{
+		m_clientPlayer = std::make_unique<ClientPlayer>(_id);
+		m_playerId = m_clientPlayer->GetID();
+
+		m_players.push_back(m_clientPlayer->GetPlayer());
+	}
+	else
+	{
+		m_players.push_back(std::make_shared<Player>(_id));
+	}
+
 	add(m_players[m_players.size() - 1].get());
+
+	Player* plPtr = m_players[m_players.size() - 1].get();
+	printf("Player name: %s\n", plPtr->GetUsername().c_str());
 
 	//Puts the chatbox at the back of the list of children so it gets drawn over everything else
 	remove(m_chatBox);
 	add(m_chatBox);
+
+	redraw();
 
 	return m_players[m_players.size() - 1];
 }
@@ -301,7 +316,7 @@ bool Lobby::Closed()
 	return m_closed;
 }
 
-bool Lobby::IsLoaded()
+bool Lobby::Loaded()
 {
 	return m_hasLoaded;
 }

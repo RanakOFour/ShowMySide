@@ -19,8 +19,8 @@ class Lobby :
 private:
     pugi::xml_document m_events;
     std::vector<std::shared_ptr<Player>> m_players;
+    std::unique_ptr<ClientPlayer> m_clientPlayer;
     Chatbox m_chatBox;
-    ClientPlayer m_clientPlayer;
     int m_playerId;
     std::string m_textFromChatbox;
     bool m_closed;
@@ -96,5 +96,5 @@ public:
 
     bool Closed();
 
-    bool IsLoaded();
+    bool Loaded();
 };

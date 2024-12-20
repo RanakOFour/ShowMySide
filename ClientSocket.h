@@ -35,7 +35,7 @@ public:
 	/**
 		Puts any recieved information into _message
 	*/
-	bool Receive(std::string& _message);
+	void Receive(std::string& _message);
 
 	void CloseConnection();
 

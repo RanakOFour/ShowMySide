@@ -32,41 +32,35 @@ void Client::OnTick()
 	{
 		return;
 	}
-
-	pugi::xml_document eventsDocument;
-	std::string eventsFromServer;
-
-	// Loop through getting information from server until it has it all
-	bool dataComplete{ false };
-	while (!dataComplete)
-	{
-		std::string currentDataPull;
-		m_socket->Receive(currentDataPull);
-
-		eventsFromServer.append(currentDataPull);
-		pugi::xml_parse_result result = eventsDocument.load_string(eventsFromServer.c_str());
-		if ((currentDataPull == "" && eventsFromServer == "") || !result.status)
-		{
-			dataComplete = true;
-		}
-	}
+	
+	std::string messagesFromServer;
+	m_socket->Receive(messagesFromServer);
 
 
 	// Process events from server
-	if (eventsFromServer != "")
+	if (messagesFromServer != "")
 	{
+
+		pugi::xml_document eventsDocument;
+
+		pugi::xml_parse_result parse = eventsDocument.load_string(messagesFromServer.c_str());
+		if (parse.status)
+		{
+			printf("Invalid xml parsed\n");
+		}
+
 		//printf("Client received: %s", eventsFromServer.c_str());
 
 		if (eventsDocument.child("ServerInfo"))
 		{
-			if (!m_lobby.IsLoaded())
+			if (!m_lobby.Loaded())
 			{
-				m_lobby.LoadLobbyInformation(eventsFromServer);
+				m_lobby.LoadLobbyInformation(messagesFromServer);
 			}
 			else
 			{
 				std::string serverInfo = "Server Version: ";
-				serverInfo.append(eventsDocument.child("ServerInfo").attribute("version").as_string());
+				serverInfo.append(eventsDocument.child("ServerInfo").attribute("version").as_string() + std::string("\n"));
 
 				
 				m_mainWindowLog.append(serverInfo.c_str());

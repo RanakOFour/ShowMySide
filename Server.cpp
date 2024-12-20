@@ -4,6 +4,7 @@
 #include "ServerRecords.h"
 #include "Pugixml/pugixml.hpp"
 
+#include <iostream>
 #include <stdexcept>
 #include <thread>
 
@@ -28,6 +29,8 @@ void Server::MonitorNetwork()
 {
 	while (!m_serverClosed)
 	{
+		//Stops server from throttling and sending responses too quickly
+
 		//Get repackaged xml message from serversocket
 		pugi::xml_document eventsFromClient = m_socket.Update();
 
@@ -46,10 +49,10 @@ void Server::MonitorNetwork()
 
 				if (eventName == "new_plr")
 				{
+					m_socket.SendTo(m_records.GetNextPlayerIndex(), m_records.AsXMLString());
+
 					int newPlayersId = m_records.CreateNewPlayer();
 					m_socket.SetNewPlayerID(m_records.FindPlayer(newPlayersId));
-					m_socket.SendTo(m_records.FindPlayer(newPlayersId), m_records.AsXMLString());
-
 					currentEvent.append_attribute("id").set_value(newPlayersId);
 					
 				}
@@ -79,6 +82,9 @@ void Server::MonitorNetwork()
 				m_records.LogEvent(currentEvent);
 				//Only other event types are 'new_message' and 'close_server', but that is handled by individual clients
 			}
+
+			// Prevents server from throttling
+			Sleep(20);
 
 			//Echo events out to the clients
 			m_socket.Send(eventsFromClient);

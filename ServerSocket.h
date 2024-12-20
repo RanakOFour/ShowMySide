@@ -17,7 +17,6 @@ private:
 	std::vector<std::shared_ptr<ClientSocket>> m_clients;
 	SOCKET m_socket;
 	std::string m_ipAddress;
-	int m_newPlayerID;
 
 	/**
 		Checks for any new connections, and returns a smart pointer to a new connection if there is one

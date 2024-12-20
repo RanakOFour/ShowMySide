@@ -17,5 +17,8 @@ public:
     up events from the MainWindow to buttons in the MenuBar. */
     MenuWrapper(MainWindow* _mwWithEvents);
     ~MenuWrapper();
+
+    void AddLobbyButton(MainWindow* _mw);
+    void RemoveLobbyButton();
 };
 
