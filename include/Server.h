@@ -1,7 +1,7 @@
 #include "Timer.h"
 #include "ServerSocket.h"
 #include "ServerRecords.h"
-#include "Pugixml/pugixml.hpp"
+#include "pugixml.hpp"
 
 #include <string>
 #include <thread>

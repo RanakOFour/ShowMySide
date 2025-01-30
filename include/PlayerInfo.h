@@ -1,5 +1,5 @@
-#include "ImagePool.h"
-#include "Pugixml/pugixml.hpp"
+#include <ImagePool.h>
+#include "pugixml.hpp"
 
 #include "FL/Fl_PNG_Image.H"
 

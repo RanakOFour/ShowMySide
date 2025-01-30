@@ -2,10 +2,10 @@
 #include "ClientSocket.h"
 #include "Lobby.h"
 #include "Player.h"
-#include "Pugixml/pugixml.hpp"
+#include "pugixml.hpp"
 
-#include "FL/Fl_Text_Buffer.H"
-#include "FL/Fl_Text_Display.H"
+#include <FL/Fl_Text_Buffer.H>
+#include <FL/Fl_Text_Display.H>
 
 #include <stdexcept>
 #include <sstream>

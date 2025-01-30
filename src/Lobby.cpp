@@ -4,7 +4,7 @@
 #include "ChatBox.h"
 #include "ImagePool.h"
 #include "ClientPlayer.h"
-#include "Pugixml/pugixml.hpp"
+#include "pugixml.hpp"
 
 #include <vector>
 #include <memory>

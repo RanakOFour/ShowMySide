@@ -1,6 +1,6 @@
 #include "ServerSocket.h"
 #include "ClientSocket.h"
-#include "pugixml/pugixml.hpp"
+#include "pugixml.hpp"
 
 
 #include <stdexcept>
@@ -78,7 +78,7 @@ ServerSocket::ServerSocket(int _port)
 	//connect socket at loopback address
 	if (connect(sock, reinterpret_cast<sockaddr*>(&loopback), sizeof(loopback)) == -1)
 	{
-		CLOSE_SOCKET(sock);
+		closesocket(sock);
 		throw std::runtime_error("Could not connect\n");
 	}
 
@@ -86,12 +86,12 @@ ServerSocket::ServerSocket(int _port)
 	socklen_t addrlen = sizeof(loopback);
 	if (getsockname(sock, reinterpret_cast<sockaddr*>(&loopback), &addrlen) == -1)
 	{
-		CLOSE_SOCKET(sock);
+		closesocket(sock);
 		throw std::runtime_error("Could not getsockname\n");
 	}
 
 	// Socket is no longer needed
-	CLOSE_SOCKET(sock);
+	closesocket(sock);
 
 	// Get the ip address from loopback's socket information
 	char buffer[22];
@@ -107,7 +107,7 @@ ServerSocket::ServerSocket(int _port)
 
 ServerSocket::~ServerSocket()
 {
-	CLOSE_SOCKET(m_socket);
+	closesocket(m_socket);
 }
 
 std::shared_ptr<ClientSocket> ServerSocket::Accept()

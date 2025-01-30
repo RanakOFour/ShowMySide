@@ -1,7 +1,7 @@
-#include "Chatbox.h"
-#include "FL/Fl_Group.H"
-#include "FL/Fl_Button.H"
-#include "FL/Fl_Input.H"
+#include <Chatbox.h>
+#include <FL/Fl_Group.H>
+#include <FL/Fl_Button.H>
+#include <FL/Fl_Input.H>
 
 Chatbox::Chatbox() :
 	Fl_Group(0, 0, 300, 300, ""),

@@ -1,13 +1,7 @@
-#ifdef _WIN32
-	#include <winsock2.h>
-	#include <ws2tcpip.h.h>
-#else
-	#include <sys/socket.h>
-	#include <arpa/inet.h>
-	#include <unistd.h>
-#endif
-
-include "Pugixml/pugixml.hpp"
+#include <winsock2.h>
+#include <ws2tcpip.h>
+#include "pugixml.hpp"
+#include "ClientSocket.h"
 #include <memory>
 #include <vector>
 #include <string>

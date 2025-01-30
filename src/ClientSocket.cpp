@@ -1,16 +1,8 @@
 #include "ClientSocket.h"
 #include "Blowfish.h"
-
-#include <sys/socket.h>
 #include <string>
 #include <memory>
 #include <stdexcept>
-
-#ifdef _WIN32
-    #define CLOSE_SOCKET(s) closesocket(s)
-#else
-    #define CLOSE_SOCKET(s) close(s)
-#endif
 
 ClientSocket::ClientSocket() : 
 	m_socket(INVALID_SOCKET),
@@ -23,7 +15,7 @@ ClientSocket::~ClientSocket()
 {
 	if (m_socket != INVALID_SOCKET)
 	{
-		CLOSE_SOCKET(m_socket)
+		closesocket(m_socket);
 	}
 }
 
@@ -57,7 +49,7 @@ bool ClientSocket::Connect(std::string& _serverName)
 	int iResult = connect(m_socket, result->ai_addr, (int)result->ai_addrlen);
 	if (iResult == SOCKET_ERROR) {
 		printf("Invalid iResult!\n");
-		CLOSE_SOCKET(m_socket);
+		closesocket(m_socket);
 		m_socket = INVALID_SOCKET;
 	}
 
@@ -146,7 +138,7 @@ void ClientSocket::Receive(std::string& _message)
 
 void ClientSocket::CloseConnection()
 {
-	int result = CLOSE_SOCKET(m_socket);
+	int result = closesocket(m_socket);
 
 	if (result == 0)
 	{
