@@ -1,5 +1,5 @@
 #include <Blowfish.h>
-#include <Pugixml/pugixml.hpp>
+#include <pugixml.hpp>
 
 #include <string>
 #include <vector>
