@@ -157,12 +157,26 @@ void MainWindow::OnClientStart(Fl_Widget* _widget, void* _userData)
 void MainWindow::OnServerStart(Fl_Widget* _widget, void* _userData)
 {
 	MainWindow* mw = (MainWindow*)_userData;
-	//Start a new Server and connect client to it
-	
-							 //port, timer duration
-	mw->m_Server = std::make_unique<Server>(8080);
+	printf("Cast window");
 
-	mw->m_Client = std::make_unique<Client>();
+	try
+	{
+		mw->m_Server = std::make_unique<Server>(8080);
+	}
+	catch(const std::exception& e)
+	{
+		printf("Failed to make server");
+	}
+
+	try
+	{
+		mw->m_Client = std::make_unique<Client>();
+	}
+	catch(const std::exception& e)
+	{
+		printf("Could not make client");
+	}
+	
 
 	std::string ip = mw->m_Server->GetIPAddress();
 	mw->m_Client->Connect(ip);
