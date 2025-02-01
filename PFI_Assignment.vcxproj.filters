@@ -1,0 +1,180 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Header Files\Networking">
+      <UniqueIdentifier>{25a4a9c2-e7a7-4b71-955c-1fab45c3c670}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\GUI">
+      <UniqueIdentifier>{12c84f19-e17e-443b-a646-9df240c1192f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\GUI">
+      <UniqueIdentifier>{31b25725-39d1-41e5-846f-a4bcc8cf3913}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Networking">
+      <UniqueIdentifier>{52cfee1a-31f3-4378-b24d-427671e2a034}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\pugixml">
+      <UniqueIdentifier>{a63df374-dedb-4b4a-9cda-2a084b91509e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Encryption">
+      <UniqueIdentifier>{4cbe30a6-5858-4142-9b0d-c8a234f19d84}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\GUI\Widgets">
+      <UniqueIdentifier>{aba56841-e340-47c0-b2a5-ee1e46712454}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\GUI\Windows">
+      <UniqueIdentifier>{86c90346-e9d2-42eb-9283-d6ceadcd0503}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Networking\Winsock">
+      <UniqueIdentifier>{4bce2cf5-d5df-425e-a74c-44eb2716f2ae}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Encryption">
+      <UniqueIdentifier>{8b475630-aaa1-4246-8cbd-20c3f97385b8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Networking\Winsock">
+      <UniqueIdentifier>{7ff4b40e-dcc5-42cd-90c6-f9b2c092db91}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\GUI\Widgets">
+      <UniqueIdentifier>{1083fd37-aa8f-4148-80af-0281b2c45a69}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\GUI\Windows">
+      <UniqueIdentifier>{0104e8c7-0037-48de-9bbe-1a30133051f9}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Wsa.cpp">
+      <Filter>Source Files\Networking</Filter>
+    </ClCompile>
+    <ClCompile Include="Timer.cpp">
+      <Filter>Source Files\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="Server.cpp">
+      <Filter>Source Files\Networking</Filter>
+    </ClCompile>
+    <ClCompile Include="Client.cpp">
+      <Filter>Source Files\Networking</Filter>
+    </ClCompile>
+    <ClCompile Include="Pugixml\pugixml.cpp">
+      <Filter>Resource Files\pugixml</Filter>
+    </ClCompile>
+    <ClCompile Include="ServerRecords.cpp">
+      <Filter>Source Files\Networking</Filter>
+    </ClCompile>
+    <ClCompile Include="ImagePool.cpp">
+      <Filter>Source Files\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="PlayerInfo.cpp">
+      <Filter>Source Files\Networking</Filter>
+    </ClCompile>
+    <ClCompile Include="ClientPlayer.cpp">
+      <Filter>Source Files\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="Blowfish.cpp">
+      <Filter>Source Files\Encryption</Filter>
+    </ClCompile>
+    <ClCompile Include="ServerSocket.cpp">
+      <Filter>Source Files\Networking\Winsock</Filter>
+    </ClCompile>
+    <ClCompile Include="ClientSocket.cpp">
+      <Filter>Source Files\Networking\Winsock</Filter>
+    </ClCompile>
+    <ClCompile Include="Chatbox.cpp">
+      <Filter>Source Files\GUI\Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="FileTextDisplay.cpp">
+      <Filter>Source Files\GUI\Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="Lobby.cpp">
+      <Filter>Source Files\GUI\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="MainWindow.cpp">
+      <Filter>Source Files\GUI\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="MenuWrapper.cpp">
+      <Filter>Source Files\GUI\Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="Messagebox.cpp">
+      <Filter>Source Files\GUI\Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="Player.cpp">
+      <Filter>Source Files\GUI\Widgets</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Wsa.h">
+      <Filter>Header Files\Networking</Filter>
+    </ClInclude>
+    <ClInclude Include="Timer.h">
+      <Filter>Header Files\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="Server.h">
+      <Filter>Header Files\Networking</Filter>
+    </ClInclude>
+    <ClInclude Include="Client.h">
+      <Filter>Header Files\Networking</Filter>
+    </ClInclude>
+    <ClInclude Include="Pugixml\pugiconfig.hpp">
+      <Filter>Resource Files\pugixml</Filter>
+    </ClInclude>
+    <ClInclude Include="Pugixml\pugixml.hpp">
+      <Filter>Resource Files\pugixml</Filter>
+    </ClInclude>
+    <ClInclude Include="ServerRecords.h">
+      <Filter>Header Files\Networking</Filter>
+    </ClInclude>
+    <ClInclude Include="ImagePool.h">
+      <Filter>Header Files\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayerInfo.h">
+      <Filter>Header Files\Networking</Filter>
+    </ClInclude>
+    <ClInclude Include="ClientPlayer.h">
+      <Filter>Header Files\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="Blowfish.h">
+      <Filter>Header Files\Encryption</Filter>
+    </ClInclude>
+    <ClInclude Include="Chatbox.h">
+      <Filter>Header Files\GUI\Widgets</Filter>
+    </ClInclude>
+    <ClInclude Include="MainWindow.h">
+      <Filter>Header Files\GUI\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="Lobby.h">
+      <Filter>Header Files\GUI\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="MenuWrapper.h">
+      <Filter>Header Files\GUI\Widgets</Filter>
+    </ClInclude>
+    <ClInclude Include="FileTextDisplay.h">
+      <Filter>Header Files\GUI\Widgets</Filter>
+    </ClInclude>
+    <ClInclude Include="Player.h">
+      <Filter>Header Files\GUI\Widgets</Filter>
+    </ClInclude>
+    <ClInclude Include="Messagebox.h">
+      <Filter>Header Files\GUI\Widgets</Filter>
+    </ClInclude>
+    <ClInclude Include="ClientSocket.h">
+      <Filter>Header Files\Networking\Winsock</Filter>
+    </ClInclude>
+    <ClInclude Include="ServerSocket.h">
+      <Filter>Header Files\Networking\Winsock</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
