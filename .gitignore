@@ -386,9 +386,9 @@ FodyWeavers.xsd
 !.vscode/extensions.json
 *.code-workspace
 
-/.vs
-/PFI_Assignment
-/x64
+.vs/*
+PFI_Assignment/*
+x64/*
 
 # Local History for Visual Studio Code
 .history/
