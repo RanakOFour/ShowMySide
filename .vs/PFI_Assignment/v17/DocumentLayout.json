@@ -3,8 +3,8 @@
   "WorkspaceRootPath": "C:\\Users\\gamer\\Documents\\Programming\\ShowMySide\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{6297C23D-510A-42EF-8A62-D440708B4FFE}|PFI_Assignment.vcxproj|C:\\Users\\gamer\\Documents\\Programming\\ShowMySide\\main.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
-      "RelativeMoniker": "D:0:0:{6297C23D-510A-42EF-8A62-D440708B4FFE}|PFI_Assignment.vcxproj|solutionrelative:main.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+      "AbsoluteMoniker": "D:0:0:{6297C23D-510A-42EF-8A62-D440708B4FFE}|PFI_Assignment.vcxproj|C:\\Users\\gamer\\Documents\\Programming\\ShowMySide\\Source\\main.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{6297C23D-510A-42EF-8A62-D440708B4FFE}|PFI_Assignment.vcxproj|solutionrelative:Source\\main.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     }
   ],
   "DocumentGroupContainers": [
@@ -20,13 +20,13 @@
               "$type": "Document",
               "DocumentIndex": 0,
               "Title": "main.cpp",
-              "DocumentMoniker": "C:\\Users\\gamer\\Documents\\Programming\\ShowMySide\\main.cpp",
-              "RelativeDocumentMoniker": "main.cpp",
-              "ToolTip": "C:\\Users\\gamer\\Documents\\Programming\\ShowMySide\\main.cpp",
-              "RelativeToolTip": "main.cpp",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABUAAAABAAAAAAAAAA==",
+              "DocumentMoniker": "C:\\Users\\gamer\\Documents\\Programming\\ShowMySide\\Source\\main.cpp",
+              "RelativeDocumentMoniker": "Source\\main.cpp",
+              "ToolTip": "C:\\Users\\gamer\\Documents\\Programming\\ShowMySide\\Source\\main.cpp",
+              "RelativeToolTip": "Source\\main.cpp",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
-              "WhenOpened": "2025-02-01T00:50:32.385Z",
+              "WhenOpened": "2025-02-01T15:05:52.438Z",
               "EditorCaption": ""
             }
           ]

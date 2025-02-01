@@ -2,7 +2,7 @@
 #include "PlayerInfo.h"
 #include "Messagebox.h"
 #include "ImagePool.h"
-#include "Pugixml/pugixml.hpp"
+#include "pugixml.hpp"
 
 #include "FL/Fl_Box.H"
 #include "FL/Fl_PNG_Image.H"

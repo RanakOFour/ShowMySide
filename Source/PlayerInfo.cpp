@@ -1,6 +1,6 @@
 #include "PlayerInfo.h"
 #include "ImagePool.h"
-#include "Pugixml/pugixml.hpp"
+#include "pugixml.hpp"
 
 #include <sstream>
 

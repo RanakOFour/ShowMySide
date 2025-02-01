@@ -1,6 +1,6 @@
 #include "ServerSocket.h"
 #include "ClientSocket.h"
-#include "pugixml/pugixml.hpp"
+#include "pugixml.hpp"
 
 
 #include <ws2tcpip.h>

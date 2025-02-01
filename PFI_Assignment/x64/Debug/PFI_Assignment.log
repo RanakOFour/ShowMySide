@@ -1,33 +1,22 @@
-﻿  Chatbox.cpp
-  Client.cpp
+﻿  Client.cpp
   ClientPlayer.cpp
   ClientSocket.cpp
-C:\Users\gamer\Documents\Programming\ShowMySide\ClientSocket.cpp(82,74): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
-  Blowfish.cpp
-C:\Users\gamer\Documents\Programming\ShowMySide\Blowfish.cpp(109,21): warning C4244: '=': conversion from 'int64_t' to 'int32_t', possible loss of data
-C:\Users\gamer\Documents\Programming\ShowMySide\Blowfish.cpp(112,20): warning C4244: '=': conversion from 'int64_t' to 'int32_t', possible loss of data
-C:\Users\gamer\Documents\Programming\ShowMySide\Blowfish.cpp(132,23): warning C4244: 'argument': conversion from 'int64_t' to 'int32_t', possible loss of data
-C:\Users\gamer\Documents\Programming\ShowMySide\Blowfish.cpp(176,23): warning C4244: 'argument': conversion from 'int64_t' to 'int32_t', possible loss of data
-  FileTextDisplay.cpp
-  ServerRecords.cpp
-C:\Users\gamer\Documents\Programming\ShowMySide\ServerRecords.cpp(48,27): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
-  ImagePool.cpp
+C:\Users\gamer\Documents\Programming\ShowMySide\Source\ClientSocket.cpp(82,74): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
   Lobby.cpp
-  MainWindow.cpp
   main.cpp
-  Server.cpp
-  Messagebox.cpp
-  Player.cpp
-C:\Users\gamer\Documents\Programming\ShowMySide\Player.cpp(75,12): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
-C:\Users\gamer\Documents\Programming\ShowMySide\Player.cpp(76,12): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
-  PlayerInfo.cpp
-  pugixml.cpp
-  ServerSocket.cpp
-C:\Users\gamer\Documents\Programming\ShowMySide\ServerSocket.cpp(41,44): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
-C:\Users\gamer\Documents\Programming\ShowMySide\ServerSocket.cpp(65,11): warning C4244: 'initializing': conversion from 'SOCKET' to 'int', possible loss of data
+  MainWindow.cpp
   MenuWrapper.cpp
+  Player.cpp
+C:\Users\gamer\Documents\Programming\ShowMySide\Source\Player.cpp(75,12): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
+C:\Users\gamer\Documents\Programming\ShowMySide\Source\Player.cpp(76,12): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
+  PlayerInfo.cpp
+  Server.cpp
+  ServerRecords.cpp
+C:\Users\gamer\Documents\Programming\ShowMySide\Source\ServerRecords.cpp(48,27): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
+  ServerSocket.cpp
+C:\Users\gamer\Documents\Programming\ShowMySide\Source\ServerSocket.cpp(41,44): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\gamer\Documents\Programming\ShowMySide\Source\ServerSocket.cpp(65,11): warning C4244: 'initializing': conversion from 'SOCKET' to 'int', possible loss of data
   Timer.cpp
   Wsa.cpp
   Generating Code...
-LINK : warning LNK4098: defaultlib 'MSVCRT' conflicts with use of other libs; use /NODEFAULTLIB:library
   PFI_Assignment.vcxproj -> C:\Users\gamer\Documents\Programming\ShowMySide\x64\Debug\PFI_Assignment.exe

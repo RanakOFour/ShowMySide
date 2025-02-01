@@ -3,8 +3,40 @@
   "WorkspaceRootPath": "C:\\Users\\gamer\\Documents\\Programming\\ShowMySide\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{6297C23D-510A-42EF-8A62-D440708B4FFE}|PFI_Assignment.vcxproj|C:\\Users\\gamer\\Documents\\Programming\\ShowMySide\\main.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
-      "RelativeMoniker": "D:0:0:{6297C23D-510A-42EF-8A62-D440708B4FFE}|PFI_Assignment.vcxproj|solutionrelative:main.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+      "AbsoluteMoniker": "D:0:0:{6297C23D-510A-42EF-8A62-D440708B4FFE}|PFI_Assignment.vcxproj|C:\\Users\\gamer\\Documents\\Programming\\ShowMySide\\Source\\PlayerInfo.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{6297C23D-510A-42EF-8A62-D440708B4FFE}|PFI_Assignment.vcxproj|solutionrelative:Source\\PlayerInfo.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{6297C23D-510A-42EF-8A62-D440708B4FFE}|PFI_Assignment.vcxproj|C:\\Users\\gamer\\Documents\\Programming\\ShowMySide\\Source\\Player.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{6297C23D-510A-42EF-8A62-D440708B4FFE}|PFI_Assignment.vcxproj|solutionrelative:Source\\Player.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{6297C23D-510A-42EF-8A62-D440708B4FFE}|PFI_Assignment.vcxproj|C:\\Users\\gamer\\Documents\\Programming\\ShowMySide\\Headers\\ClientPlayer.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{6297C23D-510A-42EF-8A62-D440708B4FFE}|PFI_Assignment.vcxproj|solutionrelative:Headers\\ClientPlayer.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{6297C23D-510A-42EF-8A62-D440708B4FFE}|PFI_Assignment.vcxproj|C:\\Users\\gamer\\Documents\\Programming\\ShowMySide\\Headers\\Server.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{6297C23D-510A-42EF-8A62-D440708B4FFE}|PFI_Assignment.vcxproj|solutionrelative:Headers\\Server.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{6297C23D-510A-42EF-8A62-D440708B4FFE}|PFI_Assignment.vcxproj|C:\\Users\\gamer\\Documents\\Programming\\ShowMySide\\Headers\\ServerSocket.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{6297C23D-510A-42EF-8A62-D440708B4FFE}|PFI_Assignment.vcxproj|solutionrelative:Headers\\ServerSocket.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{6297C23D-510A-42EF-8A62-D440708B4FFE}|PFI_Assignment.vcxproj|C:\\Users\\gamer\\Documents\\Programming\\ShowMySide\\Headers\\ServerRecords.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{6297C23D-510A-42EF-8A62-D440708B4FFE}|PFI_Assignment.vcxproj|solutionrelative:Headers\\ServerRecords.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{6297C23D-510A-42EF-8A62-D440708B4FFE}|PFI_Assignment.vcxproj|C:\\Users\\gamer\\Documents\\Programming\\ShowMySide\\Headers\\PlayerInfo.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{6297C23D-510A-42EF-8A62-D440708B4FFE}|PFI_Assignment.vcxproj|solutionrelative:Headers\\PlayerInfo.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{6297C23D-510A-42EF-8A62-D440708B4FFE}|PFI_Assignment.vcxproj|C:\\Users\\gamer\\Documents\\Programming\\ShowMySide\\Source\\Blowfish.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{6297C23D-510A-42EF-8A62-D440708B4FFE}|PFI_Assignment.vcxproj|solutionrelative:Source\\Blowfish.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{6297C23D-510A-42EF-8A62-D440708B4FFE}|PFI_Assignment.vcxproj|C:\\Users\\gamer\\Documents\\Programming\\ShowMySide\\Source\\main.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{6297C23D-510A-42EF-8A62-D440708B4FFE}|PFI_Assignment.vcxproj|solutionrelative:Source\\main.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     }
   ],
   "DocumentGroupContainers": [
@@ -19,14 +51,118 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "main.cpp",
-              "DocumentMoniker": "C:\\Users\\gamer\\Documents\\Programming\\ShowMySide\\main.cpp",
-              "RelativeDocumentMoniker": "main.cpp",
-              "ToolTip": "C:\\Users\\gamer\\Documents\\Programming\\ShowMySide\\main.cpp",
-              "RelativeToolTip": "main.cpp",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Title": "PlayerInfo.cpp",
+              "DocumentMoniker": "C:\\Users\\gamer\\Documents\\Programming\\ShowMySide\\Source\\PlayerInfo.cpp",
+              "RelativeDocumentMoniker": "Source\\PlayerInfo.cpp",
+              "ToolTip": "C:\\Users\\gamer\\Documents\\Programming\\ShowMySide\\Source\\PlayerInfo.cpp",
+              "RelativeToolTip": "Source\\PlayerInfo.cpp",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAIAAAARAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
-              "WhenOpened": "2025-02-01T00:50:32.385Z",
+              "WhenOpened": "2025-02-01T15:13:03.884Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Player.cpp",
+              "DocumentMoniker": "C:\\Users\\gamer\\Documents\\Programming\\ShowMySide\\Source\\Player.cpp",
+              "RelativeDocumentMoniker": "Source\\Player.cpp",
+              "ToolTip": "C:\\Users\\gamer\\Documents\\Programming\\ShowMySide\\Source\\Player.cpp",
+              "RelativeToolTip": "Source\\Player.cpp",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAQAAAAKAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2025-02-01T15:12:55.936Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "Server.h",
+              "DocumentMoniker": "C:\\Users\\gamer\\Documents\\Programming\\ShowMySide\\Headers\\Server.h",
+              "RelativeDocumentMoniker": "Headers\\Server.h",
+              "ToolTip": "C:\\Users\\gamer\\Documents\\Programming\\ShowMySide\\Headers\\Server.h",
+              "RelativeToolTip": "Headers\\Server.h",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAMAAAAKAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
+              "WhenOpened": "2025-02-01T15:12:48.851Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "ClientPlayer.h",
+              "DocumentMoniker": "C:\\Users\\gamer\\Documents\\Programming\\ShowMySide\\Headers\\ClientPlayer.h",
+              "RelativeDocumentMoniker": "Headers\\ClientPlayer.h",
+              "ToolTip": "C:\\Users\\gamer\\Documents\\Programming\\ShowMySide\\Headers\\ClientPlayer.h",
+              "RelativeToolTip": "Headers\\ClientPlayer.h",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAEAAAAKAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
+              "WhenOpened": "2025-02-01T15:12:43.865Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "ServerRecords.h",
+              "DocumentMoniker": "C:\\Users\\gamer\\Documents\\Programming\\ShowMySide\\Headers\\ServerRecords.h",
+              "RelativeDocumentMoniker": "Headers\\ServerRecords.h",
+              "ToolTip": "C:\\Users\\gamer\\Documents\\Programming\\ShowMySide\\Headers\\ServerRecords.h",
+              "RelativeToolTip": "Headers\\ServerRecords.h",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAKAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
+              "WhenOpened": "2025-02-01T15:12:24.625Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "ServerSocket.h",
+              "DocumentMoniker": "C:\\Users\\gamer\\Documents\\Programming\\ShowMySide\\Headers\\ServerSocket.h",
+              "RelativeDocumentMoniker": "Headers\\ServerSocket.h",
+              "ToolTip": "C:\\Users\\gamer\\Documents\\Programming\\ShowMySide\\Headers\\ServerSocket.h",
+              "RelativeToolTip": "Headers\\ServerSocket.h",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
+              "WhenOpened": "2025-02-01T15:11:30.396Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "PlayerInfo.h",
+              "DocumentMoniker": "C:\\Users\\gamer\\Documents\\Programming\\ShowMySide\\Headers\\PlayerInfo.h",
+              "RelativeDocumentMoniker": "Headers\\PlayerInfo.h",
+              "ToolTip": "C:\\Users\\gamer\\Documents\\Programming\\ShowMySide\\Headers\\PlayerInfo.h",
+              "RelativeToolTip": "Headers\\PlayerInfo.h",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAEAAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
+              "WhenOpened": "2025-02-01T15:11:10.533Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "Blowfish.cpp",
+              "DocumentMoniker": "C:\\Users\\gamer\\Documents\\Programming\\ShowMySide\\Source\\Blowfish.cpp",
+              "RelativeDocumentMoniker": "Source\\Blowfish.cpp",
+              "ToolTip": "C:\\Users\\gamer\\Documents\\Programming\\ShowMySide\\Source\\Blowfish.cpp",
+              "RelativeToolTip": "Source\\Blowfish.cpp",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAEAAAAKAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2025-02-01T15:09:03.966Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "main.cpp",
+              "DocumentMoniker": "C:\\Users\\gamer\\Documents\\Programming\\ShowMySide\\Source\\main.cpp",
+              "RelativeDocumentMoniker": "Source\\main.cpp",
+              "ToolTip": "C:\\Users\\gamer\\Documents\\Programming\\ShowMySide\\Source\\main.cpp",
+              "RelativeToolTip": "Source\\main.cpp",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2025-02-01T15:05:52.438Z",
               "EditorCaption": ""
             }
           ]

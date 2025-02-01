@@ -111,7 +111,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>fltk\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>fltk\include;Headers\;Pugixml\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -156,48 +156,48 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Chatbox.cpp" />
-    <ClCompile Include="Client.cpp" />
-    <ClCompile Include="ClientPlayer.cpp" />
-    <ClCompile Include="ClientSocket.cpp" />
-    <ClCompile Include="Blowfish.cpp" />
-    <ClCompile Include="FileTextDisplay.cpp" />
-    <ClCompile Include="ServerRecords.cpp" />
-    <ClCompile Include="ImagePool.cpp" />
-    <ClCompile Include="Lobby.cpp" />
-    <ClCompile Include="MainWindow.cpp" />
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="Server.cpp" />
-    <ClCompile Include="Messagebox.cpp" />
-    <ClCompile Include="Player.cpp" />
-    <ClCompile Include="PlayerInfo.cpp" />
     <ClCompile Include="Pugixml\pugixml.cpp" />
-    <ClCompile Include="ServerSocket.cpp" />
-    <ClCompile Include="MenuWrapper.cpp" />
-    <ClCompile Include="Timer.cpp" />
-    <ClCompile Include="Wsa.cpp" />
+    <ClCompile Include="Source\Blowfish.cpp" />
+    <ClCompile Include="Source\ChatBox.cpp" />
+    <ClCompile Include="Source\Client.cpp" />
+    <ClCompile Include="Source\ClientPlayer.cpp" />
+    <ClCompile Include="Source\ClientSocket.cpp" />
+    <ClCompile Include="Source\FileTextDisplay.cpp" />
+    <ClCompile Include="Source\ImagePool.cpp" />
+    <ClCompile Include="Source\Lobby.cpp" />
+    <ClCompile Include="Source\main.cpp" />
+    <ClCompile Include="Source\MainWindow.cpp" />
+    <ClCompile Include="Source\MenuWrapper.cpp" />
+    <ClCompile Include="Source\Messagebox.cpp" />
+    <ClCompile Include="Source\Player.cpp" />
+    <ClCompile Include="Source\PlayerInfo.cpp" />
+    <ClCompile Include="Source\Server.cpp" />
+    <ClCompile Include="Source\ServerRecords.cpp" />
+    <ClCompile Include="Source\ServerSocket.cpp" />
+    <ClCompile Include="Source\Timer.cpp" />
+    <ClCompile Include="Source\Wsa.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Chatbox.h" />
-    <ClInclude Include="Client.h" />
-    <ClInclude Include="ClientPlayer.h" />
-    <ClInclude Include="ClientSocket.h" />
-    <ClInclude Include="Blowfish.h" />
-    <ClInclude Include="FileTextDisplay.h" />
-    <ClInclude Include="ServerRecords.h" />
-    <ClInclude Include="ImagePool.h" />
-    <ClInclude Include="Lobby.h" />
-    <ClInclude Include="MainWindow.h" />
-    <ClInclude Include="Server.h" />
-    <ClInclude Include="Messagebox.h" />
-    <ClInclude Include="Player.h" />
-    <ClInclude Include="PlayerInfo.h" />
+    <ClInclude Include="Headers\Blowfish.h" />
+    <ClInclude Include="Headers\ChatBox.h" />
+    <ClInclude Include="Headers\Client.h" />
+    <ClInclude Include="Headers\ClientPlayer.h" />
+    <ClInclude Include="Headers\ClientSocket.h" />
+    <ClInclude Include="Headers\FileTextDisplay.h" />
+    <ClInclude Include="Headers\ImagePool.h" />
+    <ClInclude Include="Headers\Lobby.h" />
+    <ClInclude Include="Headers\MainWindow.h" />
+    <ClInclude Include="Headers\MenuWrapper.h" />
+    <ClInclude Include="Headers\Messagebox.h" />
+    <ClInclude Include="Headers\Player.h" />
+    <ClInclude Include="Headers\PlayerInfo.h" />
+    <ClInclude Include="Headers\Server.h" />
+    <ClInclude Include="Headers\ServerRecords.h" />
+    <ClInclude Include="Headers\ServerSocket.h" />
+    <ClInclude Include="Headers\Timer.h" />
+    <ClInclude Include="Headers\Wsa.h" />
     <ClInclude Include="Pugixml\pugiconfig.hpp" />
     <ClInclude Include="Pugixml\pugixml.hpp" />
-    <ClInclude Include="ServerSocket.h" />
-    <ClInclude Include="MenuWrapper.h" />
-    <ClInclude Include="Timer.h" />
-    <ClInclude Include="Wsa.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

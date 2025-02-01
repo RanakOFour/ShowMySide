@@ -1,4 +1,4 @@
-#include "Pugixml/pugixml.hpp"
+#include "pugixml.hpp"
 
 #include <winsock2.h>
 #include <WS2tcpip.h>
