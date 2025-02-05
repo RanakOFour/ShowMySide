@@ -386,9 +386,9 @@ FodyWeavers.xsd
 !.vscode/extensions.json
 *.code-workspace
 
-.vs/*
-PFI_Assignment/*
-x64/*
+.vs/**
+PFI_Assignment/**
+x64/**
 
 # Local History for Visual Studio Code
 .history/
@@ -402,3 +402,43 @@ x64/*
 
 # JetBrains Rider
 *.sln.iml
+
+# Prerequisites
+*.d
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Fortran module files
+*.mod
+*.smod
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+
+.vs/**
+x64/**
+fltk/**
+PFI_Assignment/**
+PFI_Assignment.drawio
+.$PFI_Assignment.drawio.bkp
