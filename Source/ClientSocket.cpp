@@ -1,10 +1,22 @@
 #include "ClientSocket.h"
 #include "Blowfish.h"
 
-#include <ws2tcpip.h>
 #include <string>
 #include <memory>
 #include <stdexcept>
+
+#if _WIN32
+	#include <ws2tcpip.h>
+#else
+	#include <unistd.h>
+	#include <sys/types.h>
+	#include <sys/socket.h>
+	#include <sys/ioctl.h>
+	#include <netinet/in.h>
+	#include <netdb.h>
+	#define INVALID_SOCKET (~0)
+	#define SOCKET_ERROR (-1)
+#endif
 
 ClientSocket::ClientSocket() : 
 	m_socket(INVALID_SOCKET),
@@ -17,15 +29,20 @@ ClientSocket::~ClientSocket()
 {
 	if (m_socket != INVALID_SOCKET)
 	{
-		closesocket(m_socket);
+		#if _WIN32
+			closesocket(m_socket);
+		#else
+			close(m_socket);
+		#endif
 	}
 }
 
 bool ClientSocket::Connect(std::string& _serverName)
 {
 	addrinfo* result = nullptr,
-		* ptr = nullptr,
-		hints{ 0 };
+		    * ptr = nullptr,
+		      hints{ 0 };
+
 	hints.ai_family = AF_INET;
 	hints.ai_socktype = SOCK_STREAM;
 	hints.ai_protocol = 0;
@@ -35,38 +52,69 @@ bool ClientSocket::Connect(std::string& _serverName)
 	int addrResult = getaddrinfo(_serverName.c_str(), "8080", &hints, &result);
 	if (addrResult != 0) {
 		printf("getaddrinfo failed with error: %d\n", addrResult);
-		WSACleanup();
+
+		#if _WIN32
+			WSACleanup();
+		#endif
+
 		return false;
 	}
 
 	m_socket = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
 
 	if (m_socket == INVALID_SOCKET) {
-		printf("Error at socket(): %ld\n", WSAGetLastError());
+		#if _WIN32
+			printf("Error at socket(): %ld\n", WSAGetLastError());
+		#else
+			printf("Error at socket(): %ld\n");
+		#endif
+
 		freeaddrinfo(result);
-		WSACleanup();
+
+		#if _WIN32
+			WSACleanup();
+		#endif
+		
 		return false;
 	}
 
 	int iResult = connect(m_socket, result->ai_addr, (int)result->ai_addrlen);
 	if (iResult == SOCKET_ERROR) {
 		printf("Invalid iResult!\n");
-		closesocket(m_socket);
+		
+		#if _WIN32
+			closesocket(m_socket);
+		#else
+			close(m_socket);
+		#endif
+		
 		m_socket = INVALID_SOCKET;
 	}
 
 	u_long mode = 1;
-	if (ioctlsocket(m_socket, FIONBIO, &mode) == SOCKET_ERROR)
-	{
-		throw std::runtime_error("Failed to set non-blocking");
-	}
+
+	#if _WIN32
+		if (ioctlsocket(m_socket, FIONBIO, &mode) == SOCKET_ERROR)
+		{
+			throw std::runtime_error("Failed to set non-blocking");
+		}
+	#else
+		if (ioctl(m_socket, FIONBIO, &mode) == SOCKET_ERROR)
+		{
+			throw std::runtime_error("Failed to set non-blocking");
+		}
+	#endif
 
 	freeaddrinfo(result);
 
 	if (m_socket == INVALID_SOCKET)
 	{
 		printf("Unable to connect to server!\n");
-		WSACleanup();
+		
+		#if _WIN32
+			WSACleanup();
+		#endif
+
 		return false;
 	}
 
@@ -111,10 +159,13 @@ void ClientSocket::Receive(std::string& _message)
 		// It is a non-fatal error and just means that the non-blocking socket couldn't do it's thing
 		if (bytes == SOCKET_ERROR)
 		{
-			if (WSAGetLastError() != WSAEWOULDBLOCK)
-			{
-				throw std::runtime_error("Read failed");
-			}
+			#if _WIN32
+				if (WSAGetLastError() != WSAEWOULDBLOCK)
+				{
+					throw std::runtime_error("Read failed");
+				}
+			#endif
+
 			break;
 		}
 
@@ -140,7 +191,13 @@ void ClientSocket::Receive(std::string& _message)
 
 void ClientSocket::CloseConnection()
 {
-	int result = closesocket(m_socket);
+	int result = -40;
+	
+	#if _WIN32
+		result = closesocket(m_socket);
+	#else
+		result = close(m_socket);
+	#endif
 
 	if (result == 0)
 	{

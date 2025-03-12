@@ -1,10 +1,12 @@
 #include "Lobby.h"
 #include "Player.h"
 #include "PlayerInfo.h"
-#include "ChatBox.h"
+#include "Chatbox.h"
 #include "ImagePool.h"
 #include "ClientPlayer.h"
 #include "pugixml.hpp"
+
+#include "FL/Fl.H"
 
 #include <vector>
 #include <memory>

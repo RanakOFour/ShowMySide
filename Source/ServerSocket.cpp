@@ -2,8 +2,20 @@
 #include "ClientSocket.h"
 #include "pugixml.hpp"
 
+#if _WIN32
+	#include <ws2tcpip.h>
+#else
+	#include <unistd.h>
+	#include <sys/types.h>
+	#include <sys/socket.h>
+	#include <sys/ioctl.h>
+	#include <netinet/in.h>
+	#include <netdb.h>
+	#include <arpa/inet.h>
+	#define INVALID_SOCKET (~0)
+	#define SOCKET_ERROR (-1)
+#endif
 
-#include <ws2tcpip.h>
 #include <stdexcept>
 #include <sstream>
 #include <string>
@@ -52,10 +64,17 @@ ServerSocket::ServerSocket(int _port)
 
 	//Set non-blocking
 	u_long mode = 1;
-	if (ioctlsocket(m_socket, FIONBIO, &mode) == SOCKET_ERROR)
-	{
-		throw std::runtime_error("Failed to set non-blocking");
-	}
+	#if _WIN32
+		if (ioctlsocket(m_socket, FIONBIO, &mode) == SOCKET_ERROR)
+		{
+			throw std::runtime_error("Failed to set non-blocking");
+		}
+	#else
+		if (ioctl(m_socket, FIONBIO, &mode) == SOCKET_ERROR)
+		{
+			throw std::runtime_error("Failed to set non-blocking");
+		}
+	#endif
 
 	//printf("Successfully opened socket %d\n", (int)m_socket);
 
@@ -79,7 +98,11 @@ ServerSocket::ServerSocket(int _port)
 	//connect socket at loopback address
 	if (connect(sock, reinterpret_cast<sockaddr*>(&loopback), sizeof(loopback)) == -1)
 	{
-		::closesocket(sock);
+		#if _WIN32
+			::closesocket(sock);
+		#else
+			close(sock);
+		#endif
 		throw std::runtime_error("Could not connect\n");
 	}
 
@@ -87,12 +110,20 @@ ServerSocket::ServerSocket(int _port)
 	socklen_t addrlen = sizeof(loopback);
 	if (getsockname(sock, reinterpret_cast<sockaddr*>(&loopback), &addrlen) == -1)
 	{
-		::closesocket(sock);
+		#if _WIN32
+			::closesocket(sock);
+		#else
+			close(sock);
+		#endif
 		throw std::runtime_error("Could not getsockname\n");
 	}
 
 	// Socket is no longer needed
-	::closesocket(sock);
+	#if _WIN32
+		::closesocket(sock);
+	#else
+		close(sock);
+	#endif
 
 	// Get the ip address from loopback's socket information
 	char buffer[22];
@@ -108,7 +139,11 @@ ServerSocket::ServerSocket(int _port)
 
 ServerSocket::~ServerSocket()
 {
-	closesocket(m_socket);
+	#if _WIN32
+		closesocket(m_socket);
+	#else
+		close(m_socket);
+	#endif
 }
 
 std::shared_ptr<ClientSocket> ServerSocket::Accept()
@@ -116,10 +151,12 @@ std::shared_ptr<ClientSocket> ServerSocket::Accept()
 	SOCKET socket = ::accept(m_socket, NULL, NULL);
 	if (socket == INVALID_SOCKET)
 	{
-		if (WSAGetLastError() != WSAEWOULDBLOCK)
-		{
-			throw std::runtime_error("Failed to accept socket");
-		}
+		#if _WIN32
+			if (WSAGetLastError() != WSAEWOULDBLOCK)
+			{
+				throw std::runtime_error("Failed to accept socket");
+			}
+		#endif
 		return std::shared_ptr<ClientSocket>(); // Equivalent to NULL
 	}
 	std::shared_ptr<ClientSocket> rtn = std::make_shared<ClientSocket>();

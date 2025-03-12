@@ -4,6 +4,11 @@
 #include "ServerRecords.h"
 #include "pugixml.hpp"
 
+#if _WIN32
+#else
+	#include <unistd.h>
+#endif
+
 #include <iostream>
 #include <stdexcept>
 #include <thread>
@@ -84,7 +89,11 @@ void Server::MonitorNetwork()
 			}
 
 			// Prevents server from throttling
-			Sleep(20);
+			#if _WIN32
+				Sleep(20);
+			#else
+				sleep(20);
+			#endif
 
 			//Echo events out to the clients
 			m_socket.Send(eventsFromClient);

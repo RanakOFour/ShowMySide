@@ -1,7 +1,13 @@
 #include "pugixml.hpp"
 
-#include <winsock2.h>
-#include <WS2tcpip.h>
+#if _WIN32
+	#include <winsock2.h>
+	#include <WS2tcpip.h>
+#else
+	#include <sys/socket.h>
+	#define SOCKET int
+#endif
+
 #include <memory>
 #include <vector>
 #include <string>

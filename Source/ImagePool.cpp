@@ -1,6 +1,7 @@
 #include "ImagePool.h"
 #include "FL/Fl_PNG_Image.H"
 #include <memory>
+#include <cstdio>
 
 
 // Weird singletony thing, the compiler doesn't like it being a smart pointer
