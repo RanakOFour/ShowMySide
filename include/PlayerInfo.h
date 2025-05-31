@@ -1,7 +1,7 @@
 #include "ImagePool.h"
 #include "pugixml.hpp"
 
-#include "FL/Fl_PNG_Image.H"
+#include <FL/Fl_PNG_Image.H>
 
 #include <string>
 

@@ -1,7 +1,7 @@
 #include "FileTextDisplay.h"
 
-#include "FL/Fl_Text_Display.H"
-#include "FL/Fl_Text_Buffer.H"
+#include <FL/Fl_Text_Display.H>
+#include <FL/Fl_Text_Buffer.H>
 
 #include <string>
 #include <fstream>

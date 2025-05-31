@@ -3,7 +3,7 @@
 #include "ClientPlayer.h"
 #include "pugixml.hpp"
 
-#include "FL/Fl_Double_Window.H"
+#include <FL/Fl_Double_Window.H>
 
 #include <string>
 #include <vector>

@@ -4,10 +4,10 @@
 #include "ImagePool.h"
 #include "pugixml.hpp"
 
-#include "FL/Fl_Box.H"
-#include "FL/Fl_PNG_Image.H"
-#include "FL/Fl_Group.H"
-#include "FL/Fl_Box.H"
+#include <FL/Fl_Box.H>
+#include <FL/Fl_PNG_Image.H>
+#include <FL/Fl_Group.H>
+#include <FL/Fl_Box.H>
 
 #include <string>
 

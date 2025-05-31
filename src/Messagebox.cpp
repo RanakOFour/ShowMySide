@@ -2,9 +2,9 @@
 #include "Timer.h"
 #include "ImagePool.h"
 
-#include "FL/Fl_Window.H"
-#include "FL/Fl_Box.H"
-#include "FL/Fl_Multiline_Output.H"
+#include <FL/Fl_Window.H>
+#include <FL/Fl_Box.H>
+#include <FL/Fl_Multiline_Output.H>
 
 
 Messagebox::Messagebox(int _playerX, int _playerY) :

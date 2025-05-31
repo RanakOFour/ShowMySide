@@ -1,8 +1,8 @@
 #include "PlayerInfo.h"
 #include "Messagebox.h"
 
-#include "FL/Fl_Group.H"
-#include "FL/Fl_Box.H"
+#include <FL/Fl_Group.H>
+#include <FL/Fl_Box.H>
 
 #include <string>
 #include <memory>

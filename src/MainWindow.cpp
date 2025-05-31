@@ -6,11 +6,11 @@
 #include "MenuWrapper.h"
 #include "FileTextDisplay.h"
 
-#include "FL/Fl_Box.H"
+#include <FL/Fl_Box.H>
 #include <FL/Fl_Input.H>
 #include <FL/Fl_Output.H>
 #include <FL/Fl_Button.H>
-#include "FL/Fl_Text_Display.H"
+#include <FL/Fl_Text_Display.H>
 
 #include <string>
 #include <thread>

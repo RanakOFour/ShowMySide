@@ -1,6 +1,6 @@
 #include "MenuWrapper.h"
 #include "MainWindow.h"
-#include "FL/Fl_Flex.H"
+#include <FL/Fl_Flex.H>
 
 MenuWrapper::MenuWrapper(MainWindow* _mw) :
 	Fl_Flex(0, 0, _mw->w(), 30, ""),

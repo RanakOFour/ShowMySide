@@ -6,8 +6,7 @@
 #include "ClientPlayer.h"
 #include "pugixml.hpp"
 
-#include "FL/Fl.H"
-
+#include <FL/Fl.H>
 #include <vector>
 #include <memory>
 
@@ -28,7 +27,8 @@ Lobby::Lobby() :
 
 	callback(CloseWindow, this);
 
-	end();
+	printf("Lobby created\n");
+	show();
 }
 
 Lobby::~Lobby()

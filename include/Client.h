@@ -2,8 +2,8 @@
 #include "Lobby.h"
 #include "pugixml.hpp"
 
-#include "FL/Fl_Text_Buffer.H"
-#include "FL/Fl_Text_Display.H"
+#include <FL/Fl_Text_Buffer.H>
+#include <FL/Fl_Text_Display.H>
 
 #include <string>
 #include <memory>
