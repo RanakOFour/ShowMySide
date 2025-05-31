@@ -9,8 +9,9 @@ add_executable(ShowMySide main.cpp)
 
 add_subdirectory(src)
 add_subdirectory(Pugixml)
+add_subdirectory(submodules/fltk)
 
 target_include_directories(ShowMySide PRIVATE include)
 target_link_directories(ShowMySide PRIVATE lib)
 
-target_link_libraries(ShowMySide PRIVATE fltk fltk_forms png fltk_images fltk_gl)
+target_link_libraries(ShowMySide PRIVATE fltk fltk_forms fltk_images fltk_gl)
