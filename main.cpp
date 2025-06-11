@@ -1,6 +1,6 @@
 #include "Wsa.h"
-#include "MainWindow.h"
-#include "ImagePool.h"
+#include "GUI/MainWindow.h"
+#include "GUI/ImagePool.h"
 #include "Blowfish.h"
 #include "FL/Fl.H"
 
