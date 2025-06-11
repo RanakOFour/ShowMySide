@@ -2,6 +2,7 @@
 #include "MainWindow.h"
 #include "ImagePool.h"
 #include "Blowfish.h"
+#include "FL/Fl.H"
 
 #include <string>
 

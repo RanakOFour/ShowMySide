@@ -1,6 +1,8 @@
 #include "Timer.h"
 #include "Messagebox.h"
 
+#include "FL/Fl.H"
+
 #include <memory>
 
 Timer::Timer()

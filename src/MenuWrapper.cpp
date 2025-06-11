@@ -1,9 +1,9 @@
 #include "MenuWrapper.h"
 #include "MainWindow.h"
-#include "FL/Fl_Flex.H"
+#include "FL/Fl_Group.H"
 
 MenuWrapper::MenuWrapper(MainWindow* _mw) :
-	Fl_Flex(0, 0, _mw->w(), 30, ""),
+	Fl_Group(0, 0, _mw->w(), 30, ""),
 	m_menuBar(0, 0, w(), 30, "")
 {
 	m_menuBar.add("&Start/&Join Server", 0, MainWindow::OnClientStart, _mw);
@@ -14,8 +14,6 @@ MenuWrapper::MenuWrapper(MainWindow* _mw) :
 	m_menuBar.add("&About", 0, MainWindow::ShowAbout, _mw);
 
 	m_menuBar.show();
-
-	fixed(m_menuBar, 30);
 	end();
 }
 
