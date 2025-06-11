@@ -1,4 +1,4 @@
-#include "ImagePool.h"
+#include "GUI/ImagePool.h"
 #include "FL/Fl_PNG_Image.H"
 #include <memory>
 #include <cstdio>

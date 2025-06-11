@@ -1,11 +1,12 @@
-#include "MainWindow.h"
+#include "GUI/MainWindow.h"
 #include "Timer.h"
-#include "Server.h"
-#include "Client.h"
-#include "ImagePool.h"
-#include "MenuWrapper.h"
-#include "FileTextDisplay.h"
+#include "Network/Server.h"
+#include "Network/Client.h"
+#include "GUI/ImagePool.h"
+#include "GUI/MenuWrapper.h"
+#include "GUI/FileTextDisplay.h"
 
+#include <FL/Fl.H>
 #include "FL/Fl_Box.H"
 #include <FL/Fl_Input.H>
 #include <FL/Fl_Output.H>
@@ -159,7 +160,7 @@ void MainWindow::OnServerStart(Fl_Widget* _widget, void* _userData)
 	MainWindow* mw = (MainWindow*)_userData;
 	//Start a new Server and connect client to it
 	
-							 //port, timer duration
+							 //port
 	mw->m_Server = std::make_unique<Server>(8080);
 
 	mw->m_Client = std::make_unique<Client>();
@@ -197,13 +198,11 @@ void MainWindow::OnExit(Fl_Widget* _widget, void* _userData)
 	{
 		mw->m_lobbyEventLogDisplay.buffer(NULL);
 		mw->m_Client->Close();
-		mw->m_Client.reset();
 	}
 
 	if (mw->m_Server)
 	{
 		mw->m_Server->CloseServer();
-		mw->m_Server.reset();
 	}
 }
 

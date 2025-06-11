@@ -1,6 +1,6 @@
-#include "Messagebox.h"
+#include "GUI/Messagebox.h"
 #include "Timer.h"
-#include "ImagePool.h"
+#include "GUI/ImagePool.h"
 
 #include "FL/Fl_Window.H"
 #include "FL/Fl_Box.H"

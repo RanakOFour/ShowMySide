@@ -1,5 +1,5 @@
-#include "PlayerInfo.h"
-#include "ImagePool.h"
+#include "Network/PlayerInfo.h"
+#include "GUI/ImagePool.h"
 #include "pugixml.hpp"
 
 #include <sstream>

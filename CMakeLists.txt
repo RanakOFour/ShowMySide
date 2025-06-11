@@ -15,4 +15,4 @@ add_subdirectory(Pugixml)
 target_include_directories(ShowMySide PRIVATE include)
 target_link_directories(ShowMySide PRIVATE lib)
 
-target_link_libraries(ShowMySide PRIVATE fltk fltk_forms fltk_images fltk_gl)
+target_link_libraries(ShowMySide PRIVATE fltk fltk_images fltk_gl)

@@ -1,7 +1,7 @@
-#include "Server.h"
+#include "Network/Server.h"
 #include "Timer.h"
-#include "ServerSocket.h"
-#include "ServerRecords.h"
+#include "Network/ServerSocket.h"
+#include "Network/ServerRecords.h"
 #include "pugixml.hpp"
 
 #if _WIN32
@@ -30,18 +30,39 @@ Server::~Server()
 
 }
 
+/* msleep(): Sleep for the requested number of milliseconds. Godspeed, random stackoverflow person */
+int msleep(long msec)
+{
+    struct timespec ts;
+    int res;
+
+    if (msec < 0)
+    {
+        errno = EINVAL;
+        return -1;
+    }
+
+    ts.tv_sec = msec / 1000;
+    ts.tv_nsec = (msec % 1000) * 1000000;
+
+    do 
+	{
+        res = nanosleep(&ts, &ts);
+    } while (res && errno == EINTR);
+
+    return res;
+}
+
 void Server::MonitorNetwork()
 {
 	while (!m_serverClosed)
 	{
-		//Stops server from throttling and sending responses too quickly
-
 		//Get repackaged xml message from serversocket
 		pugi::xml_document eventsFromClient = m_socket.Update();
 
 		if (eventsFromClient.child("Events").first_child() != NULL)
 		{
-			//printf("Server messages recieved\n");
+			printf("Server messages recieved\n");
 
 			//Cycle through events and apply changes based on event type
 			for (pugi::xml_node currentEvent = eventsFromClient.child("Events").first_child(); currentEvent; currentEvent = currentEvent.next_sibling())
@@ -92,7 +113,7 @@ void Server::MonitorNetwork()
 			#if _WIN32
 				Sleep(20);
 			#else
-				sleep(20);
+				msleep(20);
 			#endif
 
 			//Echo events out to the clients

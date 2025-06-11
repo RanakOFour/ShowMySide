@@ -1,5 +1,5 @@
-#include "ServerSocket.h"
-#include "ClientSocket.h"
+#include "Network/ServerSocket.h"
+#include "Network/ClientSocket.h"
 #include "pugixml.hpp"
 
 #if _WIN32
@@ -239,7 +239,6 @@ void ServerSocket::Send(pugi::xml_document& _xmlToSend)
 
 void ServerSocket::SendTo(int _index, std::string _xmlToSend)
 {
-	
 	m_clients.at(_index)->Send(_xmlToSend);
 }
 

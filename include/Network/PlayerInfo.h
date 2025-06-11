@@ -1,4 +1,4 @@
-#include "ImagePool.h"
+#include "GUI/ImagePool.h"
 #include "pugixml.hpp"
 
 #include "FL/Fl_PNG_Image.H"

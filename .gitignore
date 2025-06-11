@@ -3,8 +3,11 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/main/VisualStudio.gitignore
 
-build/**
-submodules/**
+.vs/**
+.$ShowMySide.drawio.bkp
+.vscode/**
+[Ss]ubmodules/**
+
 # User-specific files
 *.rsuser
 *.suo
@@ -19,6 +22,7 @@ submodules/**
 mono_crash.*
 
 # Build results
+[Bb]uild/
 [Dd]ebug/
 [Dd]ebugPublic/
 [Rr]elease/
@@ -437,12 +441,3 @@ x64/**
 *.exe
 *.out
 *.app
-
-.vs/**
-x64/**
-fltk/**
-PFI_Assignment/**
-PFI_Assignment.drawio
-.$PFI_Assignment.drawio.bkp
-.vscode/**
-build/**

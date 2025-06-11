@@ -1,7 +1,7 @@
-#include "Client.h"
-#include "ClientSocket.h"
-#include "Lobby.h"
-#include "Player.h"
+#include "Network/Client.h"
+#include "Network/ClientSocket.h"
+#include "Network/Lobby.h"
+#include "Network/Player.h"
 #include "pugixml.hpp"
 
 #include "FL/Fl_Text_Buffer.H"

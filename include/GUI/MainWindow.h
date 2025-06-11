@@ -1,5 +1,5 @@
-#include "FileTextDisplay.h"
-#include "MenuWrapper.h"
+#include "GUI/FileTextDisplay.h"
+#include "GUI/MenuWrapper.h"
 #include "Timer.h"
 
 #include "FL/Fl_Double_Window.H"

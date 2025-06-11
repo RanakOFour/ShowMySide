@@ -1,4 +1,4 @@
-#include "FileTextDisplay.h"
+#include "GUI/FileTextDisplay.h"
 
 #include "FL/Fl_Text_Display.H"
 #include "FL/Fl_Text_Buffer.H"

@@ -1,9 +1,9 @@
-#include "Lobby.h"
-#include "Player.h"
-#include "PlayerInfo.h"
-#include "Chatbox.h"
-#include "ImagePool.h"
-#include "ClientPlayer.h"
+#include "Network/Lobby.h"
+#include "Network/Player.h"
+#include "Network/PlayerInfo.h"
+#include "GUI/Chatbox.h"
+#include "GUI/ImagePool.h"
+#include "Network/ClientPlayer.h"
 #include "pugixml.hpp"
 
 #include "FL/Fl.H"
@@ -29,6 +29,7 @@ Lobby::Lobby() :
 	callback(CloseWindow, this);
 
 	end();
+	show();
 }
 
 Lobby::~Lobby()

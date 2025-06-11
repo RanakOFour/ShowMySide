@@ -1,6 +1,6 @@
 #include "Timer.h"
-#include "Chatbox.h"
-#include "ClientPlayer.h"
+#include "GUI/Chatbox.h"
+#include "Network/ClientPlayer.h"
 #include "pugixml.hpp"
 
 #include "FL/Fl_Double_Window.H"

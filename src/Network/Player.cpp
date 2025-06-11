@@ -1,7 +1,7 @@
-#include "Player.h"
-#include "PlayerInfo.h"
-#include "Messagebox.h"
-#include "ImagePool.h"
+#include "Network/Player.h"
+#include "Network/PlayerInfo.h"
+#include "GUI/Messagebox.h"
+#include "GUI/ImagePool.h"
 #include "pugixml.hpp"
 
 #include "FL/Fl_Box.H"

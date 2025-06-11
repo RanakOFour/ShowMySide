@@ -1,6 +1,6 @@
-#include "ClientPlayer.h"
-#include "Player.h"
-#include "PlayerInfo.h"
+#include "Network/ClientPlayer.h"
+#include "Network/Player.h"
+#include "Network/PlayerInfo.h"
 #include "pugixml.hpp"
 
 #include <memory>

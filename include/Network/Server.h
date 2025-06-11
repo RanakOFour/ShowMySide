@@ -1,6 +1,6 @@
 #include "Timer.h"
-#include "ServerSocket.h"
-#include "ServerRecords.h"
+#include "Network/ServerSocket.h"
+#include "Network/ServerRecords.h"
 #include "pugixml.hpp"
 
 #include <string>

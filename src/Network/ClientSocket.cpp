@@ -1,4 +1,4 @@
-#include "ClientSocket.h"
+#include "Network/ClientSocket.h"
 #include "Blowfish.h"
 
 #include <string>

@@ -1,5 +1,5 @@
-#include "PlayerInfo.h"
-#include "Messagebox.h"
+#include "Network/PlayerInfo.h"
+#include "GUI/Messagebox.h"
 
 #include "FL/Fl_Group.H"
 #include "FL/Fl_Box.H"

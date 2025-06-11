@@ -1,5 +1,5 @@
-#include "ServerRecords.h"
-#include "PlayerInfo.h"
+#include "Network/ServerRecords.h"
+#include "Network/PlayerInfo.h"
 
 #include <vector>
 #include <sstream>

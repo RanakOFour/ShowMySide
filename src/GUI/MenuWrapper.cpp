@@ -1,5 +1,5 @@
-#include "MenuWrapper.h"
-#include "MainWindow.h"
+#include "GUI/MenuWrapper.h"
+#include "GUI/MainWindow.h"
 #include "FL/Fl_Group.H"
 
 MenuWrapper::MenuWrapper(MainWindow* _mw) :
