@@ -166,7 +166,6 @@ bool Client::Connect(std::string& _ipToConnect)
 		//Request xml info then apply
 		//printf("Connected successfully!\n");
 
-
 		pugi::xml_document newPlayerEvent;
 		newPlayerEvent.append_child("Events");
 		newPlayerEvent.first_child().append_child("Event").append_attribute("type").set_value("new_plr");
@@ -174,13 +173,13 @@ bool Client::Connect(std::string& _ipToConnect)
 		std::stringstream ss;
 		newPlayerEvent.save(ss);
 		std::string messageString = ss.str();
-		//printf("Request to Send:\n%s", messageString.c_str());
+		printf("Request to Send:\n%s", messageString.c_str());
 
 		m_socket->Send(messageString);
 		return true;
 	}
 
-	//printf("Failed to connect to %s\n", _ipToConnect.c_str());
+	printf("Failed to connect to %s\n", _ipToConnect.c_str());
 	return false;
 }
 
@@ -206,9 +205,12 @@ void Client::Close()
 	{
 		m_socket->CloseConnection();
 	}
+
+	printf("Connection closed\n");
 }
 
 bool Client::Closed()
 {
 	return m_lobby.Closed();
+	printf("Lobby closed\n");
 }

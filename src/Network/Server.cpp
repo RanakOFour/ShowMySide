@@ -23,6 +23,7 @@ Server::Server(int _port) :
 	// Also using fltk timeout gets messed up when you have too many timers aparrently
 	// Also it needs to be a pointer so that it can be instantiated here, after the server and lobby have been instantiated
 	m_networkingThread = std::thread(&Server::MonitorNetwork, this);
+	m_networkingThread.detach();
 }
 
 Server::~Server()

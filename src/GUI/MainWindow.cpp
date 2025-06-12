@@ -163,8 +163,9 @@ void MainWindow::OnServerStart(Fl_Widget* _widget, void* _userData)
 							 //port
 	mw->m_Server = std::make_unique<Server>(8080);
 
-	mw->m_Client = std::make_unique<Client>();
 
+	mw->m_Client = std::make_unique<Client>();
+	
 	std::string ip = mw->m_Server->GetIPAddress();
 	mw->m_Client->Connect(ip);
 	mw->m_Client->SetLogDisplay(&(mw->m_lobbyEventLogDisplay));
