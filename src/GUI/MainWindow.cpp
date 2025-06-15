@@ -163,7 +163,6 @@ void MainWindow::OnServerStart(Fl_Widget* _widget, void* _userData)
 							 //port
 	mw->m_Server = std::make_unique<Server>(8080);
 
-
 	mw->m_Client = std::make_unique<Client>();
 	
 	std::string ip = mw->m_Server->GetIPAddress();
@@ -182,10 +181,16 @@ void MainWindow::OnJoinServer(Fl_Widget* _widget, void* _userData)
 
 	printf("IP: %s\n", ip.c_str());
 
+	mw->m_Client = std::make_unique<Client>();
+
 	if (mw->m_Client->Connect(ip))
 	{
 		mw->m_Client->SetLogDisplay(&(mw->m_lobbyEventLogDisplay));
 		mw->ChangeLayout(LayoutType::IN_GAME);
+	}
+	else
+	{
+		mw->m_Client.reset();
 	}
 }
 

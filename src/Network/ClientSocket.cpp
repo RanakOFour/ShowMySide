@@ -8,12 +8,13 @@
 #if _WIN32
 	#include <ws2tcpip.h>
 #else
-	#include <unistd.h>
-	#include <sys/types.h>
+	#include <unistd.h> 
+	#include <arpa/inet.h>
 	#include <sys/socket.h>
 	#include <sys/ioctl.h>
 	#include <netinet/in.h>
 	#include <netdb.h>
+	#include <fcntl.h>
 	#define INVALID_SOCKET (~0)
 	#define SOCKET_ERROR (-1)
 #endif
@@ -48,7 +49,6 @@ bool ClientSocket::Connect(std::string& _serverName)
 	hints.ai_protocol = 0;
 	hints.ai_flags = AI_PASSIVE;
 
-	//We are SO BACK!!!
 	int addrResult = getaddrinfo(_serverName.c_str(), "8080", &hints, &result);
 	if (addrResult != 0) {
 		printf("getaddrinfo failed with error: %d\n", addrResult);
@@ -60,36 +60,25 @@ bool ClientSocket::Connect(std::string& _serverName)
 		return false;
 	}
 
-	m_socket = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
+	for(addrinfo* p = result; p != NULL; p = p->ai_next)
+	{
+        m_socket = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
+		if(m_socket == INVALID_SOCKET)
+		{
+			//throw std::runtime_error("Could not connect socket");
+			continue;
+		}
 
-	if (m_socket == INVALID_SOCKET) {
-		#if _WIN32
-			printf("Error at socket(): %ld\n", WSAGetLastError());
-		#else
-			printf("Error at socket(): %ld\n");
-		#endif
+		int connectRes = connect(m_socket, p->ai_addr, p->ai_addrlen);
+        if (connectRes < 0)
+		{
+            printf("client: connect");
+            close(m_socket);
+            continue;
+        }
 
-		freeaddrinfo(result);
-
-		#if _WIN32
-			WSACleanup();
-		#endif
-		
-		return false;
-	}
-
-	int iResult = connect(m_socket, result->ai_addr, (int)result->ai_addrlen);
-	if (iResult == SOCKET_ERROR) {
-		printf("Invalid iResult!\n");
-		
-		#if _WIN32
-			closesocket(m_socket);
-		#else
-			close(m_socket);
-		#endif
-		
-		m_socket = INVALID_SOCKET;
-	}
+        break;
+    }
 
 	u_long mode = 1;
 
@@ -99,10 +88,10 @@ bool ClientSocket::Connect(std::string& _serverName)
 			throw std::runtime_error("Failed to set non-blocking");
 		}
 	#else
-		if (ioctl(m_socket, FIONBIO, &mode) == SOCKET_ERROR)
-		{
-			throw std::runtime_error("Failed to set non-blocking");
-		}
+		if(fcntl(m_socket, F_SETFL, O_NONBLOCK) < 0)
+    	{
+        	throw std::runtime_error("Failed to set non-blocking\n");
+    	}
 	#endif
 
 	freeaddrinfo(result);
@@ -121,16 +110,66 @@ bool ClientSocket::Connect(std::string& _serverName)
 	return true;
 }
 
+// bool ClientSocket::Connect(std::string& _serverName)
+// {
+// 	m_socket = socket(AF_INET, SOCK_STREAM, 0);
+
+//     if (m_socket < 0)
+//     {
+//         printf("Socket creation error \n");
+//         return false;
+//     }
+
+// 	sockaddr_in l_serv_addr;
+//     l_serv_addr.sin_family = AF_INET;
+//     l_serv_addr.sin_port = htons(8080);
+
+//     // Convert IPv4 and IPv6 addresses from text to binary
+//     if (inet_pton(AF_INET, _serverName.c_str(), &l_serv_addr.sin_addr) <= 0) 
+//     {
+//         printf("Invalid address/ Address not supported \n");
+//         return false;
+//     }
+
+// 	// Set non-blocking
+// 	#if _WIN32
+// 		if (ioctlsocket(m_socket, FIONBIO, &mode) == SOCKET_ERROR)
+//  		{
+//  			throw std::runtime_error("Failed to set non-blocking");
+// 			return false;
+//  		}
+// 	#else
+//     	if(fcntl(m_socket, F_SETFL, O_NONBLOCK) < 0)
+//     	{
+//         	throw std::runtime_error("Failed to set non-blocking\n");
+//         	return false;
+//     	}
+// 	#endif
+
+//     // Connect to server
+//     if (connect(m_socket, (struct sockaddr *)&l_serv_addr, sizeof(l_serv_addr)) < 0) {
+//         // Non-blocking connect will return immediately
+//         // Check errno to distinguish between connection in progress and connection failed
+//         if (errno != EINPROGRESS) 
+// 		{
+//             perror("connection failed");
+//             return false;
+//         }
+//     }
+
+// 	return true;
+// }
+
 void ClientSocket::Send(std::string& _message)
 {
 	std::vector<char> encryptedXML;
 	Blowfish::Encrypt(_message, encryptedXML);
 	std::string messageToSend = std::string(encryptedXML.begin(), encryptedXML.end());
 
-	int bytes = ::send(m_socket, messageToSend.c_str(), messageToSend.length(), 0);
+	int bytes = send(m_socket, messageToSend.c_str(), messageToSend.length(), 0);
 	if (bytes <= 0)
 	{
-		throw std::runtime_error("Failed to send data");
+		throw std::runtime_error("Failed to send data!\n");
 	}
 	else
 	{
@@ -157,7 +196,7 @@ void ClientSocket::Receive(std::string& _message)
 
 		//Leave the loop when bytes returns WSAEWOULDBLOCK
 		// It is a non-fatal error and just means that the non-blocking socket couldn't do it's thing
-		if (bytes == SOCKET_ERROR)
+		if (bytes == SOCKET_ERROR || bytes < 0)
 		{
 			#if _WIN32
 				if (WSAGetLastError() != WSAEWOULDBLOCK)
@@ -174,6 +213,7 @@ void ClientSocket::Receive(std::string& _message)
 
 		totalBytes += bytes;
 
+		printf("Current bytes: %d", totalBytes);
 	} while (currentTextPull != "");
 
 	if (receivedText == "")

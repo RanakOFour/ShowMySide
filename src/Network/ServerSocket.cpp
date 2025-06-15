@@ -12,6 +12,7 @@
 	#include <netinet/in.h>
 	#include <netdb.h>
 	#include <arpa/inet.h>
+	#include <fcntl.h>
 	#define INVALID_SOCKET (~0)
 	#define SOCKET_ERROR (-1)
 #endif
@@ -22,11 +23,10 @@
 #include <memory>
 #include <vector>
 
-ServerSocket::ServerSocket(int _port)
-	: m_socket(INVALID_SOCKET),
+ServerSocket::ServerSocket(int _port) :
+	m_socket(INVALID_SOCKET),
 	m_clients()
 {
-	//Pre stuff
 	addrinfo hints = { 0 };
 	hints.ai_family = AF_INET;
 	hints.ai_socktype = SOCK_STREAM;
@@ -40,101 +40,70 @@ ServerSocket::ServerSocket(int _port)
 		throw std::runtime_error("Failed to resolve server address or port");
 	}
 
-	//Create socket with address info
-	m_socket = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
-
-	if (m_socket == INVALID_SOCKET)
+	for(addrinfo* p = result; p != NULL; p = p->ai_next)
 	{
-		freeaddrinfo(result);
-		throw std::runtime_error("Failed to create socket");
-	}
-
-	//Bind address to socket (give socket an ip address for others to connect to)
-	if (bind(m_socket, result->ai_addr, result->ai_addrlen) == SOCKET_ERROR)
-	{
-		freeaddrinfo(result);
-		throw std::runtime_error("Failed to bind socket");
-	}
-
-	//Open the socket so that it will listen to incoming signals
-	if (listen(m_socket, SOMAXCONN) == SOCKET_ERROR)
-	{
-		throw std::runtime_error("Failed to listen on socket");
-	}
-
-	//Set non-blocking
-	u_long mode = 1;
-	#if _WIN32
-		if (ioctlsocket(m_socket, FIONBIO, &mode) == SOCKET_ERROR)
+		m_socket = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
+		if(m_socket == INVALID_SOCKET)
 		{
-			throw std::runtime_error("Failed to set non-blocking");
+			//throw std::runtime_error("Could not connect socket");
+			continue;
 		}
-	#else
-		if (ioctl(m_socket, FIONBIO, &mode) == SOCKET_ERROR)
-		{
-			throw std::runtime_error("Failed to set non-blocking");
-		}
-	#endif
 
-	//printf("Successfully opened socket %d\n", (int)m_socket);
+		//Bind address to socket (give socket an ip address for others to connect to)
+		if (bind(m_socket, result->ai_addr, result->ai_addrlen) == SOCKET_ERROR)
+		{
+			#if _WIN32
+				closesocket(m_socket);
+			#else
+				close(m_socket);
+			#endif
+
+			continue;
+			//throw std::runtime_error("Failed to bind socket");
+		}
+
+		//Set non-blocking
+		u_long mode = 1;
+		int nonBlockCheck;
+		#if _WIN32
+			nonBlockCheck = ioctlsocket(m_socket, FIONBIO, &mode);
+			if (nonBlockCheck == SOCKET_ERROR)
+			{
+				printf("Failed to set non-blocking: %d\n", nonBlockCheck);
+				continue;
+			}
+		#else
+			nonBlockCheck = fcntl(m_socket, F_SETFL, O_NONBLOCK);
+			if(nonBlockCheck < 0)
+    		{
+				printf("Failed to set non-blocking: %d\n", nonBlockCheck);
+				continue;
+    		}
+		#endif
+
+		//Open the socket so that it will listen to incoming signals
+		if (listen(m_socket, SOMAXCONN) == SOCKET_ERROR)
+		{
+			continue;
+		}
+
+		break;
+	}
+
+	// Grab host IP address
+
+	char l_ipAddress[INET_ADDRSTRLEN];
+
+	// For some reason, just doing it with the connection result gives 0.0.0.0
+	gethostname(l_ipAddress, INET_ADDRSTRLEN);
+	getaddrinfo(l_ipAddress, std::to_string(_port).c_str(), &hints, &result);
+
+	sockaddr_in* l_address = (struct sockaddr_in*)result->ai_addr;
+	inet_ntop(AF_INET, &(l_address->sin_addr), l_ipAddress, sizeof(l_ipAddress));
 
 	freeaddrinfo(result);
 
-	//Next  to get the IP address of the Server another socket is opened and probed for it's IPv4 address
-	int sock = socket(AF_INET, SOCK_DGRAM, 0);
-
-	if (sock == -1) {
-		throw std::runtime_error("Could not socket\n");
-	}
-
-	sockaddr_in loopback;
-	//loopback needs to have properties set
-	loopback.sin_family = AF_INET;
-	loopback.sin_addr.s_addr = 1337;
-	
-	// using whatever port
-	loopback.sin_port = htons(9);
-
-	//connect socket at loopback address
-	if (connect(sock, reinterpret_cast<sockaddr*>(&loopback), sizeof(loopback)) == -1)
-	{
-		#if _WIN32
-			::closesocket(sock);
-		#else
-			close(sock);
-		#endif
-		throw std::runtime_error("Could not connect\n");
-	}
-
-	// Get socket information from loopback
-	socklen_t addrlen = sizeof(loopback);
-	if (getsockname(sock, reinterpret_cast<sockaddr*>(&loopback), &addrlen) == -1)
-	{
-		#if _WIN32
-			::closesocket(sock);
-		#else
-			close(sock);
-		#endif
-		throw std::runtime_error("Could not getsockname\n");
-	}
-
-	// Socket is no longer needed
-	#if _WIN32
-		::closesocket(sock);
-	#else
-		close(sock);
-	#endif
-
-	// Get the ip address from loopback's socket information
-	char buffer[22];
-	if (inet_ntop(AF_INET, &loopback.sin_addr, buffer, INET_ADDRSTRLEN) == 0x0)
-	{
-		throw std::runtime_error("Could not inet_ntop\n");
-	}
-
-	m_ipAddress = buffer;
-
-	//printf("IP: %s\n", m_ipAddress.c_str());
+	m_ipAddress = l_ipAddress;
 }
 
 ServerSocket::~ServerSocket()
@@ -175,7 +144,7 @@ pugi::xml_document ServerSocket::Update()
 
 	if (client)
 	{
-		//printf("Client Connected!\n");
+		printf("Client Connected!\n");
 
 		m_clients.push_back(client);
 	}
@@ -201,7 +170,7 @@ pugi::xml_document ServerSocket::Update()
 
 		if(clientMessageAsString != "")
 		{
-			//printf("Message recieved as server: %s\n", clientMessageAsString.c_str());
+			printf("Message recieved as server: %s\n", clientMessageAsString.c_str());
 
 
 			//Parse client message into xml and pass up to Server

@@ -23,7 +23,7 @@ Server::Server(int _port) :
 	// Also using fltk timeout gets messed up when you have too many timers aparrently
 	// Also it needs to be a pointer so that it can be instantiated here, after the server and lobby have been instantiated
 	m_networkingThread = std::thread(&Server::MonitorNetwork, this);
-	m_networkingThread.detach();
+	// m_networkingThread.detach();
 }
 
 Server::~Server()
@@ -31,33 +31,11 @@ Server::~Server()
 
 }
 
-/* msleep(): Sleep for the requested number of milliseconds. Godspeed, random stackoverflow person */
-int msleep(long msec)
-{
-    struct timespec ts;
-    int res;
-
-    if (msec < 0)
-    {
-        errno = EINVAL;
-        return -1;
-    }
-
-    ts.tv_sec = msec / 1000;
-    ts.tv_nsec = (msec % 1000) * 1000000;
-
-    do 
-	{
-        res = nanosleep(&ts, &ts);
-    } while (res && errno == EINTR);
-
-    return res;
-}
-
 void Server::MonitorNetwork()
 {
 	while (!m_serverClosed)
 	{
+		printf("Monitoring server\n");
 		//Get repackaged xml message from serversocket
 		pugi::xml_document eventsFromClient = m_socket.Update();
 
@@ -81,6 +59,8 @@ void Server::MonitorNetwork()
 					int newPlayersId = m_records.CreateNewPlayer();
 					m_socket.SetNewPlayerID(m_records.FindPlayer(newPlayersId));
 					currentEvent.append_attribute("id").set_value(newPlayersId);
+
+					printf("New player created\n");
 					
 				}
 				else if (eventName == "plr_leave")
@@ -109,18 +89,26 @@ void Server::MonitorNetwork()
 				m_records.LogEvent(currentEvent);
 				//Only other event types are 'new_message' and 'close_server', but that is handled by individual clients
 			}
-
-			// Prevents server from throttling
-			#if _WIN32
-				Sleep(20);
-			#else
-				msleep(20);
-			#endif
-
 			//Echo events out to the clients
 			m_socket.Send(eventsFromClient);
+			printf("Messages sent\n");
 		}
+		else
+		{
+			printf("No messages\n");
+		}
+
+		// Prevents server from throttling
+		#if _WIN32
+			Sleep(20);
+		#else
+			usleep(20000);
+		#endif
+
+		printf("Finished sleeping\n");
 	}
+
+	printf("Closing server\n");
 }
 
 bool Server::CloseServer()
