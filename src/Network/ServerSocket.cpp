@@ -52,6 +52,7 @@ ServerSocket::ServerSocket(int _port) :
 		//Bind address to socket (give socket an ip address for others to connect to)
 		if (bind(m_socket, result->ai_addr, result->ai_addrlen) == SOCKET_ERROR)
 		{
+			printf("Failed to bind socket");
 			#if _WIN32
 				closesocket(m_socket);
 			#else
@@ -61,6 +62,9 @@ ServerSocket::ServerSocket(int _port) :
 			continue;
 			//throw std::runtime_error("Failed to bind socket");
 		}
+
+
+		printf("Socket bound");
 
 		//Set non-blocking
 		u_long mode = 1;
@@ -73,8 +77,8 @@ ServerSocket::ServerSocket(int _port) :
 				continue;
 			}
 		#else
-			nonBlockCheck = fcntl(m_socket, F_SETFL, O_NONBLOCK);
-			if(nonBlockCheck < 0)
+			nonBlockCheck = fcntl(m_socket, F_SETFL, fcntl(m_socket, F_GETFL, 0) | O_NONBLOCK);
+			if(nonBlockCheck == -1)
     		{
 				printf("Failed to set non-blocking: %d\n", nonBlockCheck);
 				continue;

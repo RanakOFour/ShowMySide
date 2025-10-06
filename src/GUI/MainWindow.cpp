@@ -91,14 +91,19 @@ void MainWindow::OnTick()
 {
 	if (m_Client && m_Client->Closed())
 	{
+		printf("Closing client");
+		
 		if (m_Server)
 		{
 			m_Server->CloseServer();
-			m_Server = nullptr;
+			Server* l_server = m_Server.release();
+			delete l_server;
 		}
 
 		m_lobbyEventLogDisplay.buffer(NULL);
-		m_Client = nullptr;
+
+		Client* l_client = m_Client.release();
+		delete l_client;
 
 		ChangeLayout(LayoutType::SPLASH_SCREEN);
 	}
