@@ -25,7 +25,7 @@ Blowfish::Blowfish() :
 	sBox{ 0 }
 {
 	// Load pBox values 
-	std::fstream file("./text/pBox.txt");
+	std::fstream file("./resources/text/pBox.txt");
 	std::string currentBox;
 
 	int i = 0;
@@ -51,7 +51,7 @@ Blowfish::Blowfish() :
 		int j = 0;
 		int k = 0;
 		int readCount{ 0 };
-		std::string path = "./text/s" + std::to_string(i + 1) + ".txt";
+		std::string path = "./resources/text/s" + std::to_string(i + 1) + ".txt";
 		file.open(path.c_str());
 
 		while (std::getline(file, currentBox))

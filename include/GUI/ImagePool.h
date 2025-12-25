@@ -21,6 +21,7 @@ class ImagePool
 {
 
 private:
+	static ImagePool* m_self;
 	std::shared_ptr<Fl_PNG_Image> m_images[7];
 	ImagePool();
 

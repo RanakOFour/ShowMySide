@@ -24,7 +24,7 @@ MainWindow::MainWindow(int _w, int _h, std::string _name)
 	Fl_Double_Window(200, 200, _w, _h, "Show My Side"),
 	m_Client(nullptr),
 	m_Server(nullptr),
-	m_aboutText("./text/about.txt", _w, _h),
+	m_aboutText("./resources/text/about.txt", _w, _h),
 	m_menuWrapper(this),
 	m_splashImage(100, 100, _w - 200, _h - 200, ""),
 	m_ipInput(100, 100, 120, 25, "Enter IP here: "),
