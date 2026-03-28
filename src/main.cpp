@@ -19,5 +19,9 @@ int main(int argc, char** argv)
 	MainWindow win(640, 360, "ShowMySide");
 	win.show();
 
-	return Fl::run();
+	Fl::run();
+
+	Blowfish::Stop();
+
+	return 0;
 }
