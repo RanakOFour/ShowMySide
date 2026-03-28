@@ -79,6 +79,11 @@ int ServerRecords::CreateNewPlayer()
 void ServerRecords::RemovePlayer(int _id)
 {
 	int playerIndex = FindPlayer(_id);
+	if (playerIndex < 0)
+	{
+		printf("RemovePlayer: player id %d not found\n", _id);
+		return;
+	}
 
 	std::shared_ptr<PlayerInfo> deletedPlayer = m_playerInfos[playerIndex];
 	m_lobbyInfo.first_child().remove_child(*m_playerXML[playerIndex].get());
@@ -89,6 +94,11 @@ void ServerRecords::RemovePlayer(int _id)
 void ServerRecords::ChangeAttribute(int _id, std::string _attributeName, std::string& _newValue)
 {
 	int playerIndex = FindPlayer(_id);
+	if (playerIndex < 0)
+	{
+		printf("ChangeAttribute: player id %d not found\n", _id);
+		return;
+	}
 
 	m_playerInfos[playerIndex]->ChangeAttribute(_attributeName, _newValue);
 	m_playerXML[playerIndex]->attribute(_attributeName.c_str()).set_value(_newValue.c_str());

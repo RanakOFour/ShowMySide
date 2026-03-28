@@ -42,7 +42,7 @@ void Messagebox::DisplayMessage(std::string& _message)
 {
 	//fl_alert("Message to show: %s", _message.c_str());
 
-	if (m_textBox.value() != "")
+	if (m_textBox.value() != nullptr && m_textBox.value()[0] != '\0')
 	{
 		m_textBox.value(_message.c_str());
 

@@ -4,6 +4,8 @@
 #include <string>
 #include <memory>
 #include <stdexcept>
+#include <cstdint>
+#include <vector>
 
 #if _WIN32
 	#include <ws2tcpip.h>
@@ -15,6 +17,7 @@
 	#include <netinet/in.h>
 	#include <netdb.h>
 	#include <fcntl.h>
+	#include <errno.h>
 	#define INVALID_SOCKET (~0)
 	#define SOCKET_ERROR (-1)
 #endif
@@ -62,7 +65,7 @@ bool ClientSocket::Connect(std::string& _serverName)
 
 	for(addrinfo* p = result; p != NULL; p = p->ai_next)
 	{
-        m_socket = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
+        m_socket = socket(p->ai_family, p->ai_socktype, p->ai_protocol);
 		if(m_socket == INVALID_SOCKET)
 		{
 			//throw std::runtime_error("Could not connect socket");
@@ -80,6 +83,19 @@ bool ClientSocket::Connect(std::string& _serverName)
         break;
     }
 
+	freeaddrinfo(result);
+
+	if (m_socket == INVALID_SOCKET)
+	{
+		printf("Unable to connect to server!\n");
+		
+		#if _WIN32
+			WSACleanup();
+		#endif
+
+		return false;
+	}
+
 	u_long mode = 1;
 
 	#if _WIN32
@@ -93,19 +109,6 @@ bool ClientSocket::Connect(std::string& _serverName)
         	throw std::runtime_error("Failed to set non-blocking\n");
     	}
 	#endif
-
-	freeaddrinfo(result);
-
-	if (m_socket == INVALID_SOCKET)
-	{
-		printf("Unable to connect to server!\n");
-		
-		#if _WIN32
-			WSACleanup();
-		#endif
-
-		return false;
-	}
 
 	return true;
 }
@@ -164,69 +167,98 @@ void ClientSocket::Send(std::string& _message)
 {
 	std::vector<char> encryptedXML;
 	Blowfish::Encrypt(_message, encryptedXML);
-	std::string messageToSend = std::string(encryptedXML.begin(), encryptedXML.end());
 
-	int bytes = send(m_socket, messageToSend.c_str(), messageToSend.length(), 0);
-	if (bytes <= 0)
+	// Prefix a 4-byte little-endian length so the receiver can always
+	// extract exactly one complete message even if two arrive in one recv().
+	uint32_t len = (uint32_t)encryptedXML.size();
+	std::vector<char> frame(4 + encryptedXML.size());
+	frame[0] = (char)((len >>  0) & 0xFF);
+	frame[1] = (char)((len >>  8) & 0xFF);
+	frame[2] = (char)((len >> 16) & 0xFF);
+	frame[3] = (char)((len >> 24) & 0xFF);
+	std::copy(encryptedXML.begin(), encryptedXML.end(), frame.begin() + 4);
+
+	size_t totalSent = 0;
+	while (totalSent < frame.size())
 	{
-		throw std::runtime_error("Failed to send data!\n");
+		int bytes = ::send(m_socket, frame.data() + totalSent, (int)(frame.size() - totalSent), 0);
+		if (bytes < 0)
+		{
+			#if _WIN32
+				if (WSAGetLastError() != WSAEWOULDBLOCK)
+					throw std::runtime_error("Failed to send data!\n");
+			#else
+				if (errno != EAGAIN && errno != EWOULDBLOCK)
+					throw std::runtime_error("Failed to send data!\n");
+			#endif
+			// Send buffer temporarily full — drop this message rather than block
+			printf("Send would block on socket %d, dropping\n", (int)m_socket);
+			return;
+		}
+		if (bytes == 0)
+			throw std::runtime_error("Connection closed during send\n");
+		totalSent += (size_t)bytes;
 	}
-	else
-	{
-		printf("Bytes sent on socket %d: %d\n", (int)m_socket, bytes);
-	}
+	printf("Bytes sent on socket %d: %zu\n", (int)m_socket, totalSent);
 }
 
 void ClientSocket::Receive(std::string& _message)
 {
 	if (m_closed)
-	{
 		return;
-	}
 
-	std::string receivedText;
-	std::string currentTextPull;
-	int totalBytes{ 0 };
-
-	do
+	// Drain the socket into the persistent buffer
 	{
-		currentTextPull = "";
-		char buffer[256] = { 0 };
-		int bytes = ::recv(m_socket, buffer, sizeof(buffer) - 1, 0);
-
-		//Leave the loop when bytes returns WSAEWOULDBLOCK
-		// It is a non-fatal error and just means that the non-blocking socket couldn't do it's thing
-		if (bytes == SOCKET_ERROR || bytes < 0)
+		char buf[4096];
+		for (;;)
 		{
-			#if _WIN32
-				if (WSAGetLastError() != WSAEWOULDBLOCK)
-				{
-					throw std::runtime_error("Read failed");
-				}
-			#endif
-
-			break;
+			int bytes = ::recv(m_socket, buf, sizeof(buf), 0);
+			if (bytes > 0)
+			{
+				m_receiveBuffer.append(buf, (size_t)bytes);
+			}
+			else if (bytes == 0)
+			{
+				// Peer closed connection cleanly
+				break;
+			}
+			else
+			{
+				#if _WIN32
+					if (WSAGetLastError() != WSAEWOULDBLOCK)
+						throw std::runtime_error("Read failed");
+				#else
+					if (errno != EAGAIN && errno != EWOULDBLOCK)
+						throw std::runtime_error("Read failed");
+				#endif
+				break; // EAGAIN — no more data right now
+			}
 		}
-
-		currentTextPull.append(buffer, bytes);
-		receivedText.append(currentTextPull);
-
-		totalBytes += bytes;
-
-		printf("Current bytes: %d", totalBytes);
-	} while (currentTextPull != "");
-
-	if (receivedText == "")
-	{
-		return;
 	}
 
-	printf("Bytes recieved: %d\n", totalBytes);
+	// Extract one complete length-prefixed frame from the buffer.
+	// The sender prepends a 4-byte little-endian payload length before the
+	// encrypted data, so two back-to-back messages never get merged.
+	if (m_receiveBuffer.size() < 4)
+		return; // length header not yet complete
+
+	uint32_t payloadLen =
+		((uint8_t)m_receiveBuffer[0]) |
+		((uint8_t)m_receiveBuffer[1] << 8) |
+		((uint8_t)m_receiveBuffer[2] << 16) |
+		((uint8_t)m_receiveBuffer[3] << 24);
+
+	if (m_receiveBuffer.size() < 4 + payloadLen)
+		return; // payload not yet complete
+
+	printf("Bytes received on socket %d: %u\n", (int)m_socket, payloadLen);
+
+	std::string encrypted = m_receiveBuffer.substr(4, payloadLen);
+	m_receiveBuffer.erase(0, 4 + payloadLen); // leave any next message for the next tick
 
 	std::vector<char> decryptedChar;
-	Blowfish::Decrypt(receivedText, decryptedChar);
+	Blowfish::Decrypt(encrypted, decryptedChar);
 	_message = std::string(decryptedChar.begin(), decryptedChar.end());
-	//printf("Decrypt Pre: %s\nDecrypt Post: %s\n", encrypedMessage.c_str(), _message.c_str());
 }
 
 void ClientSocket::CloseConnection()

@@ -7,17 +7,21 @@
 #include <stdint.h>
 #include <memory>
 
-
-
-// The compiler does not agree with this being a smart pointer
-static Blowfish* m_self;
+// Out-of-line definition required for static member (C++14 and earlier)
+std::shared_ptr<Blowfish> Blowfish::m_self = nullptr;
 
 void Blowfish::Initialise()
 {
 	if (m_self == nullptr)
 	{
-		m_self = new Blowfish();
+		Blowfish* l_blowfish = new Blowfish();
+		m_self = std::shared_ptr<Blowfish>(l_blowfish);
 	}
+}
+
+void Blowfish::Stop()
+{
+	m_self.reset();
 }
 
 Blowfish::Blowfish() :

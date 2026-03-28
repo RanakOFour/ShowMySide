@@ -12,4 +12,4 @@ add_subdirectory(extern/pugixml)
 target_include_directories(ShowMySide PRIVATE include extern extern/pugixml)
 target_link_directories(ShowMySide PRIVATE lib)
 
-target_link_libraries(ShowMySide PRIVATE fltk fltk_images fltk_png fltk_forms fltk_z)
+target_link_libraries(ShowMySide PRIVATE fltk fltk_images fltk_png fltk_forms fltk_z X11 Xrender)

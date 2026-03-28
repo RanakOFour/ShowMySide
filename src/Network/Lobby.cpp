@@ -63,12 +63,17 @@ void Lobby::HandleMouseEvent(int _mouseButton)
 
 	// That is dumb, if it's needed it shouldn't be private, different approach required
 	// ClientPlayer : Player with Create__Event()?
-	// :thumbs_up:
 	if (_mouseButton == FL_LEFT_MOUSE && !m_chatBox.visible())
 	{
-		
-		pugi::xml_document newEvent = m_clientPlayer->CreateMovementEvent(Fl::event_x(), Fl::event_y());
-		m_events.first_child().append_copy(newEvent.first_child());
+		if(m_clientPlayer)
+		{
+			pugi::xml_document newEvent = m_clientPlayer->CreateMovementEvent(Fl::event_x(), Fl::event_y());
+			m_events.first_child().append_copy(newEvent.first_child());
+		}
+		else
+		{
+			printf("Player not found, cannot create movement event\n");
+		}
 	}
 }
 

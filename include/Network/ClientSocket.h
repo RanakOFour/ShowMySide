@@ -1,4 +1,5 @@
 #include <string>
+#include <cstdint>
 
 #if _WIN32
 	#include <winsock2.h>
@@ -23,6 +24,7 @@ private:
 	SOCKET m_socket;
 	bool m_closed;
 	int m_id;
+	std::string m_receiveBuffer; // accumulates partial data between Receive() calls
 
 public:
 	ClientSocket();

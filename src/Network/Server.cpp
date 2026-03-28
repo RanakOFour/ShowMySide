@@ -23,7 +23,7 @@ Server::Server(int _port) :
 	// Also using fltk timeout gets messed up when you have too many timers aparrently
 	// Also it needs to be a pointer so that it can be instantiated here, after the server and lobby have been instantiated
 	m_networkingThread = std::thread(&Server::MonitorNetwork, this);
-	m_networkingThread.detach();
+	// Do NOT detach — CloseServer() joins this thread to stop it cleanly.
 }
 
 Server::~Server()
@@ -86,7 +86,6 @@ void Server::MonitorNetwork()
 					m_socket.SendTo(m_records.FindPlayer(currentEvent.attribute("id").as_int()), m_records.AsXMLString());
 				}
 
-				m_records.LogEvent(currentEvent);
 				//Only other event types are 'new_message' and 'close_server', but that is handled by individual clients
 			}
 			//Echo events out to the clients

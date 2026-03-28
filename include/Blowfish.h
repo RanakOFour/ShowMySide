@@ -61,6 +61,8 @@ private:
 
 	Blowfish();
 
+	static std::shared_ptr<Blowfish> m_self;
+
 public:
 	~Blowfish();
 
@@ -78,6 +80,7 @@ public:
 		which is used to call the non-static functions.
 	*/
 	static void Initialise();
+	static void Stop();
 	///@}
 };
 

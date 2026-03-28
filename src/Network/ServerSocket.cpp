@@ -13,6 +13,7 @@
 	#include <netdb.h>
 	#include <arpa/inet.h>
 	#include <fcntl.h>
+	#include <errno.h>
 	#define INVALID_SOCKET (~0)
 	#define SOCKET_ERROR (-1)
 #endif
@@ -42,15 +43,19 @@ ServerSocket::ServerSocket(int _port) :
 
 	for(addrinfo* p = result; p != NULL; p = p->ai_next)
 	{
-		m_socket = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
+		m_socket = socket(p->ai_family, p->ai_socktype, p->ai_protocol);
 		if(m_socket == INVALID_SOCKET)
 		{
 			//throw std::runtime_error("Could not connect socket");
 			continue;
 		}
 
+		// Allow reuse of the port immediately after server restart
+		int opt = 1;
+		setsockopt(m_socket, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
+
 		//Bind address to socket (give socket an ip address for others to connect to)
-		if (bind(m_socket, result->ai_addr, result->ai_addrlen) == SOCKET_ERROR)
+		if (bind(m_socket, p->ai_addr, p->ai_addrlen) == SOCKET_ERROR)
 		{
 			printf("Failed to bind socket");
 			#if _WIN32
@@ -58,6 +63,7 @@ ServerSocket::ServerSocket(int _port) :
 			#else
 				close(m_socket);
 			#endif
+			m_socket = INVALID_SOCKET;
 
 			continue;
 			//throw std::runtime_error("Failed to bind socket");
@@ -92,6 +98,14 @@ ServerSocket::ServerSocket(int _port) :
 		}
 
 		break;
+	}
+
+	freeaddrinfo(result);
+	result = NULL;
+
+	if (m_socket == INVALID_SOCKET)
+	{
+		throw std::runtime_error("Failed to bind and listen on any address");
 	}
 
 	// Grab host IP address
@@ -129,9 +143,31 @@ std::shared_ptr<ClientSocket> ServerSocket::Accept()
 			{
 				throw std::runtime_error("Failed to accept socket");
 			}
+		#else
+			if (errno != EAGAIN && errno != EWOULDBLOCK)
+			{
+				throw std::runtime_error("Failed to accept socket");
+			}
 		#endif
 		return std::shared_ptr<ClientSocket>(); // Equivalent to NULL
 	}
+
+	// Set accepted socket to non-blocking so Receive() doesn't block the server thread
+	#if _WIN32
+		u_long mode = 1;
+		if (ioctlsocket(socket, FIONBIO, &mode) == SOCKET_ERROR)
+		{
+			closesocket(socket);
+			throw std::runtime_error("Failed to set accepted socket non-blocking");
+		}
+	#else
+		if (fcntl(socket, F_SETFL, fcntl(socket, F_GETFL, 0) | O_NONBLOCK) == -1)
+		{
+			close(socket);
+			throw std::runtime_error("Failed to set accepted socket non-blocking");
+		}
+	#endif
+
 	std::shared_ptr<ClientSocket> rtn = std::make_shared<ClientSocket>();
 	rtn->m_socket = socket;
 	return rtn;
