@@ -72,7 +72,7 @@
  *
  */
  
-/* #undef FLTK_USE_CAIRO */
+#define FLTK_USE_CAIRO 1
 
 
 /*
@@ -82,7 +82,7 @@
  *
  */
 
-/* #undef FLTK_USE_WAYLAND */
+#define FLTK_USE_WAYLAND 1
 
 
 /*

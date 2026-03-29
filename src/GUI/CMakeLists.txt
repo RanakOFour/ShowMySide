@@ -1,2 +1,2 @@
-file(GLOB SRCES *.cpp)
-target_sources(ShowMySide PUBLIC ${SRCES})
+file(GLOB SRCS *.cpp)
+target_sources(ShowMySide PUBLIC ${SRCS})
